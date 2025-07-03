@@ -1,0 +1,47 @@
+{
+  "Id": "e9290c46-57be-44ec-8e0d-72302483cc7c",
+  "Key": "god-of-war-ragnarök",
+  "Name": "God of War: Ragnarök",
+  "Description": "Kontynuacja przygód Kratosa w mitologii nordyckiej",
+  "Price": 61.0,
+  "UnitInStock": 25,
+  "Discontinued": 10,
+  "PublisherId": "d5b83dbd-3a41-4f3a-8dcf-8be4f11ccbf1",
+  "Publisher": {
+    "Id": "d5b83dbd-3a41-4f3a-8dcf-8be4f11ccbf1",
+    "CompanyName": "Bethesda Softworks",
+    "Description": "Amerykanski wydawca gier komputerowych, znany z serii The Elder Scrolls i Fallout.",
+    "HomePage": "https://bethesda.net",
+    "Games": []
+  },
+  "GameGenres": [
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "e9290c46-57be-44ec-8e0d-72302483cc7c",
+      "GenreId": "85e13f87-0f54-4774-9fce-d225ef5e097e",
+      "Genre": {
+        "Id": "85e13f87-0f54-4774-9fce-d225ef5e097e",
+        "Name": "RPG",
+        "ParentGenreId": null,
+        "ParentGenre": null,
+        "ChildGenres": null,
+        "GameGenres": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    }
+  ],
+  "GamePlatforms": [
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "e9290c46-57be-44ec-8e0d-72302483cc7c",
+      "PlatformId": "4fd85116-83d9-4a1f-877d-33ad77d34592",
+      "Platform": {
+        "Id": "4fd85116-83d9-4a1f-877d-33ad77d34592",
+        "Type": "PlayStation 5",
+        "GamePlatforms": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    }
+  ],
+  "GameFile": null
+}

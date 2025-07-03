@@ -1,0 +1,69 @@
+{
+  "Id": "1988ac7b-6e53-4063-9d6f-8cb70cfcc1e2",
+  "Key": "the-witcher-3-wild-hunt",
+  "Name": "The Witcher 3: Wild Hunt",
+  "Description": "Epicka gra RPG oparta na prozie Andrzeja Sapkowskiego",
+  "Price": 39.0,
+  "UnitInStock": 15,
+  "Discontinued": 10,
+  "PublisherId": "ce8a46b7-91d5-4316-bf72-8b57551054e5",
+  "Publisher": {
+    "Id": "ce8a46b7-91d5-4316-bf72-8b57551054e5",
+    "CompanyName": "CD Projekt Red",
+    "Description": "Polski producent gier komputerowych, znany z serii Wiedzmin oraz Cyberpunk 2077.",
+    "HomePage": "https://www.cdprojektred.com",
+    "Games": []
+  },
+  "GameGenres": [
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "1988ac7b-6e53-4063-9d6f-8cb70cfcc1e2",
+      "GenreId": "85e13f87-0f54-4774-9fce-d225ef5e097e",
+      "Genre": {
+        "Id": "85e13f87-0f54-4774-9fce-d225ef5e097e",
+        "Name": "RPG",
+        "ParentGenreId": null,
+        "ParentGenre": null,
+        "ChildGenres": null,
+        "GameGenres": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    }
+  ],
+  "GamePlatforms": [
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "1988ac7b-6e53-4063-9d6f-8cb70cfcc1e2",
+      "PlatformId": "4fd85116-83d9-4a1f-877d-33ad77d34592",
+      "Platform": {
+        "Id": "4fd85116-83d9-4a1f-877d-33ad77d34592",
+        "Type": "PlayStation 5",
+        "GamePlatforms": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    },
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "1988ac7b-6e53-4063-9d6f-8cb70cfcc1e2",
+      "PlatformId": "f6e20ace-d049-4a19-95b3-758b616bcff2",
+      "Platform": {
+        "Id": "f6e20ace-d049-4a19-95b3-758b616bcff2",
+        "Type": "PC",
+        "GamePlatforms": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    },
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "1988ac7b-6e53-4063-9d6f-8cb70cfcc1e2",
+      "PlatformId": "bce469f3-5153-4dcc-9349-cd6fdf602cc6",
+      "Platform": {
+        "Id": "bce469f3-5153-4dcc-9349-cd6fdf602cc6",
+        "Type": "PlayStation 4",
+        "GamePlatforms": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    }
+  ],
+  "GameFile": null
+}

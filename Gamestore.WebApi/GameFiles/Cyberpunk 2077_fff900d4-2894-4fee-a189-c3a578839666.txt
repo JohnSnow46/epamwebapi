@@ -1,0 +1,83 @@
+{
+  "Id": "fff900d4-2894-4fee-a189-c3a578839666",
+  "Key": "cyberpunk-2077",
+  "Name": "Cyberpunk 2077",
+  "Description": "Futurystyczna gra RPG osadzona w dystopijnym Night City",
+  "Price": 59.0,
+  "UnitInStock": 20,
+  "Discontinued": 10,
+  "PublisherId": "ce8a46b7-91d5-4316-bf72-8b57551054e5",
+  "Publisher": {
+    "Id": "ce8a46b7-91d5-4316-bf72-8b57551054e5",
+    "CompanyName": "CD Projekt Red",
+    "Description": "Polski producent gier komputerowych, znany z serii Wiedzmin oraz Cyberpunk 2077.",
+    "HomePage": "https://www.cdprojektred.com",
+    "Games": []
+  },
+  "GameGenres": [
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "fff900d4-2894-4fee-a189-c3a578839666",
+      "GenreId": "95c0c86c-9006-4901-ad27-cc7449b44d38",
+      "Genre": {
+        "Id": "95c0c86c-9006-4901-ad27-cc7449b44d38",
+        "Name": "Simulation",
+        "ParentGenreId": null,
+        "ParentGenre": null,
+        "ChildGenres": null,
+        "GameGenres": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    },
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "fff900d4-2894-4fee-a189-c3a578839666",
+      "GenreId": "85e13f87-0f54-4774-9fce-d225ef5e097e",
+      "Genre": {
+        "Id": "85e13f87-0f54-4774-9fce-d225ef5e097e",
+        "Name": "RPG",
+        "ParentGenreId": null,
+        "ParentGenre": null,
+        "ChildGenres": null,
+        "GameGenres": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    }
+  ],
+  "GamePlatforms": [
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "fff900d4-2894-4fee-a189-c3a578839666",
+      "PlatformId": "4fd85116-83d9-4a1f-877d-33ad77d34592",
+      "Platform": {
+        "Id": "4fd85116-83d9-4a1f-877d-33ad77d34592",
+        "Type": "PlayStation 5",
+        "GamePlatforms": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    },
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "fff900d4-2894-4fee-a189-c3a578839666",
+      "PlatformId": "f6e20ace-d049-4a19-95b3-758b616bcff2",
+      "Platform": {
+        "Id": "f6e20ace-d049-4a19-95b3-758b616bcff2",
+        "Type": "PC",
+        "GamePlatforms": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    },
+    {
+      "Id": "00000000-0000-0000-0000-000000000000",
+      "GameId": "fff900d4-2894-4fee-a189-c3a578839666",
+      "PlatformId": "bce469f3-5153-4dcc-9349-cd6fdf602cc6",
+      "Platform": {
+        "Id": "bce469f3-5153-4dcc-9349-cd6fdf602cc6",
+        "Type": "PlayStation 4",
+        "GamePlatforms": []
+      },
+      "CreatedAt": "0001-01-01T00:00:00"
+    }
+  ],
+  "GameFile": null
+}
