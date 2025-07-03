@@ -16,6 +16,8 @@ using Gamestore.Services.Interfaces;
 using Gamestore.Data.Interfaces;
 using Gamestore.Data.Repositories;
 using Gamestore.Data.Data;
+using Gamestore.Services.Services.Orders;
+using Gamestore.Services.Services.Payment;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -248,6 +250,12 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<IDatabaseRoleService, DatabaseRoleService>();
     builder.Services.AddScoped<IRoleManagementService, RoleManagementService>();
     builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+
+    // Orders and Payment Services
+    builder.Services.AddScoped<ICartService, CartService>();
+    builder.Services.AddScoped<IOrderService, OrderService>();
+    builder.Services.AddScoped<IPaymentService, PaymentService>();
+    builder.Services.AddScoped<IPaymentMicroserviceClient, PaymentMicroserviceClient>();
 }
 
 static void ConfigureExternalAuthService(WebApplicationBuilder builder)
