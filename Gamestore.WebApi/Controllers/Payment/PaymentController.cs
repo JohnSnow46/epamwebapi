@@ -112,17 +112,46 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
         }
     }
 
-    private OkObjectResult HandleBankPaymentResponse(PaymentResponseDto result)
+    private IActionResult HandleBankPaymentResponse(PaymentResponseDto result)
     {
+        _logger.LogInformation("Handling bank payment response. Success: {Success}, HasData: {HasData}",
+            result.Success, result.Data != null);
+
         if (result.Data is not null)
         {
-            var data = result.Data as dynamic;
-            var invoiceBytes = Convert.FromBase64String(data?.InvoiceFile?.ToString() ?? "");
-            var fileName = data?.FileName?.ToString() ?? "invoice.pdf";
+            try
+            {
+                // Sprawdź typ obiektu
+                _logger.LogInformation("Data type: {Type}", result.Data.GetType().Name);
 
-            return File(invoiceBytes, "application/pdf", fileName);
+                // Konwertuj na JObject lub Dictionary aby bezpiecznie sprawdzić właściwości
+                var dataDict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(
+                    System.Text.Json.JsonSerializer.Serialize(result.Data));
+
+#pragma warning disable CA1854 // Prefer the 'IDictionary.TryGetValue(TKey, out TValue)' method
+                if (dataDict != null && dataDict.ContainsKey("InvoiceFile") && dataDict.ContainsKey("FileName"))
+                {
+                    var invoiceFileBase64 = dataDict["InvoiceFile"].ToString();
+                    var fileName = dataDict["FileName"].ToString();
+
+                    var invoiceBytes = Convert.FromBase64String(invoiceFileBase64);
+                    return File(invoiceBytes, "text/plain", "invoice.txt");
+                }
+                else
+                {
+                    _logger.LogWarning("Bank payment data missing InvoiceFile or FileName properties");
+                    return Ok(result);
+                }
+#pragma warning restore CA1854 // Prefer the 'IDictionary.TryGetValue(TKey, out TValue)' method
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing bank payment response");
+                return Ok(result);
+            }
         }
 
+        _logger.LogWarning("Bank payment response has no data");
         return Ok(result);
     }
 

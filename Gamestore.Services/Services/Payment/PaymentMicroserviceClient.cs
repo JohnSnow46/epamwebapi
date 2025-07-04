@@ -18,29 +18,38 @@ public class PaymentMicroserviceClient(HttpClient httpClient, IConfiguration con
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
         PropertyNameCaseInsensitive = true
     };
-
     public async Task<bool> ProcessVisaPaymentAsync(VisaMicroserviceRequestDto request)
     {
         _logger.LogInformation("Processing Visa payment for amount {Amount}", request.TransactionAmount);
 
-        var json = JsonSerializer.Serialize(request, JsonOptions);
-        var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-        return await ExecuteWithRetryAsync(async () =>
+        try
         {
-            var response = await _httpClient.PostAsync("/api/payments/visa", content);
+            var json = JsonSerializer.Serialize(request, JsonOptions);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-            if (response.IsSuccessStatusCode)
+            _logger.LogDebug("Sending request to microservice: {Json}", json);
+
+            return await ExecuteWithRetryAsync(async () =>
             {
-                _logger.LogInformation("Visa payment processed successfully");
-                return true;
-            }
+                var response = await _httpClient.PostAsync("/api/payments/visa", content);
 
-            var errorContent = await response.Content.ReadAsStringAsync();
-            _logger.LogWarning("Visa payment failed with status {StatusCode}: {Error}",
-                response.StatusCode, errorContent);
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("Visa payment processed successfully");
+                    return true;
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                _logger.LogWarning("Visa payment failed with status {StatusCode}: {Error}",
+                    response.StatusCode, errorContent);
+                return false;
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while processing Visa payment");
             return false;
-        });
+        }
     }
 
     public async Task<bool> ProcessIBoxPaymentAsync(IBoxMicroserviceRequestDto request)
@@ -85,12 +94,11 @@ public class PaymentMicroserviceClient(HttpClient httpClient, IConfiguration con
                     return true;
                 }
 
-                // Payment failed, but might be due to the 10% failure rate
                 if (attempt < _maxRetries)
                 {
                     _logger.LogInformation("Payment attempt {Attempt} failed, retrying in {Delay}ms", attempt, delay);
                     await Task.Delay(delay);
-                    delay *= 2; // Exponential backoff
+                    delay *= 2;
                 }
             }
             catch (Exception ex)

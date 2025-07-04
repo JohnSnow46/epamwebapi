@@ -255,8 +255,16 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<ICartService, CartService>();
     builder.Services.AddScoped<IOrderService, OrderService>();
     builder.Services.AddScoped<IPaymentService, PaymentService>();
-    builder.Services.AddScoped<IPaymentMicroserviceClient, PaymentMicroserviceClient>();
     builder.Services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
+    builder.Services.AddHttpClient<IPaymentMicroserviceClient, PaymentMicroserviceClient>(client =>
+    {
+        var config = builder.Configuration;
+        var baseUrl = config["PaymentMicroservice:BaseUrl"] ?? "https://localhost:5001";
+        client.BaseAddress = new Uri(baseUrl);
+        client.Timeout = TimeSpan.FromSeconds(config.GetValue("PaymentMicroservice:Timeout", 30));
+
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
+    });
 }
 
 static void ConfigureExternalAuthService(WebApplicationBuilder builder)

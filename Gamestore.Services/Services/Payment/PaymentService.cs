@@ -25,26 +25,26 @@ public class PaymentService(
         _logger.LogInformation("Getting available payment methods");
 
         var paymentMethods = new List<PaymentMethodDto>
+    {
+        new()
         {
-            new()
-            {
-                Title = "Bank",
-                Description = "Pay via bank transfer using generated invoice",
-                ImageUrl = "/images/payment/bank.png"
-            },
-            new()
-            {
-                Title = "IBox terminal",
-                Description = "Pay using IBox terminal service",
-                ImageUrl = "/images/payment/ibox.png"
-            },
-            new()
-            {
-                Title = "Visa",
-                Description = "Pay with your Visa credit or debit card",
-                ImageUrl = "/images/payment/visa.png"
-            }
-        };
+            Title = "Bank",
+            Description = "Pay via bank transfer using generated invoice",
+            ImageUrl = "https://cdn-icons-png.flaticon.com/512/8043/8043680.png"
+        },
+        new()
+        {
+            Title = "IBox terminal",
+            Description = "Pay using IBox terminal service",
+            ImageUrl = "https://cdn-icons-png.flaticon.com/512/6008/6008615.png"
+        },
+        new()
+        {
+            Title = "Visa",
+            Description = "Pay with your Visa credit or debit card",
+            ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
+        }
+    };
 
         return new PaymentMethodsResponseDto { PaymentMethods = paymentMethods };
     }
@@ -74,10 +74,14 @@ public class PaymentService(
         try
         {
             var cart = await GetValidCartAsync(customerId);
+            _logger.LogInformation("✅ Cart found for bank payment");
+
             var orderTotal = await _unitOfWork.OrderGames.GetOrderTotalAsync(cart.Id);
+            _logger.LogInformation("✅ Order total calculated: {Total}", orderTotal);
 
             // Update order status to Checkout
             await _unitOfWork.Orders.UpdateOrderStatusAsync(cart.Id, OrderStatus.Checkout);
+            _logger.LogInformation("✅ Order status updated to Checkout");
 
             // Create payment transaction
             var transaction = new PaymentTransaction
@@ -88,6 +92,7 @@ public class PaymentService(
                 Status = PaymentStatus.Pending
             };
             await _unitOfWork.PaymentTransactions.AddAsync(transaction);
+            _logger.LogInformation("✅ Payment transaction created");
 
             // Generate bank invoice
             var invoice = new BankInvoiceDto
@@ -98,26 +103,32 @@ public class PaymentService(
                 ValidityDate = DateTime.UtcNow.AddDays(_bankInvoiceValidityDays),
                 Sum = orderTotal
             };
+            _logger.LogInformation("✅ Bank invoice DTO created");
 
             var pdfBytes = await _pdfGenerator.GenerateBankInvoicePdfAsync(invoice);
+            _logger.LogInformation("✅ PDF generated, size: {Size} bytes", pdfBytes.Length);
 
             await _unitOfWork.CompleteAsync();
+            _logger.LogInformation("✅ Database changes committed");
+
+            var responseData = new
+            {
+                InvoiceFile = Convert.ToBase64String(pdfBytes),
+                FileName = $"invoice_{cart.Id}.pdf",
+                ValidUntil = invoice.ValidityDate
+            };
+            _logger.LogInformation("✅ Response data created with InvoiceFile");
 
             return new PaymentResponseDto
             {
                 Success = true,
                 Message = "Bank invoice generated successfully",
-                Data = new
-                {
-                    InvoiceFile = Convert.ToBase64String(pdfBytes),
-                    FileName = $"invoice_{cart.Id}.pdf",
-                    ValidUntil = invoice.ValidityDate
-                }
+                Data = responseData
             };
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error processing bank payment for customer {CustomerId}", customerId);
+            _logger.LogError(ex, "❌ Error processing bank payment for customer {CustomerId}", customerId);
             return new PaymentResponseDto
             {
                 Success = false,
@@ -227,15 +238,14 @@ public class PaymentService(
             };
             await _unitOfWork.PaymentTransactions.AddAsync(transaction);
 
-            // Process with microservice
             var microserviceRequest = new VisaMicroserviceRequestDto
             {
-                TransactionAmount = orderTotal,              // Oblicz z koszyka
-                CardHolderName = visaData.Holder,           // holder -> cardHolderName  
-                CardNumber = visaData.CardNumber,           // cardNumber -> cardNumber (bez zmian)
-                ExpirationMonth = visaData.MonthExpire,     // monthExpire -> expirationMonth
-                ExpirationYear = visaData.YearExpire,       // yearExpire -> expirationYear  
-                Cvv = visaData.Cvv2                         // cvv2 -> cvv
+                TransactionAmount = orderTotal,
+                CardHolderName = visaData.Holder,
+                CardNumber = visaData.CardNumber,
+                ExpirationMonth = visaData.MonthExpire,
+                ExpirationYear = visaData.YearExpire,
+                Cvv = visaData.Cvv2
             };
 
             var paymentSuccess = await _microserviceClient.ProcessVisaPaymentAsync(microserviceRequest);

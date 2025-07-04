@@ -4,20 +4,23 @@ namespace Gamestore.Services.Dto.PaymentDto;
 public class VisaMicroserviceRequestDto
 {
     [Required]
-    public string Holder { get; set; } = string.Empty;
+    public decimal TransactionAmount { get; set; }
+
+    [Required]
+    public string CardHolderName { get; set; } = string.Empty;
 
     [Required]
     public string CardNumber { get; set; } = string.Empty;
 
     [Required]
     [Range(1, 12)]
-    public int MonthExpire { get; set; }
+    public int ExpirationMonth { get; set; }
 
     [Required]
     [Range(2024, 2099)]
-    public int YearExpire { get; set; }
+    public int ExpirationYear { get; set; }
 
     [Required]
     [Range(100, 9999)]
-    public int Cvv2 { get; set; }
+    public int Cvv { get; set; }
 }

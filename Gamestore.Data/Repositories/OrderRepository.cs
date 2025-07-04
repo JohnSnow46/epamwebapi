@@ -39,7 +39,8 @@ public class OrderRepository(GameCatalogDbContext context) : Repository<Order>(c
         return await _context.Orders
             .Include(o => o.OrderGames)
                 .ThenInclude(og => og.Product)
-            .FirstOrDefaultAsync(o => o.CustomerId == customerId && o.Status == OrderStatus.Open);
+            .FirstOrDefaultAsync(o => o.CustomerId == customerId &&
+                (o.Status == OrderStatus.Open || o.Status == OrderStatus.Checkout));
     }
 
     public async Task<IEnumerable<Order>> GetOrdersByStatusAsync(OrderStatus status)
