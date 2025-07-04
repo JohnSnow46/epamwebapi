@@ -230,12 +230,12 @@ public class PaymentService(
             // Process with microservice
             var microserviceRequest = new VisaMicroserviceRequestDto
             {
-                TransactionAmount = orderTotal,
-                CardHolderName = visaData.Holder,
-                CardNumber = visaData.CardNumber,
-                ExpirationMonth = visaData.MonthExpire,
-                ExpirationYear = visaData.YearExpire,
-                Cvv = visaData.Cvv2
+                TransactionAmount = orderTotal,              // Oblicz z koszyka
+                CardHolderName = visaData.Holder,           // holder -> cardHolderName  
+                CardNumber = visaData.CardNumber,           // cardNumber -> cardNumber (bez zmian)
+                ExpirationMonth = visaData.MonthExpire,     // monthExpire -> expirationMonth
+                ExpirationYear = visaData.YearExpire,       // yearExpire -> expirationYear  
+                Cvv = visaData.Cvv2                         // cvv2 -> cvv
             };
 
             var paymentSuccess = await _microserviceClient.ProcessVisaPaymentAsync(microserviceRequest);

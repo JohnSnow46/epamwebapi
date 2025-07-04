@@ -249,7 +249,7 @@ public class AuthController(
             var userRole = await _databaseRoleService.GetUserRoleAsync(email);
             await _databaseRoleService.UpdateUserAsync(user.Id);
 
-            var token = JwtHelper.GenerateToken(user.Email, user.FirstName, user.LastName, userRole);
+            var token = JwtHelper.GenerateToken(user.Email, user.FirstName, user.LastName, userRole, user.Id);
 
             _logger.LogInformation("✅ Database auth successful for: {Email}, Role: {Role}", email, userRole);
 
@@ -332,7 +332,8 @@ public class AuthController(
                 authResult.Email,
                 authResult.FirstName,
                 authResult.LastName,
-                userRole);
+                userRole,
+                existingUser.Id);
 
             _logger.LogInformation("✅ External auth successful for: {Email}, Role: {Role}", authResult.Email, userRole);
 

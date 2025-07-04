@@ -256,6 +256,7 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<IOrderService, OrderService>();
     builder.Services.AddScoped<IPaymentService, PaymentService>();
     builder.Services.AddScoped<IPaymentMicroserviceClient, PaymentMicroserviceClient>();
+    builder.Services.AddScoped<IPdfGeneratorService, PdfGeneratorService>();
 }
 
 static void ConfigureExternalAuthService(WebApplicationBuilder builder)

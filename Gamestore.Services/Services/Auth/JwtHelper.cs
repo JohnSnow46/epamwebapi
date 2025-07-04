@@ -9,22 +9,29 @@ public static class JwtHelper
 {
     private const string SecretKey = "GamestoreSecretKeyForJWTTokenGeneration2024!ThisMustBeLongEnoughForSecurity";
 
-    public static string GenerateToken(string email, string firstName, string lastName, string role = "User")
+    public static string GenerateToken(string email, string firstName, string lastName, string role = "User", Guid? userId = null)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(SecretKey);
 
         var claims = new List<Claim>
+    {
+        new(ClaimTypes.Email, email),
+        new(ClaimTypes.Name, $"{firstName} {lastName}"),
+        new(ClaimTypes.GivenName, firstName),
+        new(ClaimTypes.Surname, lastName),
+        new(ClaimTypes.Role, role),
+        new(JwtRegisteredClaimNames.Sub, email),
+        new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
+    };
+
+        // Dodaj claim z ID użytkownika jeśli jest dostępne
+        if (userId.HasValue)
         {
-            new(ClaimTypes.Email, email),
-            new(ClaimTypes.Name, $"{firstName} {lastName}"),
-            new(ClaimTypes.GivenName, firstName),
-            new(ClaimTypes.Surname, lastName),
-            new(ClaimTypes.Role, role),
-            new(JwtRegisteredClaimNames.Sub, email),
-            new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new(JwtRegisteredClaimNames.Iat, DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
-        };
+            claims.Add(new Claim(ClaimTypes.NameIdentifier, userId.Value.ToString()));
+            claims.Add(new Claim("user_id", userId.Value.ToString()));
+        }
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
