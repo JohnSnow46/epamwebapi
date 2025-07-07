@@ -57,7 +57,6 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
             _logger.LogInformation("Processing {PaymentMethod} payment for user {UserEmail}",
                 paymentRequest.Method, User.GetUserEmail());
 
-            // Validate Visa payment model if required
             if (paymentRequest.Method.Equals("Visa", StringComparison.OrdinalIgnoreCase))
             {
                 if (paymentRequest.Model == null)
@@ -77,7 +76,6 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
                 _logger.LogInformation("Payment processed successfully for user {UserEmail} using {PaymentMethod}",
                     User.GetUserEmail(), paymentRequest.Method);
 
-                // Handle different response types based on payment method
                 return paymentRequest.Method.ToLowerInvariant() switch
                 {
                     "bank" => HandleBankPaymentResponse(result),
@@ -121,14 +119,12 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
         {
             try
             {
-                // Sprawdź typ obiektu
                 _logger.LogInformation("Data type: {Type}", result.Data.GetType().Name);
 
-                // Konwertuj na JObject lub Dictionary aby bezpiecznie sprawdzić właściwości
                 var dataDict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(
                     System.Text.Json.JsonSerializer.Serialize(result.Data));
 
-#pragma warning disable CA1854 // Prefer the 'IDictionary.TryGetValue(TKey, out TValue)' method
+#pragma warning disable CA1854
                 if (dataDict != null && dataDict.ContainsKey("InvoiceFile") && dataDict.ContainsKey("FileName"))
                 {
                     var invoiceFileBase64 = dataDict["InvoiceFile"].ToString();
@@ -142,7 +138,7 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
                     _logger.LogWarning("Bank payment data missing InvoiceFile or FileName properties");
                     return Ok(result);
                 }
-#pragma warning restore CA1854 // Prefer the 'IDictionary.TryGetValue(TKey, out TValue)' method
+#pragma warning restore CA1854
             }
             catch (Exception ex)
             {
