@@ -16,22 +16,18 @@ public class CartService(IUnitOfWork unitOfWork, ILogger<CartService> logger) : 
         _logger.LogInformation("Adding game {GameKey} to cart for customer {CustomerId} with quantity {Quantity}",
             gameKey, customerId, quantity);
 
-        // Validate game exists and is available
         var game = await _unitOfWork.Games.GetKeyAsync(gameKey) ?? throw new KeyNotFoundException($"Game with key '{gameKey}' not found");
         if (game.UnitInStock < quantity)
         {
             throw new ValidationException($"Insufficient stock. Available: {game.UnitInStock}, Requested: {quantity}");
         }
 
-        // Get or create cart (order with Open status)
         var cart = await GetOrCreateCartAsync(customerId);
 
-        // Check if game is already in cart
         var existingOrderGame = await _unitOfWork.OrderGames.GetOrderGameAsync(cart.Id, game.Id);
 
         if (existingOrderGame != null)
         {
-            // Increment quantity
             var newQuantity = existingOrderGame.Quantity + quantity;
 
             if (newQuantity > game.UnitInStock)
@@ -44,14 +40,13 @@ public class CartService(IUnitOfWork unitOfWork, ILogger<CartService> logger) : 
         }
         else
         {
-            // Add new item to cart
             var orderGame = new OrderGame
             {
                 OrderId = cart.Id,
                 ProductId = game.Id,
                 Price = game.Price,
                 Quantity = quantity,
-                Discount = game.Discontinued // Use game's discount
+                Discount = game.Discontinued
             };
 
             await _unitOfWork.OrderGames.AddAsync(orderGame);
@@ -79,7 +74,6 @@ public class CartService(IUnitOfWork unitOfWork, ILogger<CartService> logger) : 
             throw new KeyNotFoundException($"Game '{gameKey}' not found in cart");
         }
 
-        // If cart is empty, delete the order
         var remainingItems = await _unitOfWork.OrderGames.GetOrderGamesByOrderIdAsync(cart.Id);
         if (!remainingItems.Any())
         {
@@ -153,7 +147,6 @@ public class CartService(IUnitOfWork unitOfWork, ILogger<CartService> logger) : 
             return cart;
         }
 
-        // Create new cart
         var newCart = new Order
         {
             CustomerId = customerId,

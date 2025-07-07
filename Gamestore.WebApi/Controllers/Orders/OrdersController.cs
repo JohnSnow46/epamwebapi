@@ -36,7 +36,6 @@ public class OrdersController(IOrderService orderService, ILogger<OrdersControll
 
             var orders = await _orderService.GetPaidAndCancelledOrdersAsync(customerId.Value);
 
-            // Transform to match Epic 5 response format
             var response = orders.Select(o => new
             {
                 id = o.Id,
@@ -84,13 +83,11 @@ public class OrdersController(IOrderService orderService, ILogger<OrdersControll
                 });
             }
 
-            // Security check: ensure user can only access their own orders
             if (order.CustomerId != customerId.Value)
             {
                 return Forbid("You can only access your own orders");
             }
 
-            // Transform to match Epic 5 response format
             var response = new
             {
                 id = order.Id,
@@ -129,7 +126,6 @@ public class OrdersController(IOrderService orderService, ILogger<OrdersControll
             _logger.LogInformation("Getting order details for order {OrderId} by user {UserEmail}",
                 id, User.GetUserEmail());
 
-            // First verify the order exists and belongs to the user
             var order = await _orderService.GetOrderByIdAsync(id);
             if (order == null)
             {
@@ -147,7 +143,6 @@ public class OrdersController(IOrderService orderService, ILogger<OrdersControll
 
             var orderDetails = await _orderService.GetOrderDetailsAsync(id);
 
-            // Transform to match Epic 5 response format
             var response = orderDetails.Select(od => new
             {
                 productId = od.ProductId,

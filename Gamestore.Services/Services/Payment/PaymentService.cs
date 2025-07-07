@@ -79,11 +79,9 @@ public class PaymentService(
             var orderTotal = await _unitOfWork.OrderGames.GetOrderTotalAsync(cart.Id);
             _logger.LogInformation("✅ Order total calculated: {Total}", orderTotal);
 
-            // Update order status to Checkout
             await _unitOfWork.Orders.UpdateOrderStatusAsync(cart.Id, OrderStatus.Checkout);
             _logger.LogInformation("✅ Order status updated to Checkout");
 
-            // Create payment transaction
             var transaction = new PaymentTransaction
             {
                 OrderId = cart.Id,
@@ -94,7 +92,6 @@ public class PaymentService(
             await _unitOfWork.PaymentTransactions.AddAsync(transaction);
             _logger.LogInformation("✅ Payment transaction created");
 
-            // Generate bank invoice
             var invoice = new BankInvoiceDto
             {
                 UserId = customerId,
@@ -146,10 +143,8 @@ public class PaymentService(
             var cart = await GetValidCartAsync(customerId);
             var orderTotal = await _unitOfWork.OrderGames.GetOrderTotalAsync(cart.Id);
 
-            // Update order status to Checkout
             await _unitOfWork.Orders.UpdateOrderStatusAsync(cart.Id, OrderStatus.Checkout);
 
-            // Create payment transaction
             var transaction = new PaymentTransaction
             {
                 OrderId = cart.Id,
@@ -159,19 +154,17 @@ public class PaymentService(
             };
             await _unitOfWork.PaymentTransactions.AddAsync(transaction);
 
-            // Process with microservice
             var microserviceRequest = new IBoxMicroserviceRequestDto
             {
                 TransactionAmount = orderTotal,
-                AccountNumber = customerId, // User ID as account number
-                InvoiceNumber = cart.Id     // Order ID as invoice number
+                AccountNumber = customerId,
+                InvoiceNumber = cart.Id
             };
 
             var paymentSuccess = await _microserviceClient.ProcessIBoxPaymentAsync(microserviceRequest);
 
             if (paymentSuccess)
             {
-                // Update transaction and order status
                 transaction.Status = PaymentStatus.Completed;
                 await _unitOfWork.Orders.UpdateOrderStatusAsync(cart.Id, OrderStatus.Paid);
 
@@ -192,7 +185,6 @@ public class PaymentService(
             }
             else
             {
-                // Payment failed
                 transaction.Status = PaymentStatus.Failed;
                 await _unitOfWork.Orders.UpdateOrderStatusAsync(cart.Id, OrderStatus.Cancelled);
 
