@@ -4,5 +4,5 @@ namespace Gamestore.Services.Interfaces;
 public interface IPaymentMicroserviceClient
 {
     Task<bool> ProcessVisaPaymentAsync(VisaMicroserviceRequestDto request);
-    Task<bool> ProcessIBoxPaymentAsync(IBoxMicroserviceRequestDto request);
+    Task<bool> ProcessIBoxPaymentAsync(BoxMicroserviceRequestDto request);
 }

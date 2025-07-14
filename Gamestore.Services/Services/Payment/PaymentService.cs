@@ -23,7 +23,6 @@ public class PaymentService(
     public async Task<PaymentMethodsResponseDto> GetPaymentMethodsAsync()
     {
         _logger.LogInformation("Getting available payment methods");
-
         var paymentMethods = new List<PaymentMethodDto>
     {
         new()
@@ -45,8 +44,7 @@ public class PaymentService(
             ImageUrl = "https://upload.wikimedia.org/wikipedia/commons/4/41/Visa_Logo.png"
         }
     };
-
-        return new PaymentMethodsResponseDto { PaymentMethods = paymentMethods };
+        return await Task.FromResult(new PaymentMethodsResponseDto { PaymentMethods = paymentMethods });
     }
 
     public async Task<PaymentResponseDto> ProcessPaymentAsync(Guid customerId, PaymentRequestDto paymentRequest)
@@ -154,7 +152,7 @@ public class PaymentService(
             };
             await _unitOfWork.PaymentTransactions.AddAsync(transaction);
 
-            var microserviceRequest = new IBoxMicroserviceRequestDto
+            var microserviceRequest = new BoxMicroserviceRequestDto
             {
                 TransactionAmount = orderTotal,
                 AccountNumber = customerId,
@@ -174,7 +172,7 @@ public class PaymentService(
                 {
                     Success = true,
                     Message = "IBox payment processed successfully",
-                    Data = new IBoxPaymentResponseDto
+                    Data = new BoxPaymentResponseDto
                     {
                         UserId = customerId,
                         OrderId = cart.Id,

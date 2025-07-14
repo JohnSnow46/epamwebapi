@@ -57,16 +57,14 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
             _logger.LogInformation("Processing {PaymentMethod} payment for user {UserEmail}",
                 paymentRequest.Method, User.GetUserEmail());
 
-            if (paymentRequest.Method.Equals("Visa", StringComparison.OrdinalIgnoreCase))
+            if (paymentRequest.Method.Equals("Visa", StringComparison.OrdinalIgnoreCase)
+                && paymentRequest.Model == null)
             {
-                if (paymentRequest.Model == null)
+                return BadRequest(new ErrorResponseModel
                 {
-                    return BadRequest(new ErrorResponseModel
-                    {
-                        Message = "Visa payment requires card details",
-                        StatusCode = StatusCodes.Status400BadRequest
-                    });
-                }
+                    Message = "Visa payment requires card details",
+                    StatusCode = StatusCodes.Status400BadRequest
+                });
             }
 
             var result = await _paymentService.ProcessPaymentAsync(customerId.Value, paymentRequest);
@@ -128,7 +126,6 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
                 if (dataDict != null && dataDict.ContainsKey("InvoiceFile") && dataDict.ContainsKey("FileName"))
                 {
                     var invoiceFileBase64 = dataDict["InvoiceFile"].ToString();
-                    var fileName = dataDict["FileName"].ToString();
 
                     var invoiceBytes = Convert.FromBase64String(invoiceFileBase64);
                     return File(invoiceBytes, "text/plain", "invoice.txt");

@@ -6,34 +6,101 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Gamestore.Data.Data;
 
+/// <summary>
+/// Database context for the Game Catalog application, providing access to all entities
+/// and their relationships including games, users, orders, and authentication data.
+/// </summary>
 public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options) : DbContext(options)
 {
-    // Existing DbSets
+    /// <summary>
+    /// Gets or sets the Games entity set for managing game records.
+    /// </summary>
     public DbSet<Game> Games { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Genres entity set for managing game genre records.
+    /// </summary>
     public DbSet<Genre> Genres { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Platforms entity set for managing gaming platform records.
+    /// </summary>
     public DbSet<Platform> Platforms { get; set; }
+
+    /// <summary>
+    /// Gets or sets the GameGenres entity set for managing many-to-many relationships between games and genres.
+    /// </summary>
     public DbSet<GameGenre> GameGenres { get; set; }
+
+    /// <summary>
+    /// Gets or sets the GamePlatforms entity set for managing many-to-many relationships between games and platforms.
+    /// </summary>
     public DbSet<GamePlatform> GamePlatforms { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Publishers entity set for managing game publisher records.
+    /// </summary>
     public DbSet<Publisher> Publishers { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Comments entity set for managing user comments on games.
+    /// </summary>
     public DbSet<Comment> Comments { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Bans entity set for managing user ban records.
+    /// </summary>
     public DbSet<Ban> Bans { get; set; }
 
     // New DbSets for User Management
+    /// <summary>
+    /// Gets or sets the Users entity set for managing user account records.
+    /// </summary>
     public DbSet<User> Users { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Roles entity set for managing user role definitions.
+    /// </summary>
     public DbSet<Role> Roles { get; set; }
+
+    /// <summary>
+    /// Gets or sets the UserRoles entity set for managing many-to-many relationships between users and roles.
+    /// </summary>
     public DbSet<UserRole> UserRoles { get; set; }
+
+    /// <summary>
+    /// Gets or sets the Permissions entity set for managing system permission definitions.
+    /// </summary>
     public DbSet<Permission> Permissions { get; set; }
+
+    /// <summary>
+    /// Gets or sets the RolePermissions entity set for managing many-to-many relationships between roles and permissions.
+    /// </summary>
     public DbSet<RolePermission> RolePermissions { get; set; }
 
     // Orders & Payments
+    /// <summary>
+    /// Gets or sets the Orders entity set for managing customer order records.
+    /// </summary>
     public DbSet<Order> Orders { get; set; }
+
+    /// <summary>
+    /// Gets or sets the OrderGames entity set for managing many-to-many relationships between orders and games.
+    /// </summary>
     public DbSet<OrderGame> OrderGames { get; set; }
+
+    /// <summary>
+    /// Gets or sets the PaymentTransactions entity set for managing payment transaction records.
+    /// </summary>
     public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
+    /// <summary>
+    /// Configures the database model using Entity Framework's Fluent API.
+    /// Defines relationships, constraints, indexes, and other database schema configurations.
+    /// </summary>
+    /// <param name="modelBuilder">The ModelBuilder instance used to configure the database model.</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        // ========== EXISTING CONFIGURATIONS (unchanged) ==========
-
         // Game
         modelBuilder.Entity<Game>()
             .HasKey(g => g.Id);
@@ -136,293 +203,6 @@ public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options
             .HasOne(c => c.ParentComment)
             .WithMany(c => c.ChildComments)
             .HasForeignKey(c => c.ParentCommentId)
-            .OnDelete(DeleteBehavior.Restrict)
-            .IsRequired(false);
-
-        // Ban
-        modelBuilder.Entity<Ban>()
-            .HasKey(b => b.Id);
-
-        modelBuilder.Entity<Ban>()
-            .Property(b => b.UserName)
-            .IsRequired();
-
-        modelBuilder.Entity<Ban>()
-            .HasIndex(b => b.UserName);
-
-        // Additional properties for filtering/sorting
-        modelBuilder.Entity<Game>()
-            .Property(g => g.ViewCount)
-            .HasDefaultValue(0)
-            .IsRequired();
-
-        modelBuilder.Entity<Game>()
-            .Property(g => g.CommentCount)
-            .HasDefaultValue(0)
-            .IsRequired();
-
-        modelBuilder.Entity<Game>()
-            .Property(g => g.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()")
-            .IsRequired();
-
-        // ========== NEW USER MANAGEMENT CONFIGURATIONS ==========
-
-        // User
-        modelBuilder.Entity<User>()
-            .HasKey(u => u.Id);
-
-        modelBuilder.Entity<User>()
-            .Property(u => u.Email)
-            .IsRequired()
-            .HasMaxLength(255);
-
-        modelBuilder.Entity<User>()
-            .HasIndex(u => u.Email)
-            .IsUnique();
-
-        modelBuilder.Entity<User>()
-            .Property(u => u.FirstName)
-            .IsRequired()
-            .HasMaxLength(100);
-
-        modelBuilder.Entity<User>()
-            .Property(u => u.LastName)
-            .IsRequired()
-            .HasMaxLength(100);
-
-        modelBuilder.Entity<User>()
-            .Property(u => u.PasswordHash)
-            .IsRequired();
-
-        modelBuilder.Entity<User>()
-            .Property(u => u.IsActive)
-            .HasDefaultValue(true);
-
-        modelBuilder.Entity<User>()
-            .Property(u => u.IsEmailConfirmed)
-            .HasDefaultValue(false);
-
-        modelBuilder.Entity<User>()
-            .Property(u => u.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        // Role
-        modelBuilder.Entity<Role>()
-            .HasKey(r => r.Id);
-
-        modelBuilder.Entity<Role>()
-            .Property(r => r.Name)
-            .IsRequired()
-            .HasMaxLength(50);
-
-        modelBuilder.Entity<Role>()
-            .HasIndex(r => r.Name)
-            .IsUnique();
-
-        modelBuilder.Entity<Role>()
-            .Property(r => r.Description)
-            .HasMaxLength(500);
-
-        modelBuilder.Entity<Role>()
-            .Property(r => r.Level)
-            .IsRequired();
-
-        modelBuilder.Entity<Role>()
-            .Property(r => r.IsSystemRole)
-            .HasDefaultValue(false);
-
-        modelBuilder.Entity<Role>()
-            .Property(r => r.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        // UserRole (Many-to-Many with additional properties)
-        modelBuilder.Entity<UserRole>()
-            .HasKey(ur => ur.Id);
-
-        modelBuilder.Entity<UserRole>()
-            .HasOne(ur => ur.User)
-            .WithMany(u => u.UserRoles)
-            .HasForeignKey(ur => ur.UserId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<UserRole>()
-            .HasOne(ur => ur.Role)
-            .WithMany(r => r.UserRoles)
-            .HasForeignKey(ur => ur.RoleId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<UserRole>()
-            .HasIndex(ur => new { ur.UserId, ur.RoleId })
-            .IsUnique();
-
-        modelBuilder.Entity<UserRole>()
-            .Property(ur => ur.AssignedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        // Permission
-        modelBuilder.Entity<Permission>()
-            .HasKey(p => p.Id);
-
-        modelBuilder.Entity<Permission>()
-            .Property(p => p.Name)
-            .IsRequired()
-            .HasMaxLength(100);
-
-        modelBuilder.Entity<Permission>()
-            .HasIndex(p => p.Name)
-            .IsUnique();
-
-        modelBuilder.Entity<Permission>()
-            .Property(p => p.Description)
-            .HasMaxLength(500);
-
-        modelBuilder.Entity<Permission>()
-            .Property(p => p.Category)
-            .HasMaxLength(50);
-
-        // RolePermission (Many-to-Many)
-        modelBuilder.Entity<RolePermission>()
-            .HasKey(rp => rp.Id);
-
-        modelBuilder.Entity<RolePermission>()
-            .HasOne(rp => rp.Role)
-            .WithMany(r => r.RolePermissions)
-            .HasForeignKey(rp => rp.RoleId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<RolePermission>()
-            .HasOne(rp => rp.Permission)
-            .WithMany(p => p.RolePermissions)
-            .HasForeignKey(rp => rp.PermissionId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        modelBuilder.Entity<RolePermission>()
-            .HasIndex(rp => new { rp.RoleId, rp.PermissionId })
-            .IsUnique();
-
-        modelBuilder.Entity<RolePermission>()
-            .Property(rp => rp.GrantedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        // ========== ORDER CONFIGURATIONS ==========
-
-        // Order
-        modelBuilder.Entity<Order>()
-            .HasKey(o => o.Id);
-
-        modelBuilder.Entity<Order>()
-            .Property(o => o.CustomerId)
-            .IsRequired();
-
-        modelBuilder.Entity<Order>()
-            .Property(o => o.Status)
-            .IsRequired()
-            .HasConversion<int>();
-
-        modelBuilder.Entity<Order>()
-            .Property(o => o.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        modelBuilder.Entity<Order>()
-            .HasIndex(o => o.CustomerId);
-
-        modelBuilder.Entity<Order>()
-            .HasIndex(o => o.Status);
-
-        modelBuilder.Entity<Order>()
-            .HasIndex(o => new { o.CustomerId, o.Status });
-
-        // OrderGame
-        modelBuilder.Entity<OrderGame>()
-            .HasKey(og => og.Id);
-
-        modelBuilder.Entity<OrderGame>()
-            .Property(og => og.OrderId)
-            .IsRequired();
-
-        modelBuilder.Entity<OrderGame>()
-            .Property(og => og.ProductId)
-            .IsRequired();
-
-        modelBuilder.Entity<OrderGame>()
-            .Property(og => og.Price)
-            .IsRequired()
-            .HasColumnType("decimal(18,2)");
-
-        modelBuilder.Entity<OrderGame>()
-            .Property(og => og.Quantity)
-            .IsRequired();
-
-        modelBuilder.Entity<OrderGame>()
-            .Property(og => og.Discount)
-            .HasDefaultValue(0);
-
-        modelBuilder.Entity<OrderGame>()
-            .Property(og => og.CreatedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        // Unique constraint for ProductId + OrderId combination
-        modelBuilder.Entity<OrderGame>()
-            .HasIndex(og => new { og.OrderId, og.ProductId })
-            .IsUnique();
-
-        // Order-OrderGame relationship
-        modelBuilder.Entity<OrderGame>()
-            .HasOne(og => og.Order)
-            .WithMany(o => o.OrderGames)
-            .HasForeignKey(og => og.OrderId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        // Game-OrderGame relationship
-        modelBuilder.Entity<OrderGame>()
-            .HasOne(og => og.Product)
-            .WithMany()
-            .HasForeignKey(og => og.ProductId)
-            .OnDelete(DeleteBehavior.Restrict); // Prevent deleting games that are in orders
-
-        // ========== PAYMENT TRANSACTION CONFIGURATIONS ==========
-
-        // PaymentTransaction
-        modelBuilder.Entity<PaymentTransaction>()
-            .HasKey(pt => pt.Id);
-
-        modelBuilder.Entity<PaymentTransaction>()
-            .Property(pt => pt.OrderId)
-            .IsRequired();
-
-        modelBuilder.Entity<PaymentTransaction>()
-            .Property(pt => pt.PaymentMethod)
-            .IsRequired()
-            .HasMaxLength(50);
-
-        modelBuilder.Entity<PaymentTransaction>()
-            .Property(pt => pt.Amount)
-            .IsRequired()
-            .HasColumnType("decimal(18,2)");
-
-        modelBuilder.Entity<PaymentTransaction>()
-            .Property(pt => pt.Status)
-            .IsRequired()
-            .HasConversion<int>();
-
-        modelBuilder.Entity<PaymentTransaction>()
-            .Property(pt => pt.ProcessedAt)
-            .HasDefaultValueSql("GETUTCDATE()");
-
-        modelBuilder.Entity<PaymentTransaction>()
-            .HasIndex(pt => pt.OrderId);
-
-        modelBuilder.Entity<PaymentTransaction>()
-            .HasIndex(pt => pt.Status);
-
-        // PaymentTransaction-Order relationship
-        modelBuilder.Entity<PaymentTransaction>()
-            .HasOne(pt => pt.Order)
-            .WithMany()
-            .HasForeignKey(pt => pt.OrderId)
-            .OnDelete(DeleteBehavior.Cascade);
-
-        base.OnModelCreating(modelBuilder);
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

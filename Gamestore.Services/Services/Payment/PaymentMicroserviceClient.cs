@@ -52,7 +52,7 @@ public class PaymentMicroserviceClient(HttpClient httpClient, IConfiguration con
         }
     }
 
-    public async Task<bool> ProcessIBoxPaymentAsync(IBoxMicroserviceRequestDto request)
+    public async Task<bool> ProcessIBoxPaymentAsync(BoxMicroserviceRequestDto request)
     {
         _logger.LogInformation("Processing IBox payment for amount {Amount}, account {AccountNumber}",
             request.TransactionAmount, request.AccountNumber);
