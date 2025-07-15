@@ -68,11 +68,7 @@ public class CartService(IUnitOfWork unitOfWork, ILogger<CartService> logger) : 
             return;
         }
 
-        var removed = await _unitOfWork.OrderGames.RemoveOrderGameAsync(cart.Id, game.Id);
-        if (!removed)
-        {
-            throw new KeyNotFoundException($"Game '{gameKey}' not found in cart");
-        }
+        await _unitOfWork.OrderGames.RemoveOrderGameAsync(cart.Id, game.Id);
 
         var remainingItems = await _unitOfWork.OrderGames.GetOrderGamesByOrderIdAsync(cart.Id);
         if (!remainingItems.Any())

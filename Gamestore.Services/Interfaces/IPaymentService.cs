@@ -8,4 +8,5 @@ public interface IPaymentService
     Task<PaymentResponseDto> ProcessBankPaymentAsync(Guid customerId);
     Task<PaymentResponseDto> ProcessIBoxPaymentAsync(Guid customerId);
     Task<PaymentResponseDto> ProcessVisaPaymentAsync(Guid customerId, VisaPaymentModelDto visaData);
+    Task GetAvailablePaymentMethodsAsync(Guid value);
 }

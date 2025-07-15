@@ -53,7 +53,7 @@ public class OrderGame
     /// This represents the discount as a percentage (0-100) and is used in
     /// total price calculations. A value of 0 means no discount is applied.
     /// </summary>
-    public int Discount { get; set; }
+    public int? Discount { get; set; }
 
     /// <summary>
     /// Gets or sets the Order entity that this item belongs to.
@@ -92,5 +92,5 @@ public class OrderGame
     /// This computed property calculates: Price × Quantity × (1 - Discount%),
     /// providing the final amount for this specific item in the order.
     /// </summary>
-    public double TotalPrice => Price * Quantity * (1 - (Discount / 100.0));
+    public double TotalPrice => Price * Quantity * (1 - ((Discount ?? 0) / 100.0));
 }

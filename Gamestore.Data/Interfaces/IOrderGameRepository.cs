@@ -55,7 +55,7 @@ public interface IOrderGameRepository : IRepository<OrderGame>
     /// A task representing the asynchronous operation. The task result is true if the item was successfully removed,
     /// false if the item was not found in the order or the removal failed.
     /// </returns>
-    Task<bool> RemoveOrderGameAsync(Guid orderId, Guid productId);
+    Task RemoveOrderGameAsync(Guid orderId, Guid productId);
 
     /// <summary>
     /// Calculates the total monetary value of all items in an order.

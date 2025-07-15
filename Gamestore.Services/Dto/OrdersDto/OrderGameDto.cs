@@ -33,7 +33,7 @@ public class OrderGameDto
     /// Gets or sets the discount percentage applied to this game.
     /// Represents any promotional discount applied to the game price (e.g., 10 for 10% discount).
     /// </summary>
-    public int Discount { get; set; }
+    public int? Discount { get; set; }
 
     /// <summary>
     /// Gets or sets the total price for this game line item.

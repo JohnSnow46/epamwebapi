@@ -30,12 +30,16 @@ public class OrderService(IUnitOfWork unitOfWork, ILogger<OrderService> logger) 
         return allOrders.Select(MapToOrderDto);
     }
 
-    public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId)
+    public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId, Guid requestingCustomerId)
     {
-        _logger.LogInformation("Getting order by ID {OrderId}", orderId);
+        _logger.LogInformation("Getting order by ID {OrderId} for customer {CustomerId}", orderId, requestingCustomerId);
 
         var order = await _unitOfWork.Orders.GetOrderWithDetailsAsync(orderId);
-        return order != null ? MapToOrderDto(order) : null;
+        return order == null
+            ? null
+            : order.CustomerId != requestingCustomerId
+            ? throw new UnauthorizedAccessException("You can only access your own orders")
+            : MapToOrderDto(order);
     }
 
     public async Task<IEnumerable<OrderGameDto>> GetOrderDetailsAsync(Guid orderId)

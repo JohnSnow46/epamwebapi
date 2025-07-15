@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamestore.WebApi.Controllers.Payment;
+
 [ApiController]
 [Route("api/orders")]
 public class PaymentController(IPaymentService paymentService, ILogger<PaymentController> logger) : ControllerBase
@@ -14,18 +15,29 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
     private readonly ILogger<PaymentController> _logger = logger;
 
     /// <summary>
-    /// E05 US5 - Get payment methods
-    /// Epic 9: Everyone can view available payment methods
+    /// E05 US5 - Get available payment methods
+    /// Epic 9: Authenticated users can view payment options
     /// </summary>
     [HttpGet("payment-methods")]
-    [AllowAnonymous]
+    [Authorize(Policy = "CanBuyGames")]
     public async Task<IActionResult> GetPaymentMethods()
     {
         try
         {
-            _logger.LogInformation("Getting available payment methods");
+            var customerId = User.GetUserId();
+            if (!customerId.HasValue)
+            {
+                return BadRequest(new ErrorResponseModel
+                {
+                    Message = "Unable to identify customer",
+                    StatusCode = StatusCodes.Status400BadRequest
+                });
+            }
 
-            var paymentMethods = await _paymentService.GetPaymentMethodsAsync();
+            _logger.LogInformation("Getting payment methods for user {UserEmail}", User.GetUserEmail());
+
+            var paymentMethods = await _paymentService.GetAvailablePaymentMethodsAsync(customerId.Value);
+
             return Ok(paymentMethods);
         }
         catch (Exception ex)
@@ -35,8 +47,8 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
     }
 
     /// <summary>
-    /// E05 US6, US7, US8 - Process payment (Bank, IBox, Visa)
-    /// Epic 9: Authenticated users can process payments
+    /// E05 US6 - Process payment for order
+    /// Epic 9: Authenticated users can complete purchases
     /// </summary>
     [HttpPost("payment")]
     [Authorize(Policy = "CanBuyGames")]
@@ -54,45 +66,33 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
                 });
             }
 
-            _logger.LogInformation("Processing {PaymentMethod} payment for user {UserEmail}",
-                paymentRequest.Method, User.GetUserEmail());
+            _logger.LogInformation("Processing payment for user {UserEmail} with method {PaymentMethod}",
+                User.GetUserEmail(), paymentRequest.PaymentMethod);
 
-            if (paymentRequest.Method.Equals("Visa", StringComparison.OrdinalIgnoreCase)
-                && paymentRequest.Model == null)
+            // Service handles cart validation and payment processing
+            var paymentResult = await _paymentService.ProcessPaymentAsync(paymentRequest, customerId.Value);
+
+            return Ok(new
             {
-                return BadRequest(new ErrorResponseModel
-                {
-                    Message = "Visa payment requires card details",
-                    StatusCode = StatusCodes.Status400BadRequest
-                });
-            }
-
-            var result = await _paymentService.ProcessPaymentAsync(customerId.Value, paymentRequest);
-
-            if (result.Success)
+                success = true,
+                orderId = paymentResult.OrderId,
+                transactionId = paymentResult.TransactionId,
+                message = "Payment processed successfully",
+                processedBy = User.GetUserName(),
+                processedAt = DateTime.UtcNow
+            });
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new ErrorResponseModel
             {
-                _logger.LogInformation("Payment processed successfully for user {UserEmail} using {PaymentMethod}",
-                    User.GetUserEmail(), paymentRequest.Method);
-
-                return paymentRequest.Method.ToLowerInvariant() switch
-                {
-                    "bank" => HandleBankPaymentResponse(result),
-                    "ibox terminal" => Ok(result.Data),
-                    "visa" => Ok(),
-                    _ => Ok(result)
-                };
-            }
-            else
-            {
-                _logger.LogWarning("Payment failed for user {UserEmail} using {PaymentMethod}: {Message}",
-                    User.GetUserEmail(), paymentRequest.Method, result.Message);
-
-                return BadRequest(new ErrorResponseModel
-                {
-                    Message = result.Message,
-                    StatusCode = StatusCodes.Status400BadRequest
-                });
-            }
+                Message = ex.Message,
+                StatusCode = StatusCodes.Status404NotFound
+            });
         }
         catch (System.ComponentModel.DataAnnotations.ValidationException ex)
         {
@@ -102,50 +102,50 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
                 StatusCode = StatusCodes.Status400BadRequest
             });
         }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new ErrorResponseModel
+            {
+                Message = ex.Message,
+                StatusCode = StatusCodes.Status400BadRequest
+            });
+        }
         catch (Exception ex)
         {
-            return HandleException(ex, $"Error processing {paymentRequest.Method} payment");
+            return HandleException(ex, "Error processing payment");
         }
     }
 
-    private IActionResult HandleBankPaymentResponse(PaymentResponseDto result)
+    /// <summary>
+    /// E05 US7 - Get payment history for user
+    /// Epic 9: Authenticated users can view their payment history
+    /// </summary>
+    [HttpGet("payment-history")]
+    [Authorize]
+    public async Task<IActionResult> GetPaymentHistory()
     {
-        _logger.LogInformation("Handling bank payment response. Success: {Success}, HasData: {HasData}",
-            result.Success, result.Data != null);
-
-        if (result.Data is not null)
+        try
         {
-            try
+            var customerId = User.GetUserId();
+            if (!customerId.HasValue)
             {
-                _logger.LogInformation("Data type: {Type}", result.Data.GetType().Name);
-
-                var dataDict = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, object>>(
-                    System.Text.Json.JsonSerializer.Serialize(result.Data));
-
-#pragma warning disable CA1854
-                if (dataDict != null && dataDict.ContainsKey("InvoiceFile") && dataDict.ContainsKey("FileName"))
+                return BadRequest(new ErrorResponseModel
                 {
-                    var invoiceFileBase64 = dataDict["InvoiceFile"].ToString();
+                    Message = "Unable to identify customer",
+                    StatusCode = StatusCodes.Status400BadRequest
+                });
+            }
 
-                    var invoiceBytes = Convert.FromBase64String(invoiceFileBase64);
-                    return File(invoiceBytes, "text/plain", "invoice.txt");
-                }
-                else
-                {
-                    _logger.LogWarning("Bank payment data missing InvoiceFile or FileName properties");
-                    return Ok(result);
-                }
-#pragma warning restore CA1854
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error processing bank payment response");
-                return Ok(result);
-            }
+            _logger.LogInformation("Getting payment history for user {UserEmail}", User.GetUserEmail());
+
+            var paymentHistory = await _paymentService.GetPaymentHistoryAsync(customerId.Value);
+
+            return Ok(paymentHistory);
         }
-
-        _logger.LogWarning("Bank payment response has no data");
-        return Ok(result);
+        catch (Exception ex)
+        {
+            return HandleException(ex, "Error retrieving payment history");
+        }
     }
 
     private ObjectResult HandleException(Exception ex, string logMessage)

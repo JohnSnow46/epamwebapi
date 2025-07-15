@@ -93,17 +93,12 @@ public class OrderGameRepository(GameCatalogDbContext context) : Repository<Orde
     /// A task representing the asynchronous operation. The task result is true if the item was successfully removed,
     /// false if the item was not found in the order.
     /// </returns>
-    public async Task<bool> RemoveOrderGameAsync(Guid orderId, Guid productId)
+    public async Task RemoveOrderGameAsync(Guid orderId, Guid productId)
     {
         var orderGame = await _context.OrderGames
-            .FirstOrDefaultAsync(og => og.OrderId == orderId && og.ProductId == productId);
-        if (orderGame == null)
-        {
-            return false;
-        }
+            .FirstOrDefaultAsync(og => og.OrderId == orderId && og.ProductId == productId) ?? throw new KeyNotFoundException($"Game not found in cart");
         _context.OrderGames.Remove(orderGame);
         await _context.SaveChangesAsync();
-        return true;
     }
 
     /// <summary>
@@ -120,6 +115,6 @@ public class OrderGameRepository(GameCatalogDbContext context) : Repository<Orde
     {
         return await _context.OrderGames
             .Where(og => og.OrderId == orderId)
-            .SumAsync(og => (decimal)(og.Price * og.Quantity * (1 - (og.Discount / 100.0))));
+            .SumAsync(og => (decimal)(og.Price * og.Quantity * (1 - ((og.Discount ?? 0) / 100.0))));
     }
 }

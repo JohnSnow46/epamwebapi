@@ -66,7 +66,7 @@ public class Order
     /// This computed property calculates the sum of (price × quantity × (1 - discount%)) for all order items,
     /// providing the final order total that would be charged to the customer.
     /// </summary>
-    public decimal TotalAmount => OrderGames.Sum(og => (decimal)(og.Price * og.Quantity * (1 - (og.Discount / 100.0))));
+    public decimal TotalAmount => OrderGames.Sum(og => (decimal)(og.Price * og.Quantity * (1 - ((og.Discount ?? 0) / 100.0))));
 
     /// <summary>
     /// Gets the total number of items in the order across all products.

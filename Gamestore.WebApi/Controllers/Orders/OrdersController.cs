@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamestore.WebApi.Controllers.Orders;
+
 [ApiController]
 [Route("api/orders")]
 public class OrdersController(IOrderService orderService, ILogger<OrdersController> logger) : ControllerBase
@@ -73,19 +74,15 @@ public class OrdersController(IOrderService orderService, ILogger<OrdersControll
 
             _logger.LogInformation("Getting order {OrderId} for user {UserEmail}", id, User.GetUserEmail());
 
-            var order = await _orderService.GetOrderByIdAsync(id);
+            // Service handles authorization internally
+            var order = await _orderService.GetOrderByIdAsync(id, customerId.Value);
             if (order == null)
             {
                 return NotFound(new ErrorResponseModel
                 {
-                    Message = $"Order with ID '{id}' not found",
+                    Message = $"Order with ID '{id}' not found or access denied",
                     StatusCode = StatusCodes.Status404NotFound
                 });
-            }
-
-            if (order.CustomerId != customerId.Value)
-            {
-                return Forbid("You can only access your own orders");
             }
 
             var response = new
@@ -96,6 +93,10 @@ public class OrdersController(IOrderService orderService, ILogger<OrdersControll
             };
 
             return Ok(response);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
         }
         catch (Exception ex)
         {
@@ -126,22 +127,8 @@ public class OrdersController(IOrderService orderService, ILogger<OrdersControll
             _logger.LogInformation("Getting order details for order {OrderId} by user {UserEmail}",
                 id, User.GetUserEmail());
 
-            var order = await _orderService.GetOrderByIdAsync(id);
-            if (order == null)
-            {
-                return NotFound(new ErrorResponseModel
-                {
-                    Message = $"Order with ID '{id}' not found",
-                    StatusCode = StatusCodes.Status404NotFound
-                });
-            }
-
-            if (order.CustomerId != customerId.Value)
-            {
-                return Forbid("You can only access your own order details");
-            }
-
-            var orderDetails = await _orderService.GetOrderDetailsAsync(id);
+            // Service handles authorization internally
+            var orderDetails = await _orderService.GetOrderDetailsAsync(id, customerId.Value);
 
             var response = orderDetails.Select(od => new
             {
@@ -152,6 +139,18 @@ public class OrdersController(IOrderService orderService, ILogger<OrdersControll
             });
 
             return Ok(response);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            return Forbid(ex.Message);
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new ErrorResponseModel
+            {
+                Message = ex.Message,
+                StatusCode = StatusCodes.Status404NotFound
+            });
         }
         catch (Exception ex)
         {
