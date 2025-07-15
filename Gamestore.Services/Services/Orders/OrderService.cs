@@ -3,6 +3,7 @@ using Gamestore.Entities.Orders;
 using Gamestore.Services.Dto.OrdersDto;
 using Gamestore.Services.Interfaces;
 using Microsoft.Extensions.Logging;
+using Gamestore.Services.Services.Extensions;
 
 namespace Gamestore.Services.Services.Orders;
 
@@ -16,7 +17,7 @@ public class OrderService(IUnitOfWork unitOfWork, ILogger<OrderService> logger) 
         _logger.LogInformation("Getting all orders for customer {CustomerId}", customerId);
 
         var orders = await _unitOfWork.Orders.GetOrdersByCustomerAsync(customerId);
-        return orders.Select(MapToOrderDto);
+        return orders.ToOrderDtos(); // Using extension method
     }
 
     public async Task<IEnumerable<OrderDto>> GetPaidAndCancelledOrdersAsync(Guid customerId)
@@ -27,35 +28,31 @@ public class OrderService(IUnitOfWork unitOfWork, ILogger<OrderService> logger) 
         var cancelledOrders = await _unitOfWork.Orders.GetOrdersByCustomerAndStatusAsync(customerId, OrderStatus.Cancelled);
 
         var allOrders = paidOrders.Concat(cancelledOrders).OrderByDescending(o => o.CreatedAt);
-        return allOrders.Select(MapToOrderDto);
+        return allOrders.ToOrderDtos(); // Using extension method
     }
 
+    /// <summary>
+    /// UPDATED: Service delegates user validation to repository layer via specific method.
+    /// </summary>
     public async Task<OrderDto?> GetOrderByIdAsync(Guid orderId, Guid requestingCustomerId)
     {
         _logger.LogInformation("Getting order by ID {OrderId} for customer {CustomerId}", orderId, requestingCustomerId);
 
-        var order = await _unitOfWork.Orders.GetOrderWithDetailsAsync(orderId);
+        // Repository handles the customer filtering - no business logic in service
+        var order = await _unitOfWork.Orders.GetOrderWithDetailsByCustomerAsync(orderId, requestingCustomerId);
 
-        return order == null
-            ? null
-            : order.CustomerId != requestingCustomerId
-            ? throw new UnauthorizedAccessException("You can only access your own orders")
-            : MapToOrderDto(order);
+        return order?.ToOrderDto(); // Using extension method, null-safe
     }
 
+    /// <summary>
+    /// UPDATED: Service delegates user validation to repository layer.
+    /// </summary>
     public async Task<IEnumerable<OrderGameDto>> GetOrderDetailsAsync(Guid orderId, Guid requestingCustomerId)
     {
         _logger.LogInformation("Getting order details for order {OrderId} by customer {CustomerId}", orderId, requestingCustomerId);
 
-        // First check if the order exists and belongs to the requesting customer
-        var order = await _unitOfWork.Orders.GetOrderWithDetailsAsync(orderId) ?? throw new KeyNotFoundException($"Order with ID '{orderId}' not found");
-
-        // Delegate user authorization to service layer
-        if (order.CustomerId != requestingCustomerId)
-        {
-            throw new UnauthorizedAccessException("You can only access your own order details");
-        }
-
+        // Repository handles the customer filtering - no authorization logic in service
+        var order = await _unitOfWork.Orders.GetOrderWithDetailsByCustomerAsync(orderId, requestingCustomerId) ?? throw new KeyNotFoundException($"Order with ID '{orderId}' not found or access denied");
         var orderGames = await _unitOfWork.OrderGames.GetOrderGamesByOrderIdAsync(orderId);
         return orderGames.Select(og => new OrderGameDto
         {
@@ -101,18 +98,5 @@ public class OrderService(IUnitOfWork unitOfWork, ILogger<OrderService> logger) 
     public async Task<decimal> GetOrderTotalAsync(Guid orderId)
     {
         return await _unitOfWork.OrderGames.GetOrderTotalAsync(orderId);
-    }
-
-    private static OrderDto MapToOrderDto(Order order)
-    {
-        return new OrderDto
-        {
-            Id = order.Id,
-            CustomerId = order.CustomerId,
-            Date = order.Date,
-            Status = order.Status.ToString(),
-            TotalAmount = order.TotalAmount,
-            TotalItems = order.TotalItems
-        };
     }
 }

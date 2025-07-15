@@ -64,7 +64,6 @@ public class CartService(IUnitOfWork unitOfWork, ILogger<CartService> logger) : 
         var cart = await _unitOfWork.Orders.GetCartByCustomerAsync(customerId);
         if (cart == null)
         {
-            _logger.LogWarning("No cart found for customer {CustomerId}", customerId);
             return;
         }
 
