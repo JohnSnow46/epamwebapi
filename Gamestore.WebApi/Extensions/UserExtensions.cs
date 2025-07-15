@@ -8,7 +8,6 @@ public static class UserExtensions
 {
     public static string GetUserRole(this ClaimsPrincipal user)
     {
-        // Spróbuj oba typy claim names (krótkie i długie)
         return user.FindFirst("role")?.Value ??
                user.FindFirst(ClaimTypes.Role)?.Value ??
                Roles.Guest;
@@ -16,7 +15,6 @@ public static class UserExtensions
 
     public static string GetUserEmail(this ClaimsPrincipal user)
     {
-        // Spróbuj oba typy claim names
         return user.FindFirst("email")?.Value ??
                user.FindFirst(ClaimTypes.Email)?.Value ??
                user.FindFirst("unique_name")?.Value ??
@@ -25,7 +23,6 @@ public static class UserExtensions
 
     public static string GetUserName(this ClaimsPrincipal user)
     {
-        // Spróbuj różne claim names
         return user.FindFirst("unique_name")?.Value ??
                user.FindFirst(ClaimTypes.Name)?.Value ??
                user.FindFirst("name")?.Value ??

@@ -282,8 +282,7 @@ public class GameController(IGameService gameService, IPublisherService publishe
         {
             _logger.LogInformation("Getting deleted games for admin: {User}", User.GetUserEmail());
 
-            // Mock implementation - in real app, you'd filter by IsDeleted = true
-            // TODO: Implement actual deleted games retrieval when IsDeleted property is added
+            // Mock implementation
             var deletedGames = new[]
             {
                 new { Id = Guid.NewGuid(), Name = "Deleted Game 1", DeletedAt = DateTime.UtcNow.AddDays(-5) },

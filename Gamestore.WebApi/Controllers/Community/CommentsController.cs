@@ -94,7 +94,6 @@ public class CommentsController(ICommentService commentService, ILogger<Comments
             // Check if user can moderate comments or if it's their own comment
             if (!User.CanModerateComments())
             {
-                // TODO: In real implementation, check if comment belongs to current user
                 // For now, we'll only allow moderators and above to delete
                 return Forbid("You can only delete your own comments or you need moderation permissions");
             }
