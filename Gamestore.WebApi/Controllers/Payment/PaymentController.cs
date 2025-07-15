@@ -36,6 +36,7 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
 
             _logger.LogInformation("Getting payment methods for user {UserEmail}", User.GetUserEmail());
 
+            // ✅ POPRAWNE: przekazuje customerId do service
             var paymentMethods = await _paymentService.GetAvailablePaymentMethodsAsync(customerId.Value);
 
             return Ok(paymentMethods);
@@ -67,9 +68,8 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
             }
 
             _logger.LogInformation("Processing payment for user {UserEmail} with method {PaymentMethod}",
-                User.GetUserEmail(), paymentRequest.PaymentMethod);
+                User.GetUserEmail(), paymentRequest.Method);
 
-            // Service handles cart validation and payment processing
             var paymentResult = await _paymentService.ProcessPaymentAsync(paymentRequest, customerId.Value);
 
             return Ok(new
@@ -138,6 +138,7 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
 
             _logger.LogInformation("Getting payment history for user {UserEmail}", User.GetUserEmail());
 
+            // ✅ POPRAWNE: service handles authorization internally
             var paymentHistory = await _paymentService.GetPaymentHistoryAsync(customerId.Value);
 
             return Ok(paymentHistory);

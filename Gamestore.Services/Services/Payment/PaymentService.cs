@@ -25,8 +25,7 @@ public class PaymentService(
     {
         _logger.LogInformation("Getting available payment methods for customer {CustomerId}", customerId);
 
-        // Service layer handles customer validation
-        var customer = await ValidateCustomerAsync(customerId);
+        await ValidateCustomerAsync(customerId);
 
         var paymentMethods = new List<PaymentMethodDto>
         {
@@ -99,23 +98,17 @@ public class PaymentService(
         var cart = await GetCustomerCartAsync(customerId);
         var orderTotal = await _unitOfWork.OrderGames.GetOrderTotalAsync(cart.Id);
 
-        // Generate bank invoice PDF
-        var invoiceData = new
+        // Create BankInvoiceDto according to interface
+        var bankInvoice = new BankInvoiceDto
         {
+            UserId = customerId,
             OrderId = cart.Id,
-            CustomerId = customerId,
-            Amount = orderTotal,
-            DueDate = DateTime.UtcNow.AddDays(_bankInvoiceValidityDays),
-            Items = cart.OrderGames.Select(og => new
-            {
-                Name = og.Product?.Name,
-                Quantity = og.Quantity,
-                Price = og.Price,
-                Total = og.TotalPrice
-            })
+            CreationDate = DateTime.UtcNow,
+            ValidityDate = DateTime.UtcNow.AddDays(_bankInvoiceValidityDays),
+            Sum = orderTotal
         };
 
-        var invoicePdf = await _pdfGenerator.GenerateInvoiceAsync(invoiceData);
+        var invoicePdf = await _pdfGenerator.GenerateBankInvoicePdfAsync(bankInvoice);
 
         // Update cart to checkout status
         await _unitOfWork.Orders.UpdateOrderStatusAsync(cart.Id, OrderStatus.Checkout);
@@ -140,9 +133,9 @@ public class PaymentService(
 
         var iboxRequest = new BoxMicroserviceRequestDto
         {
-            OrderId = cart.Id,
-            Amount = orderTotal,
-            CustomerId = customerId
+            TransactionAmount = orderTotal,
+            AccountNumber = customerId,
+            InvoiceNumber = cart.Id
         };
 
         var success = await _microserviceClient.ProcessIBoxPaymentAsync(iboxRequest);
@@ -156,13 +149,14 @@ public class PaymentService(
 
             await _unitOfWork.CompleteAsync();
 
+            // Return response format as required by README
             return new PaymentResponseDto
             {
                 Success = true,
+                UserId = customerId,
                 OrderId = cart.Id,
-                PaymentMethod = "IBox Terminal",
-                TransactionId = Guid.NewGuid().ToString(),
-                Message = "Payment processed successfully via IBox Terminal"
+                PaymentDate = DateTime.UtcNow,
+                Sum = orderTotal
             };
         }
 
@@ -178,10 +172,12 @@ public class PaymentService(
 
         var visaRequest = new VisaMicroserviceRequestDto
         {
-            OrderId = cart.Id,
-            Amount = orderTotal,
-            CustomerId = customerId,
-            CardData = visaData
+            TransactionAmount = orderTotal,
+            CardHolderName = visaData.Holder,
+            CardNumber = visaData.CardNumber,
+            ExpirationMonth = visaData.MonthExpire,
+            ExpirationYear = visaData.YearExpire,
+            Cvv = visaData.Cvv2
         };
 
         var success = await _microserviceClient.ProcessVisaPaymentAsync(visaRequest);
@@ -191,7 +187,7 @@ public class PaymentService(
             await _unitOfWork.Orders.UpdateOrderStatusAsync(cart.Id, OrderStatus.Paid);
 
             // Create payment transaction record
-            await CreatePaymentTransactionAsync(cart.Id, orderTotal, "Visa", customerId);
+            await CreatePaymentTransactionAsync(cart.Id, orderTotal, "Visa Card", customerId);
 
             await _unitOfWork.CompleteAsync();
 
@@ -199,27 +195,34 @@ public class PaymentService(
             {
                 Success = true,
                 OrderId = cart.Id,
-                PaymentMethod = "Visa",
+                PaymentMethod = "Visa Card",
                 TransactionId = Guid.NewGuid().ToString(),
-                Message = "Payment processed successfully via Visa"
+                Message = "Payment processed successfully via Visa Card"
             };
         }
 
         throw new InvalidOperationException("Visa payment processing failed");
     }
 
-    private async Task<Order> ValidateCustomerAsync(Guid customerId)
+    private async Task ValidateCustomerAsync(Guid customerId)
     {
-        // Add customer validation logic if needed
-        // For now, just return - customer validation might be handled elsewhere
-        await Task.CompletedTask;
-        return new Order();
+        _logger.LogDebug("Validating customer {CustomerId}", customerId);
+
+        // Check if customer exists in the system
+        var customer = await _unitOfWork.Users.GetByIdAsync(customerId);
+        if (customer == null)
+        {
+            _logger.LogWarning("Customer {CustomerId} not found", customerId);
+            throw new KeyNotFoundException($"Customer with ID {customerId} not found");
+        }
+
+        _logger.LogDebug("Customer {CustomerId} validation successful", customerId);
     }
 
     private async Task ValidateCustomerCartAsync(Guid customerId)
     {
         var cart = await _unitOfWork.Orders.GetCartByCustomerAsync(customerId);
-        if (cart == null || !cart.OrderGames.Any())
+        if (cart == null || cart.OrderGames.Count == 0)
         {
             throw new ValidationException("Cart is empty. Cannot process payment for empty cart.");
         }
@@ -228,11 +231,9 @@ public class PaymentService(
     private async Task<Order> GetCustomerCartAsync(Guid customerId)
     {
         var cart = await _unitOfWork.Orders.GetCartByCustomerAsync(customerId);
-        if (cart == null || !cart.OrderGames.Any())
-        {
-            throw new ValidationException("Cart is empty. Cannot process payment for empty cart.");
-        }
-        return cart;
+        return cart == null || cart.OrderGames.Count == 0
+            ? throw new ValidationException("Cart is empty. Cannot process payment for empty cart.")
+            : cart;
     }
 
     private async Task CreatePaymentTransactionAsync(Guid orderId, decimal amount, string paymentMethod, Guid customerId)
@@ -240,7 +241,7 @@ public class PaymentService(
         var transaction = new PaymentTransaction
         {
             OrderId = orderId,
-            CustomerId = customerId,
+            CustomerId = customerId, // Przywracamy CustomerId zgodnie z README
             Amount = amount,
             PaymentMethod = paymentMethod,
             Status = PaymentStatus.Completed,

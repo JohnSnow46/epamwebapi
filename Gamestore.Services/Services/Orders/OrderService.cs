@@ -36,16 +36,11 @@ public class OrderService(IUnitOfWork unitOfWork, ILogger<OrderService> logger) 
 
         var order = await _unitOfWork.Orders.GetOrderWithDetailsAsync(orderId);
 
-        if (order == null)
-            return null;
-
-        // Delegate user authorization to service layer
-        if (order.CustomerId != requestingCustomerId)
-        {
-            throw new UnauthorizedAccessException("You can only access your own orders");
-        }
-
-        return MapToOrderDto(order);
+        return order == null
+            ? null
+            : order.CustomerId != requestingCustomerId
+            ? throw new UnauthorizedAccessException("You can only access your own orders")
+            : MapToOrderDto(order);
     }
 
     public async Task<IEnumerable<OrderGameDto>> GetOrderDetailsAsync(Guid orderId, Guid requestingCustomerId)
@@ -53,11 +48,7 @@ public class OrderService(IUnitOfWork unitOfWork, ILogger<OrderService> logger) 
         _logger.LogInformation("Getting order details for order {OrderId} by customer {CustomerId}", orderId, requestingCustomerId);
 
         // First check if the order exists and belongs to the requesting customer
-        var order = await _unitOfWork.Orders.GetOrderWithDetailsAsync(orderId);
-        if (order == null)
-        {
-            throw new KeyNotFoundException($"Order with ID '{orderId}' not found");
-        }
+        var order = await _unitOfWork.Orders.GetOrderWithDetailsAsync(orderId) ?? throw new KeyNotFoundException($"Order with ID '{orderId}' not found");
 
         // Delegate user authorization to service layer
         if (order.CustomerId != requestingCustomerId)

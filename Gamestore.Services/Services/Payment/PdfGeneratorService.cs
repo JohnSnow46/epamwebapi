@@ -4,6 +4,7 @@ using Gamestore.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Gamestore.Services.Services.Payment;
+
 public class PdfGeneratorService(ILogger<PdfGeneratorService> logger) : IPdfGeneratorService
 {
     private readonly ILogger<PdfGeneratorService> _logger = logger;

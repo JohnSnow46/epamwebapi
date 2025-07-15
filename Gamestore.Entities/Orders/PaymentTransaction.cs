@@ -23,6 +23,14 @@ public class PaymentTransaction
     public Guid OrderId { get; set; }
 
     /// <summary>
+    /// Gets or sets the unique identifier of the customer who made the payment.
+    /// This enables direct querying of payment history by customer and supports
+    /// the GetTransactionsByCustomerAsync repository method as required by the system.
+    /// </summary>
+    [Required]
+    public Guid CustomerId { get; set; }
+
+    /// <summary>
     /// Gets or sets the payment method used for the transaction.
     /// This indicates how the payment was processed (e.g., credit card, PayPal, bank transfer).
     /// </summary>

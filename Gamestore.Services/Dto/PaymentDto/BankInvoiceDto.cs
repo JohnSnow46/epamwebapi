@@ -1,38 +1,39 @@
 ﻿namespace Gamestore.Services.Dto.PaymentDto;
 
 /// <summary>
-/// Represents a bank invoice data transfer object for payment processing.
-/// Contains invoice details for bank transfer payment methods.
+/// Represents a bank invoice data transfer object for PDF generation.
+/// Contains all necessary information to generate a bank payment invoice according to README requirements.
 /// </summary>
 public class BankInvoiceDto
 {
     /// <summary>
-    /// Gets or sets the unique identifier of the user associated with the invoice.
-    /// This identifies the customer who will make the payment.
+    /// Gets or sets the unique identifier of the user/customer.
+    /// Required field for bank invoice according to README US6.
     /// </summary>
     public Guid UserId { get; set; }
 
     /// <summary>
-    /// Gets or sets the unique identifier of the order associated with the invoice.
-    /// This links the invoice to the specific order being paid for.
+    /// Gets or sets the unique identifier of the order.
+    /// Required field for bank invoice according to README US6.
     /// </summary>
     public Guid OrderId { get; set; }
 
     /// <summary>
-    /// Gets or sets the date when the invoice was created.
-    /// This timestamp records when the invoice was generated.
+    /// Gets or sets the creation date of the invoice.
+    /// Required field for bank invoice according to README US6.
     /// </summary>
     public DateTime CreationDate { get; set; }
 
     /// <summary>
-    /// Gets or sets the date until which the invoice is valid.
-    /// After this date, the invoice may no longer be accepted for payment.
+    /// Gets or sets the validity date - how long the invoice is valid.
+    /// Required field for bank invoice according to README US6.
+    /// This should be configurable via application settings.
     /// </summary>
     public DateTime ValidityDate { get; set; }
 
     /// <summary>
-    /// Gets or sets the total amount to be paid according to the invoice.
-    /// This represents the monetary value in the system's base currency.
+    /// Gets or sets the total amount/sum for the invoice.
+    /// Required field for bank invoice according to README US6.
     /// </summary>
     public decimal Sum { get; set; }
 }
