@@ -2,6 +2,7 @@
 
 namespace Gamestore.Services.Dto.AuthDto;
 
+
 /// <summary>
 /// Represents a request to create a new user account.
 /// Contains user information, password, and role assignments for user registration.

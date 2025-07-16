@@ -1,260 +1,151 @@
-# Epic 5 - Payment methods
-Extend the functionality of the Game Store by adding the ability to buy a game.
+# Epic 8 - NoSQL database
+Our customer has bought the Northwind Online Store, which is still in active use.
+Extend Online Game Store with their database and the application must work with 2 databases from now.
+You can find all the needed information in mongo.zip.
+
 
 ## General requirements
+
 Please use the following Angular Front-end: [gamestore-ui-app](gamestore-ui-app)
-You should use the following [Microservice payment](microservice\publish)  
+
+Existing [MongoDB](mongo)
+
 System should support the following features: 
-* Add game to cart.
-* Get games from cart.
-* Get orders.
-* Get payment methods.
-* Perform payment with the selected method.
-
-### Entities
-**Order**
-* **Id:** Guid, required, unique
-* **Date:** DateTime, optional
-* **CustomerId:** Guid, required
-* **Status:** Enum, required
-
-**OrderGame**
-* **OrderId:** Guid, required
-* **ProductId:** Guid, required
-* **Price:** Double, required
-* **Quantity:** Int, required
-* **Discount:** Int, optional
-
-Product-Order combinations are unique.
+* Two databases as data storage.
+* Operations logging.   
 
 ## Additional Requirements
-#### Payment  
-	Create a single endpoint for payment independently from the selected method.  
-	If the payment is processed successfully then the order must be marked as paid otherwise cancelled
+#### Products
+	A user should be able to perform the same actions with products from Northwind Online Store in Game Store: view, edit, delete, buy, comment, use the same filter options, etc.  
 
 
-#### Payment Methods  
-	Allowed payment methods: “Bank”, “IBox terminal”, “Visa”.   
-	Only one method can be applied to an order to get paid.  
-	Each payment method contains a little picture (open-source pictures), title, short description.  
+#### Orders History
+	Order history should contain orders from both databases.
+	Start/end date query parameters are optional, if the value is not populated then should be treated as unlimited.
 
 
-#### Customer  
-	Since we don’t have users yet, for Customer Id use a stub value.
+#### Northwind database entities
+	Northwind database is read-only, neither the data scheme nor the data content must be changed. Only changes required by task description are allowed.
 
 
-#### Bank payment date of validity  
-	The date of validity – how long the invoice is valid. The value should be configurable by application settings.
+#### Entity changes logs
+	A new model should be created for logs inside the Northwind database.
 
 
-#### Order limitations  
-	User cannot order more games than available in the stock.
+#### Shippers
+	Shippers should be stored only in the Northwind database, the game store app will not add new ones.
 
 
-#### Order statuses  
-Any order has the next possible statuses:
-* Open – games are in the cart.
-* Checkout – payment is started.
-* Paid – payment is performed successfully.
-* Cancelled – payment is performed with errors.
+#### Game store Database Entities
+	Entities in an SQL database must have the same set of attributes as in NoSQL: Suppliers, Products, Orders, 		Order details, and Categories.	
+
+
+#### Operations
+	Products, Suppliers, and Categories must have CRUD as before, regardless database.
+
+
+#### Product mapping
+	Product can be used as game in our system.
+	Northwind does not guarantee any product property is unique,	
+	Add a new game key field into Northwind db managed only by the game store app. This field should be used for mapping products and should be unique for two databases.
+
+
+#### Product view counter
+	Product views count field can be added in Mongo schema.
+
+
+#### Supplier
+	Supplier can be used as publisher in our system.
+	Use supplier name as unique key for mapping entities in two databases.
+
+
+#### Orders
+	All orders from Northwind should be used only for reading.
+
+
+#### Data Transfer Objects
+	Any existing endpoint results should not be changed in this task.
+
+
+#### Categories
+	Category can be used as genre in our system.
+
+
+#### Product count 
+	Products count value should be synced for both databases and recalculated after order payment.
+
+
+#### Damaged data                                      
+	After years of using Northwind contains some broken data, this should be handled by the Game store app.
+
 
 
 
 ## Task Description
 
-### E05 US1 - User story 1
+### E08 US1 - User story 1
 
-Add game in and delete from the cart 
-Add game in the cart endpoint.
+Get Shippers endpoint.
 ```{xml} 
-Url: /games/{key}/buy
-Type: POST
-Limitation: if the endpoint is called for the game which is already in the cart, then just increment the quantity
-Response: Success status code
-```
-
-Delete game from cart endpoint
-```{xml} 
-Url: /orders/cart/{key}
-Type: DELETE
-Response: Success status code
-```
-
-### E05 US2 - User story 2
-Get paid and cancelled orders endpoint.
-```{xml} 
-Url: /orders
+Url: /shippers
 Type: GET
-Response example:
+Response: Since shipper model can be dynamic, use a free content structure.
+```
+
+### E08 US2 - User story 2
+Get orders history endpoint.
+```{xml} 
+Url: /orders/history
+Type: GET
+Response example:
 [
   {
-    "id": "5d8af81a-c146-4588-93bf-0e5c7e9e4a9e",
-    "customerId": "5aa1c97e-e6b3-497c-8e00-270e96aa0b63",
-    "date": "2023-11-20T11:03:26.0572863+02:00"
+    "id": "769d6ae7-9ec1-4c78-8401-25c672afc10b",
+    "customerId": "4dee81a7-10cc-44b9-8866-920711f70b98",
+    "date": "2023-11-26T12:15:28.8416459+02:00"
   },
   {
-    "id": "bec0ffb1-fb80-47ff-8720-2f9a544a55a2",
-    "customerId": "bfa70dfa-6b18-4f3f-b882-14af597396d4",
-    "date": "2023-11-18T11:03:26.0575052+02:00"
+    "id": "33f3a9d1-0c84-4dc1-8861-ae46cb15391f",
+    "customerId": "510f9d71-8fc3-470c-a34d-02795ffa66e0",
+    "date": "2023-11-24T12:15:28.8416998+02:00"
   }
 ]
 ```
 
-Get order by id endpoint.
-```{xml} 
-Url: /orders/{id}
-Type: GET
-Response example:
-{
-  "id": "5d8af81a-c146-4588-93bf-0e5c7e9e4a9e",
-  "customerId": "5aa1c97e-e6b3-497c-8e00-270e96aa0b63",
-  "date": "2023-11-20T11:03:26.0572863+02:00"
-}
-```
-
-### E05 US3 - User story 3
-Get order details endpoint.
-```{xml} 
-Url: /orders/{id}/details
-Type: GET
-Response Example:
-[
-  {
-    "productId": "8ea595c2-765b-4190-b3da-da00540b2202",
-    "price": 100,
-    "quantity": 3,
-    "discount": 0
-  },
-  {
-    "productId": "c3a73173-fe0f-4771-a7eb-f2cd458d8303",
-    "price": 10,
-    "quantity": 5,
-    "discount": 0
-  },
-  {
-    "productId": "923a8bd8-b256-44f4-b972-a0d640d56ef4",
-    "price": 100,
-    "quantity": 1,
-    "discount": 10
-  }
-]
-```
+### E08 US3 - User story 3
+Extend SQL database with the fields presented in MongoDB
 
 
-### E05 US4 - User story 4
-Get cart endpoint.
-```{xml} 
-Url: /orders/cart
-Type: GET
-Hint: Cart is an order in the status Open, if such an order is not present in the database this should be created automatically during adding the first game to the cart. As a result, if the last game is deleted from the cart then the open order should be deleted automatically.
-Response example:
-[
-  {
-    "productId": "f6f698ee-41df-4594-b90c-3862e7d2cbee",
-    "price": 30,
-    "quantity": 1,
-    "discount": 0
-  },
-  {
-    "productId": "75396383-c1fa-4cbd-81c9-c874ae3a3e67",
-    "price": 100,
-    "quantity": 1,
-    "discount": 20
-  }
-]
-```
-
-### E05 US5 - User story 5
-Get payment methods endpoint.
-```{xml} 
-Url: /orders/payment-methods
-Type: GET
-Response Example:
-{
-  "paymentMethods": [
-    {
-      "imageUrl": "image link1",
-      "title": "Bank",
-      "description": "Some text 1"
-    },
-    {
-      "imageUrl": "image link2",
-      "title": "IBox terminal",
-      "description": "Some text 2"
-    },
-    {
-      "imageUrl": "image link3",
-      "title": "Visa",
-      "description": "Some text 3"
-    }
-  ]
-}
-```
-
-### E05 US6 - User story 6
-"Bank" payment
-```{xml} 
-Url: /orders/payment
-Type: POST
-Request: {"method":"Bank"} 
-Flow: the system should return generated invoice file for download:
-File type: PDF
-The file content:
-User ID
-Order ID
-Creation date
-The date of validity – how long is the invoice is valid.
-Sum
-```
-
-### E05 US7 - User story 7
-"IBox terminal" payment
-
-```{xml} 
-Url: /orders/payment
-Type: POST
-Request: {"method":"IBox terminal"}
-Integration: Integration with payment microservice is required 
-Flow: The system should handle requests with an IBox payment. 
-Response: should contain a user Id, invoice number (order ID), and sum.
-Response Example:
-{
-  "userId": "24967e32-dec1-47b5-8ca6-478afa84c2be",
-  "orderId": "7dce8347-4181-4316-9210-302361340975",
-  "paymentDate": "2023-11-18T11:03:26.0575052+02:00",
-  "sum": 100
-}
-```
+### E08 US4 - User story 4
+Extend CRUD operations to perform them for entities for any database.
 
 
-### E05 US8 - User story 8
-"Visa" payment
-```{xml} 
-Url: /orders/payment
-Type: POST
-Request:
-{
-  "method": "Visa",
-  "model": {
-    "holder": "Vitalii",
-    "cardNumber": "123321122344231",
-    "monthExpire": 10,
-    "yearExpire": 2030,
-    "cvv2": 111
-  }
-}
-Integration: Integration with payment microservice is required 
-Flow: The system should handle requests with card holder’s name, card number, Date of expiry (month and year), CVV2/CVC2
-Response: Success status code.
-```
+### E08 US5 - User story 5
+Implement unit-in-stock count sync for two databases.
+
+
+### E08 US6 - User story 6
+Implement duplicate management by the next criteria:
+* If there is a duplicate between our DB and MongoDB – the item in our DB is a priority.
+* If there are two same items in MongoDB – the first found item must be used.
+
+
+### E08 US7 - User story 7
+Implement Mongo DB items update by the next schema:
+* Once the User edits the items in Mongo DB – the item must be copied to the game store database and the update performed.
+* Mongo DB data should be not affected by any game store CRUD operations.
+ 
  
 ## Non-functional requirement
-
-**E05 NFR1**  
-	Microservice - an additional project that must be run locally and integrated with the game store api for Visa and IBox payments.
-	You can investigate possible requests and results of microservice by calling the swagger endpoint.
-
-**E05 NFR2**  
-	Implement full tolerance payment acceptation.
-	As the microservice that accepts iBox and card payments can reject up to 10 % of the transactions.
-	A response validation must be implemented and an additional request must be sent in case of failure, the solution must be able to work with all responses of the Microservice.
+**E08 NFR1**  
+A C# driver with IQueryable for read operations in MongoDB should be used.  
+**E08 NFR2**  
+	A FilterDefinition/UpdateDefinition for update operations in MongoDB should be used.  
+**E08 NFR3**  
+	A raw query for insert/delete in the MongoDB should be used.  
+**E08 NFR4**  
+	All entity changes in both databases must be logged into the NoSQL database. The log should include the date and time, action name, entity type, old version, and new version.  
+**E08 NFR5 [Optional]**  
+	Use a structural logging approach for entity change logs.  
+**E08 NFR6 [Optional]**  
+	Use the Database First approach for Northwind database integration.  
