@@ -21,7 +21,7 @@ public class OrdersController(IOrderService orderService,
     /// Epic 9: Authenticated users can view their order history
     /// </summary>
     [HttpGet]
-    [Authorize]
+    [AllowAnonymous]
     public async Task<IActionResult> GetOrders()
     {
         try
@@ -36,18 +36,12 @@ public class OrdersController(IOrderService orderService,
                 });
             }
 
-            _logger.LogInformation("Getting orders for user {UserEmail}", User.GetUserEmail());
+            _logger.LogInformation("Getting orders history for user {UserEmail}", User.GetUserEmail());
 
-            var orders = await _orderService.GetPaidAndCancelledOrdersAsync(customerId.Value);
+            // Użyj serwisu history zamiast zwykłego order service
+            var orders = await _orderHistoryService.GetOrderHistoryAsync();
 
-            var response = orders.Select(o => new
-            {
-                id = o.Id,
-                customerId = o.CustomerId,
-                date = o.Date
-            });
-
-            return Ok(response);
+            return Ok(orders);
         }
         catch (Exception ex)
         {

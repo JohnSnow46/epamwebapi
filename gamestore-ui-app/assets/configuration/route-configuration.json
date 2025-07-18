@@ -1,8 +1,8 @@
 {
   "Game": "/game",
-  "UpdateGame": "/update-game",
+  "UpdateGame": "update-game",
   "DeleteGame": "/delete-game",
-  "AddGame": "/add-game",
+  "AddGame": "add-game",
   "Games": "/games",
 
   "Genres": "/genres",
@@ -26,5 +26,18 @@
   "Order": "/order",
   "Orders": "/orders",
   "Basket": "/basket",
-  "MakeOrder": "/order"
+  "MakeOrder": "/order",
+
+  "Users": "/users",
+  "User": "/user",
+  "UpdateUser": "/update-user",
+  "DeleteUser": "/delete-user",
+  "AddUser": "/add-user",
+  "Login": "/login",
+
+  "Roles": "/roles",
+  "Role": "/role",
+  "UpdateRole": "/update-role",
+  "DeleteRole": "/delete-role",
+  "AddRole": "/add-role"
 }
