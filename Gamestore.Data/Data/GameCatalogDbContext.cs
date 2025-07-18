@@ -204,5 +204,18 @@ public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options
             .WithMany(c => c.ChildComments)
             .HasForeignKey(c => c.ParentCommentId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        // Epic 8 - MongoDB integration fields dla Publisher
+        modelBuilder.Entity<Publisher>()
+            .Property(p => p.ContactName)
+            .HasMaxLength(50);
+
+        modelBuilder.Entity<Publisher>()
+            .Property(p => p.Phone)
+            .HasMaxLength(30);
+
+        modelBuilder.Entity<Publisher>()
+            .Property(p => p.Country)
+            .HasMaxLength(50);
     }
 }

@@ -38,6 +38,24 @@ public class Publisher
     public string HomePage { get; set; } = string.Empty;
 
     /// <summary>
+    /// Gets or sets the contact name for the publisher.
+    /// Used for mapping with MongoDB Suppliers data (Epic 8).
+    /// </summary>
+    public string? ContactName { get; set; }
+
+    /// <summary>
+    /// Gets or sets the phone number of the publisher.
+    /// Used for mapping with MongoDB Suppliers data (Epic 8).
+    /// </summary>
+    public string? Phone { get; set; }
+
+    /// <summary>
+    /// Gets or sets the country where the publisher is located.
+    /// Used for mapping with MongoDB Suppliers data (Epic 8).
+    /// </summary>
+    public string? Country { get; set; }
+
+    /// <summary>
     /// Gets or sets the collection of games that this publisher has published.
     /// This navigation property enables the one-to-many relationship between publishers and games,
     /// allowing access to the complete catalog of games from this publisher.

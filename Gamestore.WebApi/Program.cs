@@ -1,23 +1,25 @@
-﻿using Gamestore.WebApi.Logging;
-using Gamestore.WebApi.Middleware;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using Gamestore.Services.Services.Auth;
-using Microsoft.OpenApi.Models;
-using Microsoft.AspNetCore.Authorization;
-using System.Text;
+﻿using System.Text;
 using System.Text.Json;
+using Gamestore.Data.Data;
+using Gamestore.Data.Interfaces;
+using Gamestore.Data.MongoDB;
+using Gamestore.Data.Repositories;
+using Gamestore.Services.Interfaces;
+using Gamestore.Services.Services;
+using Gamestore.Services.Services.Auth;
+using Gamestore.Services.Services.Auth.Management;
 using Gamestore.Services.Services.Business;
 using Gamestore.Services.Services.Community;
 using Gamestore.Services.Services.Filters;
-using Gamestore.Services.Services.Auth.Management;
-using Gamestore.Services.Interfaces;
-using Gamestore.Data.Interfaces;
-using Gamestore.Data.Repositories;
-using Gamestore.Data.Data;
 using Gamestore.Services.Services.Orders;
 using Gamestore.Services.Services.Payment;
+using Gamestore.WebApi.Logging;
+using Gamestore.WebApi.Middleware;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -239,6 +241,12 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<IPublisherService, PublisherService>();
     builder.Services.AddScoped<ICommentService, CommentService>();
     builder.Services.AddScoped<IGameFilterService, GameFilterService>();
+
+    // MongoDB
+    builder.Services.AddMongoDbServices(builder.Configuration);
+    builder.Services.AddScoped<IShipperService, ShipperService>();
+    builder.Services.AddScoped<IOrderHistoryService, OrderHistoryService>();
+    builder.Services.AddScoped<IUnifiedProductService, UnifiedProductService>();
 
     // Data Access
     builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
