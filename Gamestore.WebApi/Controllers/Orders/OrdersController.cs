@@ -8,9 +8,12 @@ namespace Gamestore.WebApi.Controllers.Orders;
 
 [ApiController]
 [Route("api/orders")]
-public class OrdersController(IOrderService orderService, ILogger<OrdersController> logger) : ControllerBase
+public class OrdersController(IOrderService orderService,
+    IOrderHistoryService orderHistoryService,
+    ILogger<OrdersController> logger) : ControllerBase
 {
     private readonly IOrderService _orderService = orderService;
+    private readonly IOrderHistoryService _orderHistoryService = orderHistoryService;
     private readonly ILogger<OrdersController> _logger = logger;
 
     /// <summary>
@@ -155,6 +158,38 @@ public class OrdersController(IOrderService orderService, ILogger<OrdersControll
         catch (Exception ex)
         {
             return HandleException(ex, $"Error retrieving order details for order {id}");
+        }
+    }
+
+    /// <summary>
+    /// E08 US2 - Get orders history from both databases (Epic 8)
+    /// URL: GET /api/orders/history?startDate=2023-01-01&endDate=2023-12-31
+    /// </summary>
+    [HttpGet("history")]
+    [AllowAnonymous] // Lub [Authorize] jeśli potrzebna autoryzacja
+    public async Task<IActionResult> GetOrdersHistory([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+    {
+        try
+        {
+            _logger.LogInformation("GET /api/orders/history called - StartDate: {StartDate}, EndDate: {EndDate}",
+                startDate, endDate);
+
+            var orderHistory = await _orderHistoryService.GetOrderHistoryAsync(startDate, endDate);
+
+            _logger.LogInformation("Returning {Count} orders from history", orderHistory.Count());
+
+            return Ok(orderHistory);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error in GetOrdersHistory endpoint");
+
+            return StatusCode(500, new ErrorResponseModel
+            {
+                Message = "An error occurred while fetching order history",
+                Details = ex.Message,
+                StatusCode = StatusCodes.Status500InternalServerError
+            });
         }
     }
 
