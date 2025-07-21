@@ -87,6 +87,73 @@ public class UnifiedProductsController : ControllerBase
     }
 
     /// <summary>
+    /// Creates a new product (always in SQL database)
+    /// </summary>
+    [HttpPost]
+    public async Task<IActionResult> CreateProduct([FromBody] object productData)
+    {
+        try
+        {
+            var result = await _unifiedProductService.CreateProductAsync(productData);
+            return CreatedAtAction(nameof(GetProduct), new { id = GetIdFromResult(result) }, result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating product");
+            return StatusCode(500, new { message = "Error creating product", error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Updates a product (handles both databases according to E08 US7 rules)
+    /// </summary>
+    [HttpPut("{id}")]
+    public async Task<IActionResult> UpdateProduct(string id, [FromBody] object productData)
+    {
+        try
+        {
+            var result = await _unifiedProductService.UpdateProductAsync(id, productData);
+            return Ok(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error updating product {Id}", id);
+            return StatusCode(500, new { message = "Error updating product", error = ex.Message });
+        }
+    }
+
+    /// <summary>
+    /// Deletes a product (only from SQL database)
+    /// </summary>
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteProduct(string id)
+    {
+        try
+        {
+            var result = await _unifiedProductService.DeleteProductAsync(id);
+
+            if (!result)
+            {
+                return NotFound(new { message = $"Product with ID {id} not found" });
+            }
+
+            return NoContent();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting product {Id}", id);
+            return StatusCode(500, new { message = "Error deleting product", error = ex.Message });
+        }
+    }
+
+    private static string GetIdFromResult(object result)
+    {
+        // Helper method to extract ID from result object
+        var idProperty = result.GetType().GetProperty("Id");
+        return idProperty?.GetValue(result)?.ToString() ?? string.Empty;
+    }
+
+    /// <summary>
     /// Test endpoint to verify Epic 8 implementation
     /// </summary>
     [HttpGet("epic8-status")]

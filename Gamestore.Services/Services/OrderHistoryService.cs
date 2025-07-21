@@ -3,6 +3,7 @@ using Gamestore.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using MongoDB.Driver;
 using MongoDB.Bson;
+using Microsoft.Extensions.Configuration;
 
 namespace Gamestore.Services.Services;
 
@@ -18,15 +19,33 @@ public class OrderHistoryService : IOrderHistoryService
 
     public OrderHistoryService(
         IUnitOfWork unitOfWork,
-        ILogger<OrderHistoryService> logger)
+        ILogger<OrderHistoryService> logger,
+        IConfiguration configuration)
     {
         _unitOfWork = unitOfWork;
         _logger = logger;
 
-        // Bezpośrednie połączenie z MongoDB (sprawdzone rozwiązanie)
-        var client = new MongoClient("mongodb://localhost:27017");
-        var database = client.GetDatabase("Northwind");
-        _mongoOrdersCollection = database.GetCollection<BsonDocument>("orders");
+        try
+        {
+            // Pobierz connection string z konfiguracji lub użyj domyślny
+            var connectionString = configuration.GetConnectionString("MongoDb") ?? "mongodb://localhost:27017";
+            var databaseName = configuration.GetValue<string>("MongoDb:DatabaseName") ?? "Northwind";
+
+            _logger.LogInformation("Connecting to MongoDB: {ConnectionString}, Database: {DatabaseName}",
+                connectionString, databaseName);
+
+            var client = new MongoClient(connectionString);
+            var database = client.GetDatabase(databaseName);
+            _mongoOrdersCollection = database.GetCollection<BsonDocument>("orders");
+
+            _logger.LogInformation("MongoDB connection established successfully");
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to establish MongoDB connection");
+            // W przypadku błędu, utwórz null collection - zostanie obsłużone w metodach
+            _mongoOrdersCollection = null;
+        }
     }
 
     /// <summary>
@@ -41,15 +60,16 @@ public class OrderHistoryService : IOrderHistoryService
 
             // 1. Pobierz orders z SQL database
             var sqlOrders = await GetSqlOrdersAsync(startDate, endDate);
+            _logger.LogInformation("Retrieved {SqlCount} orders from SQL database", sqlOrders.Count());
 
-            // 2. Pobierz orders z MongoDB
+            // 2. Pobierz orders z MongoDB (jeśli dostępny)
             var mongoOrders = await GetMongoOrdersAsync(startDate, endDate);
+            _logger.LogInformation("Retrieved {MongoCount} orders from MongoDB", mongoOrders.Count());
 
-            // 3. Połącz bez sortowania
+            // 3. Połącz wszystkie orders
             var combinedOrders = sqlOrders.Concat(mongoOrders).ToList();
 
-            _logger.LogInformation("Combined {SqlCount} SQL orders with {MongoCount} MongoDB orders",
-                sqlOrders.Count(), mongoOrders.Count());
+            _logger.LogInformation("Combined total: {TotalCount} orders", combinedOrders.Count);
 
             return combinedOrders;
         }
@@ -67,6 +87,8 @@ public class OrderHistoryService : IOrderHistoryService
     {
         try
         {
+            _logger.LogDebug("Fetching orders from SQL database");
+
             // Pobierz wszystkie orders z SQL
             var orders = await _unitOfWork.Orders.GetAllAsync();
 
@@ -87,18 +109,22 @@ public class OrderHistoryService : IOrderHistoryService
                 });
             }
 
-            // Konwertuj do wymaganego formatu
-            return orders.Select(o => new
+            // Konwertuj do wymaganego formatu - zgodnego z tym co oczekuje UI
+            var result = orders.Select(o => new
             {
                 id = o.Id.ToString(),
                 customerId = o.CustomerId.ToString(),
-                date = (o.Date ?? o.CreatedAt).ToString("yyyy-MM-ddTHH:mm:ss.fffffffK")
-            });
+                date = (o.Date ?? o.CreatedAt).ToString("yyyy-MM-ddTHH:mm:ss.fffffffK"),
+                source = "SQL" // Dodatkowe pole dla debugowania
+            }).ToList();
+
+            _logger.LogDebug("Converted {Count} SQL orders to required format", result.Count);
+            return result;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching SQL orders");
-            return Enumerable.Empty<object>();
+            throw; // Rzuć wyjątek dalej zamiast zwracać pustą kolekcję
         }
     }
 
@@ -109,20 +135,60 @@ public class OrderHistoryService : IOrderHistoryService
     {
         try
         {
-            var documents = await _mongoOrdersCollection.Find(new BsonDocument()).ToListAsync();
-
-            var orders = documents.Select(doc =>
+            // Jeśli MongoDB nie jest dostępny, zwróć pustą kolekcję
+            if (_mongoOrdersCollection == null)
             {
-                string dateString;
-                DateTime? orderDate = null;
+                _logger.LogWarning("MongoDB collection is not available, skipping MongoDB orders");
+                return Enumerable.Empty<object>();
+            }
 
+            _logger.LogDebug("Fetching orders from MongoDB");
+
+            // Pobierz wszystkie dokumenty z MongoDB
+            var documents = await _mongoOrdersCollection.Find(new BsonDocument()).ToListAsync();
+            _logger.LogDebug("Retrieved {Count} documents from MongoDB", documents.Count);
+
+            var orders = new List<object>();
+
+            foreach (var doc in documents)
+            {
                 try
                 {
+                    string orderId;
+                    string customerId;
+                    DateTime? orderDate = null;
+                    string dateString;
+
+                    // Pobierz OrderID
+                    if (doc.Contains("OrderID"))
+                    {
+                        orderId = doc["OrderID"].ToString();
+                    }
+                    else if (doc.Contains("_id"))
+                    {
+                        orderId = doc["_id"].ToString();
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Document missing OrderID and _id, skipping");
+                        continue;
+                    }
+
+                    // Pobierz CustomerID
+                    if (doc.Contains("CustomerID") && !doc["CustomerID"].IsBsonNull)
+                    {
+                        customerId = doc["CustomerID"].AsString;
+                    }
+                    else
+                    {
+                        customerId = "Unknown";
+                    }
+
+                    // Pobierz datę
                     if (doc.Contains("OrderDate") && !doc["OrderDate"].IsBsonNull)
                     {
                         var orderDateValue = doc["OrderDate"].AsString;
 
-                        // Parsuj string w formacie: "1996-07-04 00:00:00.000"
                         if (DateTime.TryParse(orderDateValue, out var parsedDate))
                         {
                             orderDate = parsedDate;
@@ -130,6 +196,8 @@ public class OrderHistoryService : IOrderHistoryService
                         }
                         else
                         {
+                            _logger.LogWarning("Could not parse OrderDate: {OrderDate} for OrderID: {OrderID}",
+                                orderDateValue, orderId);
                             dateString = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffK");
                         }
                     }
@@ -137,46 +205,40 @@ public class OrderHistoryService : IOrderHistoryService
                     {
                         dateString = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffK");
                     }
-                }
-                catch
-                {
-                    dateString = DateTime.UtcNow.ToString("yyyy-MM-ddTHH:mm:ss.fffffffK");
-                }
 
-                return new
-                {
-                    order = new
+                    // Filtruj według dat jeśli podane
+                    if ((startDate.HasValue || endDate.HasValue) && orderDate.HasValue)
                     {
-                        id = doc.Contains("OrderID") ? doc["OrderID"].ToString() : doc["_id"].ToString(),
-                        customerId = doc.Contains("CustomerID") ? doc["CustomerID"].AsString : "Unknown",
-                        date = dateString
-                    },
-                    parsedDate = orderDate
-                };
-            });
+                        if (startDate.HasValue && orderDate.Value < startDate.Value)
+                            continue;
 
-            // Filtruj według dat jeśli podane
-            if (startDate.HasValue || endDate.HasValue)
-            {
-                orders = orders.Where(o =>
+                        if (endDate.HasValue && orderDate.Value > endDate.Value)
+                            continue;
+                    }
+
+                    // POPRAWKA: Zwróć strukturę zgodną z SQL (bez zagnieżdżenia "order")
+                    orders.Add(new
+                    {
+                        id = orderId,
+                        customerId = customerId,
+                        date = dateString,
+                        source = "MongoDB" // Dodatkowe pole dla debugowania
+                    });
+                }
+                catch (Exception ex)
                 {
-                    if (!o.parsedDate.HasValue) return false;
-
-                    if (startDate.HasValue && o.parsedDate.Value < startDate.Value)
-                        return false;
-
-                    if (endDate.HasValue && o.parsedDate.Value > endDate.Value)
-                        return false;
-
-                    return true;
-                });
+                    _logger.LogWarning(ex, "Error processing MongoDB document, skipping");
+                    continue;
+                }
             }
 
-            return orders.Select(o => o.order);
+            _logger.LogDebug("Converted {Count} MongoDB orders to required format", orders.Count);
+            return orders;
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error fetching MongoDB orders");
+            // W przypadku błędu MongoDB, zwróć pustą kolekcję ale zloguj błąd
             return Enumerable.Empty<object>();
         }
     }

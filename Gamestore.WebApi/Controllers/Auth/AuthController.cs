@@ -406,6 +406,17 @@ public class AuthController(
             "platform" => true, // Everyone can access
             "publisher" => true, // Everyone can access
             "game" => true, // Everyone can access
+            "games" => true, // Everyone can access
+            "genres" => true, // Everyone can access
+            "platforms" => true, // Everyone can access
+            "publishers" => true, // Everyone can access
+            "history" => true, // Everyone can access order history
+            "orders" => true, // Everyone can access orders
+            "order" => true, // Everyone can access individual orders
+            "basket" => true, // Everyone can access basket
+            "makeorder" => true, // Everyone can access make order
+            "users" => userRole == Roles.Administrator, // Only admin can manage users
+            "roles" => userRole == Roles.Administrator, // Only admin can manage roles
             _ => true // Default allow for basic pages
         };
     }

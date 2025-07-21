@@ -157,15 +157,71 @@ public class OrdersController(IOrderService orderService,
 
     /// <summary>
     /// E08 US2 - Get orders history from both databases (Epic 8)
-    /// URL: GET /api/orders/history?startDate=2023-01-01&endDate=2023-12-31
+    /// URL: GET /api/orders/history?startDate=2023-01-01&amp;endDate=2023-12-31
+    /// UWAGA: UI wysyła parametry "start" i "end", nie "startDate" i "endDate"
     /// </summary>
     [HttpGet("history")]
     [AllowAnonymous] // Lub [Authorize] jeśli potrzebna autoryzacja
-    public async Task<IActionResult> GetOrdersHistory([FromQuery] DateTime? startDate, [FromQuery] DateTime? endDate)
+    public async Task<IActionResult> GetOrdersHistory(
+#pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+        [FromQuery] string? start = null,
+        [FromQuery] string? end = null)
+#pragma warning restore CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     {
         try
         {
-            _logger.LogInformation("GET /api/orders/history called - StartDate: {StartDate}, EndDate: {EndDate}",
+            _logger.LogInformation("GET /api/orders/history called - Start: {Start}, End: {End}",
+                start, end);
+
+            // Konwertuj string parametry na DateTime?
+            DateTime? startDate = null;
+            DateTime? endDate = null;
+
+            if (!string.IsNullOrEmpty(start))
+            {
+                if (DateTime.TryParse(start, out var parsedStart))
+                {
+                    startDate = parsedStart;
+                }
+                else
+                {
+                    _logger.LogWarning("Could not parse start date: {Start}", start);
+                    return BadRequest(new ErrorResponseModel
+                    {
+                        Message = $"Invalid start date format: {start}",
+                        StatusCode = StatusCodes.Status400BadRequest
+                    });
+                }
+            }
+
+            if (!string.IsNullOrEmpty(end))
+            {
+                if (DateTime.TryParse(end, out var parsedEnd))
+                {
+                    endDate = parsedEnd;
+                }
+                else
+                {
+                    _logger.LogWarning("Could not parse end date: {End}", end);
+                    return BadRequest(new ErrorResponseModel
+                    {
+                        Message = $"Invalid end date format: {end}",
+                        StatusCode = StatusCodes.Status400BadRequest
+                    });
+                }
+            }
+
+            // Walidacja dat
+            if (startDate.HasValue && endDate.HasValue && startDate > endDate)
+            {
+                return BadRequest(new ErrorResponseModel
+                {
+                    Message = "Start date cannot be later than end date",
+                    StatusCode = StatusCodes.Status400BadRequest
+                });
+            }
+
+            _logger.LogInformation("Parsed dates - StartDate: {StartDate}, EndDate: {EndDate}",
                 startDate, endDate);
 
             var orderHistory = await _orderHistoryService.GetOrderHistoryAsync(startDate, endDate);
