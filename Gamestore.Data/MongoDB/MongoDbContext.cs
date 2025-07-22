@@ -1,12 +1,12 @@
-﻿using Gamestore.Entities.MongoDB;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson;
 
 namespace Gamestore.Data.MongoDB;
 
 /// <summary>
-/// MongoDB context for MongoDB.Driver 2.7.3 without BsonClassMap
-/// Relies on default MongoDB serialization
+/// MongoDB context using BsonDocument to avoid BsonClassMap issues
+/// Workaround for MongoDB.Driver 2.7.3 + .NET 8 compatibility
 /// </summary>
 public class MongoDbContext
 {
@@ -17,16 +17,14 @@ public class MongoDbContext
         Database = client.GetDatabase("Northwind");
     }
 
-    // Collections for Northwind data (read-only)
-    public IMongoCollection<MongoProduct> Products => Database.GetCollection<MongoProduct>("products");
-    public IMongoCollection<MongoCategory> Categories => Database.GetCollection<MongoCategory>("categories");
-    public IMongoCollection<MongoSupplier> Suppliers => Database.GetCollection<MongoSupplier>("suppliers");
-    public IMongoCollection<MongoOrder> Orders => Database.GetCollection<MongoOrder>("orders");
-    public IMongoCollection<MongoOrderDetail> OrderDetails => Database.GetCollection<MongoOrderDetail>("orderdetails");
-    public IMongoCollection<MongoShipper> Shippers => Database.GetCollection<MongoShipper>("shippers");
-
-    // Collection for change logs (writable)
-    public IMongoCollection<MongoEntityChangeLog> EntityChangeLogs => Database.GetCollection<MongoEntityChangeLog>("entitychangelogs");
+    // Use BsonDocument collections to avoid BsonClassMap initialization
+    public IMongoCollection<BsonDocument> ProductsRaw => Database.GetCollection<BsonDocument>("products");
+    public IMongoCollection<BsonDocument> CategoriesRaw => Database.GetCollection<BsonDocument>("categories");
+    public IMongoCollection<BsonDocument> SuppliersRaw => Database.GetCollection<BsonDocument>("suppliers");
+    public IMongoCollection<BsonDocument> OrdersRaw => Database.GetCollection<BsonDocument>("orders");
+    public IMongoCollection<BsonDocument> OrderDetailsRaw => Database.GetCollection<BsonDocument>("orderdetails");
+    public IMongoCollection<BsonDocument> ShippersRaw => Database.GetCollection<BsonDocument>("shippers");
+    public IMongoCollection<BsonDocument> EntityChangeLogsRaw => Database.GetCollection<BsonDocument>("entitychangelogs");
 
     public IMongoDatabase Database { get; }
 }

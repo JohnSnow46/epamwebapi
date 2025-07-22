@@ -1,5 +1,4 @@
 ﻿using Gamestore.Data.Interfaces;
-using Gamestore.Entities.MongoDB;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -7,6 +6,7 @@ namespace Gamestore.Data.MongoDB;
 
 /// <summary>
 /// Extension methods for registering MongoDB services in DI container
+/// Updated to use BsonDocument approach to avoid BsonClassMap issues
 /// </summary>
 public static class MongoServiceExtensions
 {
@@ -17,61 +17,14 @@ public static class MongoServiceExtensions
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        // Check if MongoDB is enabled
-        var mongoSettings = configuration.GetSection("MongoDB");
-
         // Register MongoDB context
         services.AddScoped<MongoDbContext>();
 
-        // Register MongoDB repositories
-        services.AddScoped<IMongoRepository<MongoProduct>>(provider =>
-        {
-            var context = provider.GetRequiredService<MongoDbContext>();
-            return new MongoRepository<MongoProduct>(context.Products);
-        });
+        // Register only the specific product repository that works with BsonDocument
+        services.AddScoped<IMongoProductRepository, MongoProductRepository>();
 
-        services.AddScoped<IMongoRepository<MongoCategory>>(provider =>
-        {
-            var context = provider.GetRequiredService<MongoDbContext>();
-            return new MongoRepository<MongoCategory>(context.Categories);
-        });
-
-        services.AddScoped<IMongoRepository<MongoSupplier>>(provider =>
-        {
-            var context = provider.GetRequiredService<MongoDbContext>();
-            return new MongoRepository<MongoSupplier>(context.Suppliers);
-        });
-
-        services.AddScoped<IMongoRepository<MongoOrder>>(provider =>
-        {
-            var context = provider.GetRequiredService<MongoDbContext>();
-            return new MongoRepository<MongoOrder>(context.Orders);
-        });
-
-        services.AddScoped<IMongoRepository<MongoOrderDetail>>(provider =>
-        {
-            var context = provider.GetRequiredService<MongoDbContext>();
-            return new MongoRepository<MongoOrderDetail>(context.OrderDetails);
-        });
-
-        services.AddScoped<IMongoRepository<MongoShipper>>(provider =>
-        {
-            var context = provider.GetRequiredService<MongoDbContext>();
-            return new MongoRepository<MongoShipper>(context.Shippers);
-        });
-
-        services.AddScoped<IMongoRepository<MongoEntityChangeLog>>(provider =>
-        {
-            var context = provider.GetRequiredService<MongoDbContext>();
-            return new MongoRepository<MongoEntityChangeLog>(context.EntityChangeLogs);
-        });
-
-        // Register specific repositories
-        services.AddScoped<IMongoProductRepository>(provider =>
-        {
-            var context = provider.GetRequiredService<MongoDbContext>();
-            return new MongoProductRepository(context.Products);
-        });
+        // TODO: Implement other repositories using BsonDocument approach if needed
+        // For now, only MongoProductRepository is implemented
 
         return services;
     }
