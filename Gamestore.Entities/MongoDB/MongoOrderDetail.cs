@@ -1,12 +1,9 @@
-﻿using MongoDB.Bson;
+﻿#nullable disable
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Gamestore.Entities.MongoDB;
 
-/// <summary>
-/// MongoDB model for Northwind Order Details collection
-/// Read-only order details from Northwind system
-/// </summary>
 public class MongoOrderDetail
 {
     [BsonId]

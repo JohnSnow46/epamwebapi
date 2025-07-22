@@ -1,12 +1,9 @@
-﻿using MongoDB.Bson;
+﻿#nullable disable
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Gamestore.Entities.MongoDB;
 
-/// <summary>
-/// MongoDB model for Northwind Shippers collection
-/// Dynamic content structure as per Epic 8 US1 requirements
-/// </summary>
 public class MongoShipper
 {
     [BsonId]
@@ -16,8 +13,8 @@ public class MongoShipper
     public int ShipperId { get; set; }
 
     [BsonElement("CompanyName")]
-    public string CompanyName { get; set; } = string.Empty;
+    public string CompanyName { get; set; }
 
     [BsonElement("Phone")]
-    public string Phone { get; set; } = string.Empty;
+    public string Phone { get; set; }
 }

@@ -43,23 +43,21 @@ public class UnifiedProductService : IUnifiedProductService
             // 2. Pobierz products z MongoDB
             var mongoProducts = await GetMongoProductsAsync();
 
-            // 3. Implementuj duplicate management (E08 US6)
+            // 3. Apply duplicate management (E08 US6)
             var unifiedProducts = ApplyDuplicateManagement(sqlProducts, mongoProducts);
 
-            _logger.LogInformation("Unified products: {SqlCount} from SQL, {MongoCount} from MongoDB",
-                sqlProducts.Count(), mongoProducts.Count());
-
+            _logger.LogInformation("Successfully fetched {Count} unified products", unifiedProducts.Count);
             return unifiedProducts;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching unified products");
+            _logger.LogError(ex, "Error fetching all products");
             throw;
         }
     }
 
     /// <summary>
-    /// Gets product by ID from either database
+    /// Gets product by ID from SQL first, then MongoDB if not found
     /// </summary>
     public async Task<object?> GetProductByIdAsync(string id)
     {
@@ -67,16 +65,15 @@ public class UnifiedProductService : IUnifiedProductService
         {
             if (string.IsNullOrWhiteSpace(id))
             {
-                _logger.LogWarning("GetProductByIdAsync called with null or empty id");
+                _logger.LogWarning("GetProductByIdAsync called with null or empty ID");
                 return null;
             }
 
             _logger.LogInformation("Getting product by ID: {Id}", id);
 
-            // Sprawdź czy to GUID (SQL) czy int (MongoDB)
+            // Sprawdź SQL (Guid)
             if (Guid.TryParse(id, out var guid))
             {
-                // Szukaj w SQL
                 var game = await _unitOfWork.Games.GetByIdAsync(guid);
                 if (game != null)
                 {
@@ -85,11 +82,12 @@ public class UnifiedProductService : IUnifiedProductService
                 }
             }
 
-            // Szukaj w MongoDB
+            // Sprawdź MongoDB (int ProductId)
             if (int.TryParse(id, out var productId))
             {
                 var mongoProducts = await _mongoProductRepository.GetAsync(p => p.ProductId == productId);
                 var mongoProduct = mongoProducts.FirstOrDefault();
+
                 if (mongoProduct != null)
                 {
                     _logger.LogInformation("Found product in MongoDB with ID: {Id}", id);
@@ -187,15 +185,21 @@ public class UnifiedProductService : IUnifiedProductService
             var json = JsonSerializer.Serialize(productData);
             var gameData = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
 
+            if (gameData == null)
+            {
+                throw new ArgumentException("Invalid product data");
+            }
+
+            // Use TryGetValue instead of ContainsKey + indexer (CA1854)
             var game = new Game
             {
-                Name = gameData.ContainsKey("name") ? gameData["name"].ToString() : "New Product",
-                Key = gameData.ContainsKey("key") ? gameData["key"].ToString() : Guid.NewGuid().ToString(),
-                Price = (double)(gameData.ContainsKey("price") ? Convert.ToDecimal(gameData["price"]) : 0m),
-                UnitInStock = gameData.ContainsKey("unitsInStock") ? Convert.ToInt32(gameData["unitsInStock"]) : 0,
-                Discontinued = gameData.ContainsKey("discontinued") ? Convert.ToBoolean(gameData["discontinued"]) ? 1 : 0 : 0,
+                Name = gameData.TryGetValue("name", out var name) ? name?.ToString() ?? "New Product" : "New Product",
+                Key = gameData.TryGetValue("key", out var key) ? key?.ToString() ?? Guid.NewGuid().ToString() : Guid.NewGuid().ToString(),
+                Price = gameData.TryGetValue("price", out var price) ? (double)Convert.ToDecimal(price) : 0.0,
+                UnitInStock = gameData.TryGetValue("unitsInStock", out var stock) ? Convert.ToInt32(stock) : 0,
+                Discontinued = gameData.TryGetValue("discontinued", out var disc) ? Convert.ToBoolean(disc) ? 1 : 0 : 0,
                 ViewCount = 0,
-                Description = gameData.ContainsKey("description") ? gameData["description"].ToString() : string.Empty,
+                Description = gameData.TryGetValue("description", out var desc) ? desc?.ToString() ?? string.Empty : string.Empty,
                 PublisherId = null // Set based on your business logic
             };
 
@@ -233,22 +237,21 @@ public class UnifiedProductService : IUnifiedProductService
             var productDict = existingProduct as Dictionary<string, object> ??
                              JsonSerializer.Deserialize<Dictionary<string, object>>(JsonSerializer.Serialize(existingProduct));
 
-            // Check if it's MongoDB product
-            if (productDict["source"].ToString() == "MongoDB")
+            if (productDict == null)
             {
-                _logger.LogInformation("MongoDB product detected, copying to SQL before update");
+                throw new InvalidOperationException("Failed to deserialize product data");
+            }
 
-                // Copy to SQL first
-                var newGame = await CopyMongoProductToSql(id);
-
-                // Then update the SQL version
-                await UpdateSqlProduct(newGame.Id.ToString(), productData);
-
-                return FormatSqlProduct(newGame);
+            // Check if this is a MongoDB product
+            if (productDict.TryGetValue("source", out var source) && source?.ToString() == "MongoDB")
+            {
+                // E08 US7: Copy MongoDB product to SQL first, then update
+                var sqlProduct = await CopyMongoProductToSql(id);
+                return await UpdateSqlProduct(sqlProduct.Id.ToString(), productData);
             }
             else
             {
-                // Update SQL product directly
+                // Update existing SQL product
                 return await UpdateSqlProduct(id, productData);
             }
         }
@@ -260,7 +263,7 @@ public class UnifiedProductService : IUnifiedProductService
     }
 
     /// <summary>
-    /// Syncs stock count (E08 US5)
+    /// Syncs stock count between databases (E08 US5)
     /// </summary>
     public async Task<object> SyncStockCountAsync(string productId, int newStock)
     {
@@ -280,15 +283,40 @@ public class UnifiedProductService : IUnifiedProductService
                     await _unitOfWork.CompleteAsync();
 
                     await LogEntityChangeAsync("StockSync", "Game", productId,
-                        new { UnitInStock = oldStock },
-                        new { UnitInStock = newStock });
+                        new { stock = oldStock }, new { stock = newStock });
 
-                    return new { message = "Stock updated in SQL database", productId, newStock };
+                    _logger.LogInformation("Successfully synced stock for SQL product {ProductId} from {OldStock} to {NewStock}",
+                        productId, oldStock, newStock);
+
+                    return FormatSqlProduct(game);
                 }
             }
 
-            // For MongoDB products, we don't update (read-only)
-            return new { message = "MongoDB products are read-only", productId };
+            // Try MongoDB if not found in SQL
+            if (int.TryParse(productId, out var mongoProductId))
+            {
+                var mongoProducts = await _mongoProductRepository.GetAsync(p => p.ProductId == mongoProductId);
+                var mongoProduct = mongoProducts.FirstOrDefault();
+
+                if (mongoProduct != null)
+                {
+                    // MongoDB is read-only per E08 US7, so copy to SQL first
+                    _logger.LogInformation("MongoDB product found, copying to SQL for stock sync");
+                    var copiedGame = await CopyMongoProductToSql(productId);
+                    copiedGame.UnitInStock = newStock;
+
+                    await _unitOfWork.Games.UpdateAsync(copiedGame);
+                    await _unitOfWork.CompleteAsync();
+
+                    await LogEntityChangeAsync("StockSync", "Game", copiedGame.Id.ToString(),
+                        new { stock = 0 }, new { stock = newStock });
+
+                    _logger.LogInformation("Successfully copied MongoDB product and synced stock to {NewStock}", newStock);
+                    return FormatSqlProduct(copiedGame);
+                }
+            }
+
+            throw new KeyNotFoundException($"Product with ID {productId} not found in any database");
         }
         catch (Exception ex)
         {
@@ -298,7 +326,7 @@ public class UnifiedProductService : IUnifiedProductService
     }
 
     /// <summary>
-    /// Deletes a product (only from SQL database)
+    /// Deletes product (only from SQL database, MongoDB is read-only per E08 US7)
     /// </summary>
     public async Task<bool> DeleteProductAsync(string id)
     {
@@ -308,14 +336,12 @@ public class UnifiedProductService : IUnifiedProductService
 
             if (!Guid.TryParse(id, out var guid))
             {
-                _logger.LogWarning("Invalid GUID format for product deletion: {Id}", id);
-                return false;
+                throw new ArgumentException($"Invalid product ID for deletion: {id}");
             }
 
             var game = await _unitOfWork.Games.GetByIdAsync(guid);
             if (game == null)
             {
-                _logger.LogWarning("Product not found for deletion: {Id}", id);
                 return false;
             }
 
@@ -350,7 +376,7 @@ public class UnifiedProductService : IUnifiedProductService
         return mongoProducts.Select(FormatMongoProduct);
     }
 
-    private IEnumerable<object> ApplyDuplicateManagement(IEnumerable<object> sqlProducts, IEnumerable<object> mongoProducts)
+    private static List<object> ApplyDuplicateManagement(IEnumerable<object> sqlProducts, IEnumerable<object> mongoProducts)
     {
         // E08 US6: SQL database has priority over MongoDB duplicates
         var result = new List<object>();
@@ -372,23 +398,23 @@ public class UnifiedProductService : IUnifiedProductService
         return result;
     }
 
-    private string GetProductIdentifier(object product)
+    private static string GetProductIdentifier(object product)
     {
         var productDict = product as Dictionary<string, object> ??
                          JsonSerializer.Deserialize<Dictionary<string, object>>(JsonSerializer.Serialize(product));
 
         // Use name as identifier for duplicate detection
-        return productDict["name"]?.ToString()?.ToLower() ?? string.Empty;
+        return productDict?["name"]?.ToString()?.ToLower() ?? string.Empty;
     }
 
-    private object FormatSqlProduct(Game game)
+    private static object FormatSqlProduct(Game game)
     {
         return new
         {
             id = game.Id.ToString(),
             name = game.Name,
             key = game.Key,
-            price = (double)game.Price,
+            price = game.Price,
             unitsInStock = game.UnitInStock,
             discontinued = game.Discontinued == 1,
             viewCount = game.ViewCount,
@@ -397,14 +423,14 @@ public class UnifiedProductService : IUnifiedProductService
         };
     }
 
-    private object FormatMongoProduct(MongoProduct product)
+    private static object FormatMongoProduct(MongoProduct product)
     {
         return new
         {
             id = product.ProductId.ToString(),
             name = product.ProductName,
             key = product.GameKey,
-            price = (double?)(product.UnitPrice),
+            price = (double)(product.UnitPrice ?? 0),
             unitsInStock = product.UnitsInStock,
             discontinued = product.Discontinued,
             viewCount = product.ViewCount,
@@ -466,17 +492,22 @@ public class UnifiedProductService : IUnifiedProductService
         var json = JsonSerializer.Serialize(productData);
         var updateData = JsonSerializer.Deserialize<Dictionary<string, object>>(json);
 
-        // Update fields
-        if (updateData.ContainsKey("name"))
-            game.Name = updateData["name"].ToString();
-        if (updateData.ContainsKey("price"))
-            game.Price = (double)Convert.ToDecimal(updateData["price"]);
-        if (updateData.ContainsKey("unitsInStock"))
-            game.UnitInStock = Convert.ToInt32(updateData["unitsInStock"]);
-        if (updateData.ContainsKey("discontinued"))
-            game.Discontinued = Convert.ToBoolean(updateData["discontinued"]) ? 1 : 0;
-        if (updateData.ContainsKey("description"))
-            game.Description = updateData["description"].ToString();
+        if (updateData == null)
+        {
+            throw new ArgumentException("Invalid update data");
+        }
+
+        // Update fields using TryGetValue (CA1854)
+        if (updateData.TryGetValue("name", out var name))
+            game.Name = name?.ToString() ?? game.Name;
+        if (updateData.TryGetValue("price", out var price))
+            game.Price = (double)Convert.ToDecimal(price);
+        if (updateData.TryGetValue("unitsInStock", out var stock))
+            game.UnitInStock = Convert.ToInt32(stock);
+        if (updateData.TryGetValue("discontinued", out var disc))
+            game.Discontinued = Convert.ToBoolean(disc) ? 1 : 0;
+        if (updateData.TryGetValue("description", out var desc))
+            game.Description = desc?.ToString() ?? game.Description;
 
         await _unitOfWork.Games.UpdateAsync(game);
         await _unitOfWork.CompleteAsync();

@@ -1,12 +1,9 @@
-﻿using MongoDB.Bson;
+﻿#nullable disable
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Gamestore.Entities.MongoDB;
 
-/// <summary>
-/// MongoDB model for Northwind Orders collection
-/// Read-only orders from Northwind system
-/// </summary>
 public class MongoOrder
 {
     [BsonId]
@@ -16,7 +13,7 @@ public class MongoOrder
     public int OrderId { get; set; }
 
     [BsonElement("CustomerID")]
-    public string? CustomerId { get; set; }
+    public string CustomerId { get; set; }
 
     [BsonElement("EmployeeID")]
     public int? EmployeeId { get; set; }
@@ -37,20 +34,20 @@ public class MongoOrder
     public decimal? Freight { get; set; }
 
     [BsonElement("ShipName")]
-    public string? ShipName { get; set; }
+    public string ShipName { get; set; }
 
     [BsonElement("ShipAddress")]
-    public string? ShipAddress { get; set; }
+    public string ShipAddress { get; set; }
 
     [BsonElement("ShipCity")]
-    public string? ShipCity { get; set; }
+    public string ShipCity { get; set; }
 
     [BsonElement("ShipRegion")]
-    public string? ShipRegion { get; set; }
+    public string ShipRegion { get; set; }
 
     [BsonElement("ShipPostalCode")]
-    public string? ShipPostalCode { get; set; }
+    public string ShipPostalCode { get; set; }
 
     [BsonElement("ShipCountry")]
-    public string? ShipCountry { get; set; }
+    public string ShipCountry { get; set; }
 }

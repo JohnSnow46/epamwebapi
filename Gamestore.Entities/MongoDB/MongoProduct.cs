@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿#nullable disable
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Gamestore.Entities.MongoDB;
@@ -16,7 +17,7 @@ public class MongoProduct
     public int ProductId { get; set; }
 
     [BsonElement("ProductName")]
-    public string ProductName { get; set; } = string.Empty;
+    public string ProductName { get; set; }
 
     [BsonElement("SupplierID")]
     public int? SupplierId { get; set; }
@@ -25,7 +26,7 @@ public class MongoProduct
     public int? CategoryId { get; set; }
 
     [BsonElement("QuantityPerUnit")]
-    public string QuantityPerUnit { get; set; } = string.Empty;
+    public string QuantityPerUnit { get; set; }
 
     [BsonElement("UnitPrice")]
     public decimal? UnitPrice { get; set; }
@@ -42,10 +43,9 @@ public class MongoProduct
     [BsonElement("Discontinued")]
     public bool Discontinued { get; set; }
 
-    // New fields for Game Store integration
     [BsonElement("GameKey")]
-    public string GameKey { get; set; } = string.Empty;
+    public string GameKey { get; set; }
 
     [BsonElement("ViewCount")]
-    public int ViewCount { get; set; } = 0;
+    public int ViewCount { get; set; }
 }

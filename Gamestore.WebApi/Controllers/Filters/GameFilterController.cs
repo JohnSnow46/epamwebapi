@@ -1,5 +1,4 @@
-﻿using Gamestore.Entities.Auth;
-using Gamestore.Entities.ErrorModels;
+﻿using Gamestore.Entities.ErrorModels;
 using Gamestore.Services.Dto.FiltersDto;
 using Gamestore.Services.Dto.GamesDto;
 using Gamestore.Services.Interfaces;
@@ -8,26 +7,21 @@ using Gamestore.WebApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+namespace Gamestore.WebApi.Controllers.Filters;
+
 /// <summary>
 /// Enhanced GameFilterController z obsługą MongoDB przez UnifiedProductService
 /// </summary>
 [ApiController]
 [Route("api/games-filter")]
-public class GameFilterController : ControllerBase
+public class GameFilterController(
+    IGameFilterService gameFilterService,
+    IUnifiedProductService unifiedProductService,
+    ILogger<GameFilterController> logger) : ControllerBase
 {
-    private readonly IGameFilterService _gameFilterService;
-    private readonly IUnifiedProductService _unifiedProductService; // DODANE
-    private readonly ILogger<GameFilterController> _logger;
-
-    public GameFilterController(
-        IGameFilterService gameFilterService,
-        IUnifiedProductService unifiedProductService, // DODANE
-        ILogger<GameFilterController> logger)
-    {
-        _gameFilterService = gameFilterService;
-        _unifiedProductService = unifiedProductService; // DODANE
-        _logger = logger;
-    }
+    private readonly IGameFilterService _gameFilterService = gameFilterService;
+    private readonly IUnifiedProductService _unifiedProductService = unifiedProductService;
+    private readonly ILogger<GameFilterController> _logger = logger;
 
     /// <summary>
     /// Debug endpoint - sprawdź klucze produktów

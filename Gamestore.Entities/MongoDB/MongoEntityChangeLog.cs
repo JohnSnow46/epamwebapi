@@ -1,38 +1,35 @@
-﻿using MongoDB.Bson;
+﻿#nullable disable
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace Gamestore.Entities.MongoDB;
 
-/// <summary>
-/// MongoDB model for logging all entity changes (E08 NFR4 requirement)
-/// Logs changes from both SQL and MongoDB databases
-/// </summary>
 public class MongoEntityChangeLog
 {
     [BsonId]
     public ObjectId Id { get; set; }
 
     [BsonElement("Timestamp")]
-    public DateTime Timestamp { get; set; } = DateTime.UtcNow;
+    public DateTime Timestamp { get; set; }
 
     [BsonElement("ActionName")]
-    public string ActionName { get; set; } = string.Empty;
+    public string ActionName { get; set; }
 
     [BsonElement("EntityType")]
-    public string EntityType { get; set; } = string.Empty;
+    public string EntityType { get; set; }
 
     [BsonElement("EntityId")]
-    public string? EntityId { get; set; }
+    public string EntityId { get; set; }
 
     [BsonElement("OldVersion")]
-    public BsonDocument? OldVersion { get; set; }
+    public BsonDocument OldVersion { get; set; }
 
     [BsonElement("NewVersion")]
-    public BsonDocument? NewVersion { get; set; }
+    public BsonDocument NewVersion { get; set; }
 
     [BsonElement("UserId")]
-    public string? UserId { get; set; }
+    public string UserId { get; set; }
 
     [BsonElement("DatabaseSource")]
-    public string DatabaseSource { get; set; } = string.Empty; // "SQL" or "MongoDB"
+    public string DatabaseSource { get; set; }
 }
