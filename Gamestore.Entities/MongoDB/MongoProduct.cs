@@ -25,7 +25,7 @@ public class MongoProduct
     public int? CategoryId { get; set; }
 
     [BsonElement("QuantityPerUnit")]
-    public string? QuantityPerUnit { get; set; }
+    public string QuantityPerUnit { get; set; } = string.Empty;
 
     [BsonElement("UnitPrice")]
     public decimal? UnitPrice { get; set; }
@@ -44,7 +44,7 @@ public class MongoProduct
 
     // New fields for Game Store integration
     [BsonElement("GameKey")]
-    public string? GameKey { get; set; }
+    public string GameKey { get; set; } = string.Empty;
 
     [BsonElement("ViewCount")]
     public int ViewCount { get; set; } = 0;

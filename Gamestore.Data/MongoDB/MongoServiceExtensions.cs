@@ -17,6 +17,9 @@ public static class MongoServiceExtensions
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
+        // Check if MongoDB is enabled
+        var mongoSettings = configuration.GetSection("MongoDB");
+
         // Register MongoDB context
         services.AddScoped<MongoDbContext>();
 

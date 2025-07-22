@@ -1,6 +1,7 @@
 ﻿using Gamestore.Entities.MongoDB;
 using MongoDB.Driver;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Bson.Serialization;
 
 namespace Gamestore.Data.MongoDB;
 
@@ -10,6 +11,76 @@ namespace Gamestore.Data.MongoDB;
 /// </summary>
 public class MongoDbContext
 {
+    static MongoDbContext()
+    {
+        // Initialize BsonClassMap for entities to prevent TypeInitializationException
+        // This is required for MongoDB.Driver 2.7.3 with .NET 8 nullable context
+        try
+        {
+            if (!BsonClassMap.IsClassMapRegistered(typeof(MongoProduct)))
+            {
+                BsonClassMap.RegisterClassMap<MongoProduct>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+            if (!BsonClassMap.IsClassMapRegistered(typeof(MongoCategory)))
+            {
+                BsonClassMap.RegisterClassMap<MongoCategory>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+            if (!BsonClassMap.IsClassMapRegistered(typeof(MongoSupplier)))
+            {
+                BsonClassMap.RegisterClassMap<MongoSupplier>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+            if (!BsonClassMap.IsClassMapRegistered(typeof(MongoOrder)))
+            {
+                BsonClassMap.RegisterClassMap<MongoOrder>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+            if (!BsonClassMap.IsClassMapRegistered(typeof(MongoOrderDetail)))
+            {
+                BsonClassMap.RegisterClassMap<MongoOrderDetail>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+            if (!BsonClassMap.IsClassMapRegistered(typeof(MongoShipper)))
+            {
+                BsonClassMap.RegisterClassMap<MongoShipper>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+            if (!BsonClassMap.IsClassMapRegistered(typeof(MongoEntityChangeLog)))
+            {
+                BsonClassMap.RegisterClassMap<MongoEntityChangeLog>(cm =>
+                {
+                    cm.AutoMap();
+                    cm.SetIgnoreExtraElements(true);
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            // Log the exception to understand what's causing the issue
+            System.Diagnostics.Debug.WriteLine($"BsonClassMap registration failed: {ex.Message}");
+        }
+    }
+
     public MongoDbContext(IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString("MongoDB") ?? "mongodb://localhost:27017";

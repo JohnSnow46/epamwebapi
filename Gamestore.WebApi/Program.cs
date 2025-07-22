@@ -234,6 +234,9 @@ static void ConfigureCors(WebApplicationBuilder builder)
 
 static void ConfigureBusinessServices(WebApplicationBuilder builder)
 {
+    // MongoDB
+    builder.Services.AddMongoDbServices(builder.Configuration);
+
     // Business Services
     builder.Services.AddScoped<IGameService, GameService>();
     builder.Services.AddScoped<IGenreService, GenreService>();
@@ -242,8 +245,7 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<ICommentService, CommentService>();
     builder.Services.AddScoped<IGameFilterService, GameFilterService>();
 
-    // MongoDB
-    builder.Services.AddMongoDbServices(builder.Configuration);
+    // MongoDb Update
     builder.Services.AddScoped<IShipperService, ShipperService>();
     builder.Services.AddScoped<IOrderHistoryService, OrderHistoryService>();
     builder.Services.AddScoped<IUnifiedProductService, UnifiedProductService>();
