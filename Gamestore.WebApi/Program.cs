@@ -327,6 +327,8 @@ static async Task ConfigureMiddlewarePipeline(WebApplication app)
     app.UseAuthorization();
     app.UseAuthorizationLogging();
 
+    app.MapGet("/", () => Results.Redirect("/swagger")).ExcludeFromDescription(); // route to swagger
+
     // Endpoints
     app.MapControllerRoute(
         name: "default",
