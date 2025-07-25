@@ -17,14 +17,8 @@ public static class MongoServiceExtensions
     {
         ArgumentNullException.ThrowIfNull(configuration);
 
-        // Register MongoDB context
         services.AddScoped<MongoDbContext>();
-
-        // Register only the specific product repository that works with BsonDocument
         services.AddScoped<IMongoProductRepository, MongoProductRepository>();
-
-        // TODO: Implement other repositories using BsonDocument approach if needed
-        // For now, only MongoProductRepository is implemented
 
         return services;
     }

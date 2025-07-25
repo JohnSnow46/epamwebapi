@@ -5,6 +5,10 @@ using System.Text.Json;
 
 namespace Gamestore.Services.Services.Auth;
 
+/// <summary>
+/// Service for handling authentication operations with external auth service.
+/// Provides user authentication, registration and user management capabilities.
+/// </summary>
 public class AuthService
 {
     private readonly HttpClient _httpClient;
@@ -16,6 +20,12 @@ public class AuthService
         PropertyNameCaseInsensitive = true
     };
 
+    /// <summary>
+    /// Initializes a new instance of AuthService with required dependencies.
+    /// </summary>
+    /// <param name="httpClient">HTTP client for making requests to auth service</param>
+    /// <param name="logger">Logger for logging operations</param>
+    /// <param name="configuration">Configuration to read auth service settings</param>
     public AuthService(HttpClient httpClient, ILogger<AuthService> logger, IConfiguration configuration)
     {
         _httpClient = httpClient;
@@ -32,6 +42,12 @@ public class AuthService
         _logger.LogInformation("✅ AuthService initialized with BaseAddress: {BaseAddress}", _httpClient.BaseAddress);
     }
 
+    /// <summary>
+    /// Authenticates a user with email and password against external auth service.
+    /// </summary>
+    /// <param name="email">User's email address</param>
+    /// <param name="password">User's password</param>
+    /// <returns>Authentication response with user details and token, or null if authentication fails</returns>
     public async Task<AuthResponseDto?> AuthenticateAsync(string email, string password)
     {
         _logger.LogInformation("🔍 AuthService.AuthenticateAsync called for: {Email}", email);

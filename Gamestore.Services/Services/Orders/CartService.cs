@@ -6,11 +6,22 @@ using Gamestore.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Gamestore.Services.Services.Orders;
+
+/// <summary>
+/// Service for managing shopping cart operations including adding games, 
+/// updating quantities, and processing cart contents.
+/// </summary>
 public class CartService(IUnitOfWork unitOfWork, ILogger<CartService> logger) : ICartService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ILogger<CartService> _logger = logger;
 
+    /// <summary>
+    /// Adds a game to the customer's shopping cart with specified quantity.
+    /// </summary>
+    /// <param name="gameKey">Unique identifier of the game to add</param>
+    /// <param name="customerId">Customer's unique identifier</param>
+    /// <param name="quantity">Number of games to add (default: 1)</param>
     public async Task AddGameToCartAsync(string gameKey, Guid customerId, int quantity = 1)
     {
         _logger.LogInformation("Adding game {GameKey} to cart for customer {CustomerId} with quantity {Quantity}",

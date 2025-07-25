@@ -65,19 +65,14 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
                     StatusCode = StatusCodes.Status400BadRequest
                 });
             }
-
             _logger.LogInformation("Processing payment for user {UserEmail} with method {PaymentMethod}",
                 User.GetUserEmail(), paymentRequest.Method);
-
             var paymentResult = await _paymentService.ProcessPaymentAsync(paymentRequest, customerId.Value);
-
-            // ✅ POPRAWNE: Różne formaty odpowiedzi według README
             return paymentRequest.Method.ToLowerInvariant() switch
             {
                 // US6: Bank payment - return PDF file for download
                 "bank" => File(paymentResult.InvoiceFile!, "application/pdf",
                     $"invoice_{paymentResult.OrderId}.pdf"),
-
                 // US7: IBox terminal - specific response format from README
                 "ibox terminal" => Ok(new
                 {
@@ -86,10 +81,8 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
                     paymentDate = paymentResult.PaymentDate,
                     sum = paymentResult.Sum
                 }),
-
                 // US8: Visa payment - success status code only
                 "visa" => Ok(),
-
                 // Fallback for any other payment methods
                 _ => Ok(new
                 {
@@ -103,30 +96,6 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
         {
             return Forbid(ex.Message);
         }
-        catch (KeyNotFoundException ex)
-        {
-            return NotFound(new ErrorResponseModel
-            {
-                Message = ex.Message,
-                StatusCode = StatusCodes.Status404NotFound
-            });
-        }
-        catch (System.ComponentModel.DataAnnotations.ValidationException ex)
-        {
-            return BadRequest(new ErrorResponseModel
-            {
-                Message = ex.Message,
-                StatusCode = StatusCodes.Status400BadRequest
-            });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new ErrorResponseModel
-            {
-                Message = ex.Message,
-                StatusCode = StatusCodes.Status400BadRequest
-            });
-        }
         catch (Exception ex)
         {
             return HandleException(ex, "Error processing payment");
@@ -134,7 +103,6 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
     }
 
     /// <summary>
-    /// DODATKOWY ENDPOINT - Get payment history for user
     /// Epic 9: Authenticated users can view their payment history
     /// </summary>
     [HttpGet("payment-history")]

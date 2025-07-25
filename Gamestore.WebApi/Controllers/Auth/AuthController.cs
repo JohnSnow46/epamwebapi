@@ -24,7 +24,7 @@ public class AuthController(
     private readonly IDatabaseRoleService _databaseRoleService = databaseRoleService;
     private readonly ILogger<AuthController> _logger = logger;
     private readonly IWebHostEnvironment _environment = environment;
-    private readonly AuthService _authService = serviceProvider.GetService<AuthService>();
+    private readonly AuthService _authService = serviceProvider.GetRequiredService<AuthService>();
 
     /// <summary>
     /// Epic 9 US1 - Login endpoint with database authentication and fallback to external
@@ -520,7 +520,7 @@ public class AuthController(
             _ => StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponseModel
             {
                 Message = "An error occurred during authentication.",
-                Details = _environment.IsDevelopment() ? ex.Message : null,
+                Details = _environment.IsDevelopment() ? ex.Message : string.Empty,
                 StatusCode = StatusCodes.Status500InternalServerError,
                 ErrorId = Guid.NewGuid().ToString()
             })

@@ -1,5 +1,4 @@
-﻿// WebApi/Controllers/GameController.cs - Enhanced Authorization
-using System.Text.Json;
+﻿using System.Text.Json;
 using Gamestore.Entities.ErrorModels;
 using Gamestore.Services.Dto.GamesDto;
 using Gamestore.Services.Interfaces;
@@ -73,7 +72,6 @@ public class GameController(IGameService gameService, IPublisherService publishe
             var key = gameUpdateDto.Game.Key;
             _logger.LogInformation("Updating game with Key: {GameKey} by user: {User}", key, User.GetUserEmail());
 
-            // Check if game exists first
             var existingGame = await _gameService.GetGameByKey(key);
             if (existingGame == null)
             {
@@ -282,7 +280,6 @@ public class GameController(IGameService gameService, IPublisherService publishe
         {
             _logger.LogInformation("Getting deleted games for admin: {User}", User.GetUserEmail());
 
-            // Mock implementation
             var deletedGames = new[]
             {
                 new { Id = Guid.NewGuid(), Name = "Deleted Game 1", DeletedAt = DateTime.UtcNow.AddDays(-5) },

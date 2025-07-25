@@ -9,14 +9,14 @@ public class FileLogger(string name, FileLoggerOptions options, Func<string> get
     private readonly Func<string> _getCurrentFileName = getCurrentFileName;
     private readonly object _lock = new();
 
-    public IDisposable BeginScope<TState>(TState state) => default;
+    public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
 
     public bool IsEnabled(LogLevel logLevel)
     {
         return logLevel >= _options.MinimumLogLevel;
     }
 
-    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
+    public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception? exception, Func<TState, Exception?, string> formatter)
     {
         if (!IsEnabled(logLevel))
         {
@@ -58,8 +58,8 @@ public class FileLogger(string name, FileLoggerOptions options, Func<string> get
 
         logBuilder.AppendLine();
 
-        var filePath = _getCurrentFileName();
-        var directoryName = Path.GetDirectoryName(filePath);
+        var filePath = _getCurrentFileName() ?? string.Empty;
+        var directoryName = Path.GetDirectoryName(filePath) ?? string.Empty;
 
         if (!Directory.Exists(directoryName))
         {

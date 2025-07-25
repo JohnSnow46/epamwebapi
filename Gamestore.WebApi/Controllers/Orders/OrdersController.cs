@@ -38,7 +38,6 @@ public class OrdersController(IOrderService orderService,
 
             _logger.LogInformation("Getting orders history for user {UserEmail}", User.GetUserEmail());
 
-            // Użyj serwisu history zamiast zwykłego order service
             var orders = await _orderHistoryService.GetOrderHistoryAsync();
 
             return Ok(orders);
@@ -161,7 +160,7 @@ public class OrdersController(IOrderService orderService,
     /// UWAGA: UI wysyła parametry "start" i "end", nie "startDate" i "endDate"
     /// </summary>
     [HttpGet("history")]
-    [AllowAnonymous] // Lub [Authorize] jeśli potrzebna autoryzacja
+    [AllowAnonymous]
     public async Task<IActionResult> GetOrdersHistory(
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
         [FromQuery] string? start = null,

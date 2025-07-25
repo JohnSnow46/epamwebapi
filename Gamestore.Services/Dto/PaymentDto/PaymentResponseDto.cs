@@ -37,7 +37,6 @@ public class PaymentResponseDto
     /// </summary>
     public Guid OrderId { get; set; }
 
-    // === IBox Terminal specific properties (from README US7) ===
     /// <summary>
     /// Gets or sets the user identifier who made the payment.
     /// Required for IBox terminal payment response according to README.
@@ -56,7 +55,6 @@ public class PaymentResponseDto
     /// </summary>
     public decimal? Sum { get; set; }
 
-    // === Bank payment specific properties (from README US6) ===
     /// <summary>
     /// Gets or sets the generated invoice file for bank payments.
     /// Contains PDF file data for bank payment method according to README.

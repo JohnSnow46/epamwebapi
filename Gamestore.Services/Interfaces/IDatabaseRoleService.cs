@@ -4,7 +4,6 @@ namespace Gamestore.Services.Interfaces;
 
 public interface IDatabaseRoleService
 {
-    // ========== CORE USER OPERATIONS (Authentication) ==========
     Task<User?> GetUserByEmailAsync(string email);
     Task<User?> GetUserByIdAsync(Guid id);
     Task<IEnumerable<User>> GetAllUsersAsync();
@@ -21,21 +20,15 @@ public interface IDatabaseRoleService
     Task<bool> RemoveUserFromRoleAsync(string email, string roleName);
     Task<bool> UserHasRoleAsync(string email, string roleName);
     Task<bool> UserHasPermissionAsync(string email, string permissionName);
-
-    // ========== CORE ROLE DEFINITIONS (System Operations) ==========
     Task<IEnumerable<Role>> GetAllRolesAsync();
     Task<Role?> GetRoleByNameAsync(string name);
     Task<Role> CreateRoleAsync(string name, string description, int level, bool isSystemRole = false);
     Task<bool> DeleteRoleAsync(string name);
     Task<bool> RoleExistsAsync(string name);
-
-    // ========== CORE PERMISSION OPERATIONS (System Operations) ==========
     Task<IEnumerable<Permission>> GetAllPermissionsAsync();
     Task<IEnumerable<Permission>> GetRolePermissionsAsync(string roleName);
     Task<bool> AssignPermissionToRoleAsync(string roleName, string permissionName);
     Task<bool> RemovePermissionFromRoleAsync(string roleName, string permissionName);
-
-    // ========== SYSTEM INITIALIZATION ==========
     Task SeedDefaultRolesAndPermissionsAsync();
     Task MigrateHardcodedUsersAsync();
 }

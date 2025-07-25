@@ -10,14 +10,9 @@ namespace Gamestore.Data.MongoDB;
 /// MongoDB Product Repository using BsonDocument to avoid BsonClassMap issues
 /// Converts BsonDocument to MongoProduct manually
 /// </summary>
-public class MongoProductRepository : IMongoProductRepository
+public class MongoProductRepository(MongoDbContext context) : IMongoProductRepository
 {
-    private readonly IMongoCollection<BsonDocument> _collection;
-
-    public MongoProductRepository(MongoDbContext context)
-    {
-        _collection = context.ProductsRaw;
-    }
+    private readonly IMongoCollection<BsonDocument> _collection = context.ProductsRaw;
 
     // IMongoProductRepository specific methods
     public async Task<MongoProduct?> GetByGameKeyAsync(string gameKey)
@@ -96,13 +91,12 @@ public class MongoProductRepository : IMongoProductRepository
         return results.FirstOrDefault();
     }
 
-    public async Task<bool> UpdateAsync(FilterDefinition<MongoProduct> filter, UpdateDefinition<MongoProduct> update)
+    public Task<bool> UpdateAsync(FilterDefinition<MongoProduct> filter, UpdateDefinition<MongoProduct> update)
     {
-        // This is complex to convert from typed to BsonDocument, simplified implementation
         throw new NotImplementedException("Use UpdateGameKeyAsync or IncrementViewCountAsync instead");
     }
 
-    public async Task<bool> UpdateManyAsync(FilterDefinition<MongoProduct> filter, UpdateDefinition<MongoProduct> update)
+    public Task<bool> UpdateManyAsync(FilterDefinition<MongoProduct> filter, UpdateDefinition<MongoProduct> update)
     {
         throw new NotImplementedException("Use specific update methods instead");
     }
@@ -119,12 +113,12 @@ public class MongoProductRepository : IMongoProductRepository
         await _collection.InsertManyAsync(docs);
     }
 
-    public async Task<bool> DeleteAsync(FilterDefinition<MongoProduct> filter)
+    public Task<bool> DeleteAsync(FilterDefinition<MongoProduct> filter)
     {
         throw new NotImplementedException("Use specific delete methods instead");
     }
 
-    public async Task<bool> DeleteManyAsync(FilterDefinition<MongoProduct> filter)
+    public Task<bool> DeleteManyAsync(FilterDefinition<MongoProduct> filter)
     {
         throw new NotImplementedException("Use specific delete methods instead");
     }
@@ -164,7 +158,9 @@ public class MongoProductRepository : IMongoProductRepository
     private static decimal? GetSafeDecimal(BsonDocument doc, string fieldName)
     {
         if (!doc.Contains(fieldName) || doc[fieldName].IsBsonNull)
+        {
             return null;
+        }
 
         var value = doc[fieldName];
 
@@ -173,8 +169,25 @@ public class MongoProductRepository : IMongoProductRepository
         {
             BsonType.Double => (decimal)value.AsDouble,
             BsonType.Decimal128 => value.AsDecimal,
-            BsonType.Int32 => (decimal)value.AsInt32,
-            BsonType.Int64 => (decimal)value.AsInt64,
+            BsonType.Int32 => value.AsInt32,
+            BsonType.Int64 => value.AsInt64,
+            BsonType.EndOfDocument => throw new NotImplementedException(),
+            BsonType.String => throw new NotImplementedException(),
+            BsonType.Document => throw new NotImplementedException(),
+            BsonType.Array => throw new NotImplementedException(),
+            BsonType.Binary => throw new NotImplementedException(),
+            BsonType.Undefined => throw new NotImplementedException(),
+            BsonType.ObjectId => throw new NotImplementedException(),
+            BsonType.Boolean => throw new NotImplementedException(),
+            BsonType.DateTime => throw new NotImplementedException(),
+            BsonType.Null => throw new NotImplementedException(),
+            BsonType.RegularExpression => throw new NotImplementedException(),
+            BsonType.JavaScript => throw new NotImplementedException(),
+            BsonType.Symbol => throw new NotImplementedException(),
+            BsonType.JavaScriptWithScope => throw new NotImplementedException(),
+            BsonType.Timestamp => throw new NotImplementedException(),
+            BsonType.MinKey => throw new NotImplementedException(),
+            BsonType.MaxKey => throw new NotImplementedException(),
             _ => null
         };
     }
@@ -182,7 +195,9 @@ public class MongoProductRepository : IMongoProductRepository
     private static bool GetSafeBoolean(BsonDocument doc, string fieldName)
     {
         if (!doc.Contains(fieldName) || doc[fieldName].IsBsonNull)
+        {
             return false;
+        }
 
         var value = doc[fieldName];
 
@@ -194,6 +209,22 @@ public class MongoProductRepository : IMongoProductRepository
             BsonType.Int64 => value.AsInt64 != 0,
             BsonType.Double => value.AsDouble != 0,
             BsonType.String => bool.TryParse(value.AsString, out var result) && result,
+            BsonType.EndOfDocument => throw new NotImplementedException(),
+            BsonType.Document => throw new NotImplementedException(),
+            BsonType.Array => throw new NotImplementedException(),
+            BsonType.Binary => throw new NotImplementedException(),
+            BsonType.Undefined => throw new NotImplementedException(),
+            BsonType.ObjectId => throw new NotImplementedException(),
+            BsonType.DateTime => throw new NotImplementedException(),
+            BsonType.Null => throw new NotImplementedException(),
+            BsonType.RegularExpression => throw new NotImplementedException(),
+            BsonType.JavaScript => throw new NotImplementedException(),
+            BsonType.Symbol => throw new NotImplementedException(),
+            BsonType.JavaScriptWithScope => throw new NotImplementedException(),
+            BsonType.Timestamp => throw new NotImplementedException(),
+            BsonType.Decimal128 => throw new NotImplementedException(),
+            BsonType.MinKey => throw new NotImplementedException(),
+            BsonType.MaxKey => throw new NotImplementedException(),
             _ => false
         };
     }
@@ -211,17 +242,30 @@ public class MongoProductRepository : IMongoProductRepository
         };
 
         if (product.SupplierId.HasValue)
+        {
             doc["SupplierID"] = product.SupplierId.Value;
+        }
         if (product.CategoryId.HasValue)
+        {
             doc["CategoryID"] = product.CategoryId.Value;
+        }
         if (product.UnitPrice.HasValue)
+        {
             doc["UnitPrice"] = product.UnitPrice.Value;
+        }
         if (product.UnitsInStock.HasValue)
+        {
             doc["UnitsInStock"] = product.UnitsInStock.Value;
+        }
         if (product.UnitsOnOrder.HasValue)
+        {
             doc["UnitsOnOrder"] = product.UnitsOnOrder.Value;
+        }
+
         if (product.ReorderLevel.HasValue)
+        {
             doc["ReorderLevel"] = product.ReorderLevel.Value;
+        }
 
         return doc;
     }

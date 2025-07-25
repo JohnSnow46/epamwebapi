@@ -8,9 +8,10 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Gamestore.WebApi.Controllers.Filters;
+#pragma warning disable S3358
 
 /// <summary>
-/// Enhanced GameFilterController z obsługą MongoDB przez UnifiedProductService
+/// Enhanced GameFilterController with MongoDB support through UnifiedProductService
 /// </summary>
 [ApiController]
 [Route("api/games-filter")]
@@ -24,7 +25,7 @@ public class GameFilterController(
     private readonly ILogger<GameFilterController> _logger = logger;
 
     /// <summary>
-    /// Debug endpoint - sprawdź klucze produktów
+    /// Debug endpoint for checking product keys
     /// </summary>
     [HttpGet("debug/keys")]
     [AllowAnonymous]
@@ -32,7 +33,6 @@ public class GameFilterController(
     {
         try
         {
-            // Pobierz unified products
             var products = await _unifiedProductService.GetAllProductsAsync();
 
             var productInfo = new List<object>();
@@ -79,7 +79,7 @@ public class GameFilterController(
     }
 
     /// <summary>
-    /// 🔥 ZMODYFIKOWANY ENDPOINT: Pobiera dane z obu baz (SQL + MongoDB)
+    /// Gets filtered games from both databases (SQL + MongoDB)
     /// </summary>
     [HttpGet]
     [AllowAnonymous]
@@ -93,10 +93,6 @@ public class GameFilterController(
             _logger.LogInformation("Getting unified filtered games with parameters: {@Parameters} for user: {User} with role: {Role}",
                 parameters, userEmail, userRole);
 
-            // OPCJA 1: Użyj standardowego GameFilterService (tylko SQL)
-            // var result = await _gameFilterService.GetFilteredGamesAsync(parameters);
-
-            // OPCJA 2: Użyj UnifiedProductService + konwersja na GameFilterResult
             var unifiedProducts = await _unifiedProductService.GetAllProductsAsync();
             var result = ConvertUnifiedProductsToGameFilterResult(unifiedProducts, parameters);
 
@@ -109,18 +105,70 @@ public class GameFilterController(
     }
 
     /// <summary>
-    /// Konwertuje unified products na GameFilterResult z filtrami
+    /// Gets pagination options
     /// </summary>
+    [HttpGet("pagination-options")]
+    [AllowAnonymous]
+    public IActionResult GetPaginationOptions()
+    {
+        try
+        {
+            _logger.LogInformation("Getting pagination options");
+            var options = _gameFilterService.GetPaginationOptions();
+            return Ok(options);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, "Error retrieving pagination options");
+        }
+    }
+
+    /// <summary>
+    /// Gets sorting options
+    /// </summary>
+    [HttpGet("sorting-options")]
+    [AllowAnonymous]
+    public IActionResult GetSortingOptions()
+    {
+        try
+        {
+            _logger.LogInformation("Getting sorting options");
+            var options = _gameFilterService.GetSortingOptions();
+            return Ok(options);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, "Error retrieving sorting options");
+        }
+    }
+
+    /// <summary>
+    /// Gets publish date filter options
+    /// </summary>
+    [HttpGet("publish-date-options")]
+    [AllowAnonymous]
+    public IActionResult GetPublishDateOptions()
+    {
+        try
+        {
+            _logger.LogInformation("Getting publish date filter options");
+            var options = _gameFilterService.GetPublishDateFilterOptions();
+            return Ok(options);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, "Error retrieving publish date filter options");
+        }
+    }
+
     private GameFilterResult ConvertUnifiedProductsToGameFilterResult(IEnumerable<object> unifiedProducts, GameFilterParameters parameters)
     {
         var games = new List<GameUpdateRequestDto>();
 
-        // Konwertuj na GameUpdateRequestDto
         foreach (var product in unifiedProducts)
         {
             try
             {
-                // Użyj reflection do odczytania właściwości z anonimowego obiektu
                 var productType = product.GetType();
 
                 var gameDto = new GameUpdateRequestDto
@@ -144,13 +192,8 @@ public class GameFilterController(
 
         _logger.LogInformation("Converted {Count} unified products to GameUpdateRequestDto", games.Count);
 
-        // Zastosuj filtry
         var filteredGames = ApplyFilters(games, parameters);
-
-        // Zastosuj sortowanie
         var sortedGames = ApplySorting(filteredGames, parameters);
-
-        // Zastosuj paginację
         var paginatedResult = ApplyPagination(sortedGames, parameters);
 
         return new GameFilterResult
@@ -161,82 +204,78 @@ public class GameFilterController(
         };
     }
 
-    /// <summary>
-    /// Pobiera wartość właściwości z obiektu używając reflection
-    /// </summary>
     private T GetPropertyValue<T>(object obj, Type objType, string propertyName)
     {
         try
         {
             var property = objType.GetProperty(propertyName);
-            if (property != null)
+            if (property == null)
             {
-                var value = property.GetValue(obj);
-                if (value is T typedValue)
-                {
-                    return typedValue;
-                }
-
-                // Spróbuj konwersji
-                if (value != null && typeof(T) != typeof(string))
-                {
-                    return (T)Convert.ChangeType(value, typeof(T));
-                }
-
-                if (typeof(T) == typeof(string))
-                {
-                    return (T)(object)(value?.ToString() ?? string.Empty);
-                }
+                return default;
             }
+
+            var value = property.GetValue(obj);
+
+            // Direct type match
+            if (value is T typedValue)
+            {
+                return typedValue;
+            }
+
+            // Handle string conversion specifically
+            if (typeof(T) == typeof(string))
+            {
+                return ConvertToString<T>(value);
+            }
+
+            // Handle other type conversions
+            return value != null ? (T)Convert.ChangeType(value, typeof(T)) : default;
         }
         catch (Exception ex)
         {
             _logger.LogDebug(ex, "Failed to get property {PropertyName} from object", propertyName);
+            return default;
         }
-
-        return default(T);
     }
 
-    // Safe conversion helper methods
+    private static T ConvertToString<T>(object? value)
+    {
+        var stringValue = value?.ToString() ?? string.Empty;
+        return (T)(object)stringValue;
+    }
+
     private static double GetSafeDouble(object value)
     {
-        if (value == null) return 0.0;
-        if (value is double d) return d;
-        if (value is decimal dec) return (double)dec;
-        if (value is int i) return i;
-        if (double.TryParse(value.ToString(), out var parsed)) return parsed;
-        return 0.0;
+        return value == null
+            ? 0.0
+            : value is double d
+            ? d
+            : value is decimal dec ? (double)dec : value is int i ? i : double.TryParse(value.ToString(), out var parsed) ? parsed : 0.0;
     }
 
     private static int GetSafeInt(object value)
     {
-        if (value == null) return 0;
-        if (value is int i) return i;
-        if (value is double d) return (int)d;
-        if (int.TryParse(value.ToString(), out var parsed)) return parsed;
-        return 0;
+        return value == null
+            ? 0
+            : value is int i ? i : value is double d ? (int)d : int.TryParse(value.ToString(), out var parsed) ? parsed : 0;
     }
 
     private static bool GetSafeBool(object value)
     {
-        if (value == null) return false;
-        if (value is bool b) return b;
-        if (value.ToString().ToLowerInvariant() == "true") return true;
-        if (int.TryParse(value.ToString(), out var intVal)) return intVal != 0;
-        return false;
+        return value != null && (value is bool b
+            ? b
+            : value.ToString().ToLowerInvariant() == "true" || (int.TryParse(value.ToString(), out var intVal) && intVal != 0));
     }
 
-    private IEnumerable<GameUpdateRequestDto> ApplyFilters(IEnumerable<GameUpdateRequestDto> games, GameFilterParameters parameters)
+    private static IEnumerable<GameUpdateRequestDto> ApplyFilters(IEnumerable<GameUpdateRequestDto> games, GameFilterParameters parameters)
     {
         var filtered = games;
 
-        // Filtr nazwy
         if (!string.IsNullOrWhiteSpace(parameters.Name))
         {
             filtered = filtered.Where(g => g.Name.Contains(parameters.Name, StringComparison.OrdinalIgnoreCase));
         }
 
-        // Filtr ceny
         if (parameters.MinPrice.HasValue)
         {
             filtered = filtered.Where(g => g.Price >= parameters.MinPrice.Value);
@@ -247,33 +286,30 @@ public class GameFilterController(
             filtered = filtered.Where(g => g.Price <= parameters.MaxPrice.Value);
         }
 
-        // TODO: Dodaj filtry dla genres, platforms, publishers gdy będą dostępne w unified data
-
         return filtered;
     }
 
-    private IEnumerable<GameUpdateRequestDto> ApplySorting(IEnumerable<GameUpdateRequestDto> games, GameFilterParameters parameters)
+    private static IEnumerable<GameUpdateRequestDto> ApplySorting(IEnumerable<GameUpdateRequestDto> games, GameFilterParameters parameters)
     {
-        if (string.IsNullOrWhiteSpace(parameters.SortBy))
-            return games;
-
-        return parameters.SortBy.ToLowerInvariant() switch
-        {
-            "price asc" => games.OrderBy(g => g.Price),
-            "price desc" => games.OrderByDescending(g => g.Price),
-            "most popular" => games.OrderByDescending(g => g.Name), // Fallback - brak viewCount w GameUpdateRequestDto
-            "new" => games.OrderByDescending(g => g.Name),
-            _ => games
-        };
+        return string.IsNullOrWhiteSpace(parameters.SortBy)
+            ? games
+            : parameters.SortBy.ToLowerInvariant() switch
+            {
+                "price asc" => games.OrderBy(g => g.Price),
+                "price desc" => games.OrderByDescending(g => g.Price),
+                "most popular" => games.OrderByDescending(g => g.Name),
+                "new" => games.OrderByDescending(g => g.Name),
+                _ => games
+            };
     }
 
-    private (List<GameUpdateRequestDto> games, int currentPage, int totalPages) ApplyPagination(IEnumerable<GameUpdateRequestDto> games, GameFilterParameters parameters)
+    private static (List<GameUpdateRequestDto> games, int currentPage, int totalPages) ApplyPagination(IEnumerable<GameUpdateRequestDto> games, GameFilterParameters parameters)
     {
         var gamesList = games.ToList();
-        var pageSize = GetPageSize(parameters.PageSize);
-        var currentPage = parameters.Page; // Page jest już int z domyślną wartością 1
+        var pageSize = GetPageSize(parameters.PageSize ?? string.Empty);
+        var currentPage = parameters.Page;
 
-        if (pageSize <= 0) // "all"
+        if (pageSize <= 0)
         {
             return (gamesList, 1, 1);
         }
@@ -289,124 +325,11 @@ public class GameFilterController(
         return (paginatedGames, currentPage, totalPages);
     }
 
-    // Helper methods
-    private static Guid GetGuidFromProduct(IDictionary<string, object> product, string key)
-    {
-        if (product.TryGetValue(key, out var value))
-        {
-            if (value is string str && Guid.TryParse(str, out var guid))
-                return guid;
-        }
-        return Guid.NewGuid();
-    }
-
-    private static string GetStringFromProduct(IDictionary<string, object> product, string key)
-    {
-        if (product.TryGetValue(key, out var value))
-        {
-            var result = value?.ToString();
-            return string.IsNullOrEmpty(result) ? GetDefaultValue(key) : result;
-        }
-        return GetDefaultValue(key);
-    }
-
-    private static string GetDefaultValue(string key)
-    {
-        return key switch
-        {
-            "name" => "Unknown Product",
-            "key" => Guid.NewGuid().ToString(),
-            "description" => "No description available",
-            _ => string.Empty
-        };
-    }
-
-    private static double GetDoubleFromProduct(IDictionary<string, object> product, string key)
-    {
-        if (product.TryGetValue(key, out var value))
-        {
-            if (value is double d) return d;
-            if (value is decimal dec) return (double)dec;
-            if (double.TryParse(value?.ToString(), out var parsed)) return parsed;
-        }
-        return 0.0;
-    }
-
-    private static int GetIntFromProduct(IDictionary<string, object> product, string key)
-    {
-        if (product.TryGetValue(key, out var value))
-        {
-            if (value is int i) return i;
-            if (int.TryParse(value?.ToString(), out var parsed)) return parsed;
-        }
-        return 0;
-    }
-
-    private static bool GetBoolFromProduct(IDictionary<string, object> product, string key)
-    {
-        if (product.TryGetValue(key, out var value))
-        {
-            if (value is bool b) return b;
-            if (bool.TryParse(value?.ToString(), out var parsed)) return parsed;
-        }
-        return false;
-    }
-
     private static int GetPageSize(string pageSizeStr)
     {
-        if (string.IsNullOrWhiteSpace(pageSizeStr) || pageSizeStr.ToLowerInvariant() == "all")
-            return 0;
-
-        return int.TryParse(pageSizeStr, out var pageSize) && pageSize > 0 ? pageSize : 10;
-    }
-
-    // Pozostałe endpointy bez zmian...
-    [HttpGet("pagination-options")]
-    [AllowAnonymous]
-    public IActionResult GetPaginationOptions()
-    {
-        try
-        {
-            _logger.LogInformation("Getting pagination options");
-            var options = _gameFilterService.GetPaginationOptions();
-            return Ok(options);
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, "Error retrieving pagination options");
-        }
-    }
-
-    [HttpGet("sorting-options")]
-    [AllowAnonymous]
-    public IActionResult GetSortingOptions()
-    {
-        try
-        {
-            _logger.LogInformation("Getting sorting options");
-            var options = _gameFilterService.GetSortingOptions();
-            return Ok(options);
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, "Error retrieving sorting options");
-        }
-    }
-
-    [HttpGet("publish-date-options")]
-    [AllowAnonymous]
-    public IActionResult GetPublishDateOptions()
-    {
-        try
-        {
-            _logger.LogInformation("Getting publish date filter options");
-            var options = _gameFilterService.GetPublishDateFilterOptions();
-            return Ok(options);
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, "Error retrieving publish date filter options");
-        }
+        return string.IsNullOrWhiteSpace(pageSizeStr) || pageSizeStr.ToLowerInvariant() == "all"
+            ? 0
+            : int.TryParse(pageSizeStr, out var pageSize) && pageSize > 0 ? pageSize : 10;
     }
 
     private ObjectResult HandleException(Exception ex, string logMessage)
@@ -419,10 +342,12 @@ public class GameFilterController(
             StatusCode = StatusCodes.Status500InternalServerError,
         });
     }
+
+#pragma warning restore S3358
 }
 
 /// <summary>
-/// Extension methods dla GameFilterController
+/// Extension methods for GameFilterController
 /// </summary>
 public static class ObjectExtensions
 {

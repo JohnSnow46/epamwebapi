@@ -1,6 +1,4 @@
-﻿using Gamestore.Entities.MongoDB;
-
-namespace Gamestore.Services.Interfaces;
+﻿namespace Gamestore.Services.Interfaces;
 
 /// <summary>
 /// Service interface for Shipper operations
@@ -15,7 +13,9 @@ public interface IShipperService
     Task<IEnumerable<object>> GetAllShippersAsync();
 
     /// <summary>
-    /// Gets shipper by ID - zwraca object zamiast MongoShipper
+    /// Gets shipper by ID - returns object instead of MongoShipper.
     /// </summary>
+    /// <param name="shipperId">The shipper ID to search for</param>
+    /// <returns>Shipper data or null if not found</returns>
     Task<object?> GetShipperByIdAsync(int shipperId);
 }

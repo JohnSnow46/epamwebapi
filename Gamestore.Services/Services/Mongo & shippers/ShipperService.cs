@@ -6,8 +6,8 @@ using MongoDB.Bson;
 namespace Gamestore.Services.Services;
 
 /// <summary>
-/// Naprawiony service dla Shipper operations from MongoDB
-/// Używa bezpośredniego połączenia zamiast skomplikowanych repositories
+/// Service for Shipper operations from MongoDB.
+/// Uses direct connection instead of complex repositories for simplified operations.
 /// </summary>
 public class ShipperService : IShipperService
 {
@@ -18,7 +18,6 @@ public class ShipperService : IShipperService
     {
         _logger = logger;
 
-        // Bezpośrednie połączenie - obejście problemów z DI
         var client = new MongoClient("mongodb://localhost:27017");
         var database = client.GetDatabase("Northwind");
         _shippersCollection = database.GetCollection<BsonDocument>("shippers");
@@ -33,18 +32,15 @@ public class ShipperService : IShipperService
         {
             _logger.LogInformation("Fetching all shippers from MongoDB");
 
-            // Bezpośrednie zapytanie bez skomplikowanej serializacji
             var documents = await _shippersCollection.Find(new BsonDocument()).ToListAsync();
 
             _logger.LogInformation("Found {Count} shippers", documents.Count);
 
-            // Konwersja do dynamic structure dla E08 US1
             var result = documents.Select(doc => new
             {
                 shipperId = doc.Contains("ShipperID") ? doc["ShipperID"].ToInt32() : 0,
                 companyName = doc.Contains("CompanyName") ? doc["CompanyName"].AsString : "N/A",
                 phone = doc.Contains("Phone") ? doc["Phone"].AsString : "N/A",
-                // Dynamic content structure - możemy dodać więcej pól w przyszłości
                 mongoId = doc["_id"].ToString()
             });
 
@@ -58,8 +54,10 @@ public class ShipperService : IShipperService
     }
 
     /// <summary>
-    /// Gets shipper by ID - uproszczona wersja
+    /// Gets shipper by ID with simplified implementation.
     /// </summary>
+    /// <param name="shipperId">The shipper ID to search for</param>
+    /// <returns>Shipper data or null if not found</returns>
     public async Task<object?> GetShipperByIdAsync(int shipperId)
     {
         try

@@ -9,18 +9,12 @@ namespace Gamestore.WebApi.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/unified-products")]
-public class UnifiedProductsController : ControllerBase
+public class UnifiedProductsController(
+    IUnifiedProductService unifiedProductService,
+    ILogger<UnifiedProductsController> logger) : ControllerBase
 {
-    private readonly IUnifiedProductService _unifiedProductService;
-    private readonly ILogger<UnifiedProductsController> _logger;
-
-    public UnifiedProductsController(
-        IUnifiedProductService unifiedProductService,
-        ILogger<UnifiedProductsController> logger)
-    {
-        _unifiedProductService = unifiedProductService;
-        _logger = logger;
-    }
+    private readonly IUnifiedProductService _unifiedProductService = unifiedProductService;
+    private readonly ILogger<UnifiedProductsController> _logger = logger;
 
     /// <summary>
     /// Gets all products from both databases
@@ -53,12 +47,7 @@ public class UnifiedProductsController : ControllerBase
         {
             var product = await _unifiedProductService.GetProductByIdAsync(id);
 
-            if (product == null)
-            {
-                return NotFound(new { message = $"Product with ID {id} not found" });
-            }
-
-            return Ok(product);
+            return product == null ? NotFound(new { message = $"Product with ID {id} not found" }) : Ok(product);
         }
         catch (Exception ex)
         {
@@ -132,12 +121,7 @@ public class UnifiedProductsController : ControllerBase
         {
             var result = await _unifiedProductService.DeleteProductAsync(id);
 
-            if (!result)
-            {
-                return NotFound(new { message = $"Product with ID {id} not found" });
-            }
-
-            return NoContent();
+            return !result ? NotFound(new { message = $"Product with ID {id} not found" }) : NoContent();
         }
         catch (Exception ex)
         {
@@ -151,39 +135,5 @@ public class UnifiedProductsController : ControllerBase
         // Helper method to extract ID from result object
         var idProperty = result.GetType().GetProperty("Id");
         return idProperty?.GetValue(result)?.ToString() ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Test endpoint to verify Epic 8 implementation
-    /// </summary>
-    [HttpGet("epic8-status")]
-    public IActionResult GetEpic8Status()
-    {
-        return Ok(new
-        {
-            epic = "Epic 8 - NoSQL Database Integration",
-            status = "Implemented",
-            features = new[]
-            {
-            "✅ US1 - Shippers endpoint",
-            "✅ US2 - Orders History endpoint",
-            "✅ US3 - SQL Database extended",
-            "✅ US4 - CRUD operations for both databases",
-            "✅ US5 - Stock count sync",
-            "✅ US6 - Duplicate management",
-            "✅ US7 - MongoDB update logic (copy to SQL)",
-            "✅ NFR1 - IQueryable for MongoDB reads",
-            "✅ NFR2 - FilterDefinition/UpdateDefinition",
-            "✅ NFR3 - Raw MongoDB queries",
-            "✅ NFR4 - Entity changes logging"
-        },
-            endpoints = new[]
-            {
-            "GET /api/shippers",
-            "GET /api/orders/history",
-            "GET /api/unified-products",
-            "PUT /api/unified-products/{id}/stock"
-        }
-        });
     }
 }

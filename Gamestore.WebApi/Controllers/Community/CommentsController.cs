@@ -1,5 +1,4 @@
-﻿// WebApi/Controllers/CommentsController.cs - With Authorization
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using Gamestore.Entities.ErrorModels;
 using Gamestore.Services.Dto.CommentsDto;
 using Gamestore.Services.Interfaces;
@@ -91,7 +90,6 @@ public class CommentsController(ICommentService commentService, ILogger<Comments
     {
         try
         {
-            // Check if user can moderate comments or if it's their own comment
             if (!User.CanModerateComments())
             {
                 // For now, we'll only allow moderators and above to delete

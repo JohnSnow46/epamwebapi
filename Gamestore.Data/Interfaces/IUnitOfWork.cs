@@ -95,6 +95,11 @@ public interface IUnitOfWork
     IPaymentTransactionRepository PaymentTransactions { get; }
 
     /// <summary>
+    /// Gets the repository for managing PaymentMethod entities and payment method operations.
+    /// </summary>
+    IPaymentMethodRepository PaymentMethods { get; }
+
+    /// <summary>
     /// Commits all pending changes made through the repositories within this unit of work.
     /// This method ensures that all operations are executed as a single atomic transaction,
     /// maintaining data consistency across all related entities and relationships.
