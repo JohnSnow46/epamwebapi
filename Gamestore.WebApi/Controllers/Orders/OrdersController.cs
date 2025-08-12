@@ -172,7 +172,6 @@ public class OrdersController(IOrderService orderService,
             _logger.LogInformation("GET /api/orders/history called - Start: {Start}, End: {End}",
                 start, end);
 
-            // Konwertuj string parametry na DateTime?
             DateTime? startDate = null;
             DateTime? endDate = null;
 
@@ -210,7 +209,6 @@ public class OrdersController(IOrderService orderService,
                 }
             }
 
-            // Walidacja dat
             if (startDate.HasValue && endDate.HasValue && startDate > endDate)
             {
                 return BadRequest(new ErrorResponseModel

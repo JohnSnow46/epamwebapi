@@ -1,4 +1,5 @@
-﻿using Gamestore.Entities.ErrorModels;
+﻿using System.ComponentModel.DataAnnotations;
+using Gamestore.Entities.ErrorModels;
 using Gamestore.Services.Dto.PaymentDto;
 using Gamestore.Services.Interfaces;
 using Gamestore.WebApi.Extensions;
@@ -91,6 +92,14 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
                     message = paymentResult.Message
                 })
             };
+        }
+        catch (Exception ex) when (ex is ValidationException or ArgumentException)
+        {
+            return BadRequest(new ErrorResponseModel
+            {
+                Message = ex.Message,
+                StatusCode = StatusCodes.Status400BadRequest
+            });
         }
         catch (UnauthorizedAccessException ex)
         {
