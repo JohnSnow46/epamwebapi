@@ -52,6 +52,7 @@ public class OrderService(IUnitOfWork unitOfWork, ILogger<OrderService> logger) 
         _logger.LogInformation("Getting order details for order {OrderId} by customer {CustomerId}", orderId, requestingCustomerId);
 
         // Repository handles the customer filtering - no authorization logic in service
+        var order = await _unitOfWork.Orders.GetOrderWithDetailsByCustomerAsync(orderId, requestingCustomerId) ?? throw new KeyNotFoundException($"Order with ID '{orderId}' not found or access denied");
         var orderGames = await _unitOfWork.OrderGames.GetOrderGamesByOrderIdAsync(orderId);
         return orderGames.Select(og => new OrderGameDto
         {

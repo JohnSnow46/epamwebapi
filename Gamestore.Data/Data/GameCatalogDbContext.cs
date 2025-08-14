@@ -95,11 +95,6 @@ public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options
     public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
 
     /// <summary>
-    /// Gets or sets the PaymentMethods entity set for managing payment methods.
-    /// </summary>
-    public DbSet<PaymentMethod> PaymentMethods { get; set; }
-
-    /// <summary>
     /// Configures the database model using Entity Framework's Fluent API.
     /// Defines relationships, constraints, indexes, and other database schema configurations.
     /// </summary>

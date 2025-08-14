@@ -236,6 +236,8 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
 {
     // MongoDB
     builder.Services.AddMongoDbServices(builder.Configuration);
+    builder.Services.AddScoped<IShipperRepository, ShipperRepository>();
+    builder.Services.AddScoped<IShipperService, ShipperService>();
 
     // Business Services
     builder.Services.AddScoped<IGameService, GameService>();

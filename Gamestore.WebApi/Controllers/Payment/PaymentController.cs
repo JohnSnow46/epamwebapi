@@ -112,6 +112,7 @@ public class PaymentController(IPaymentService paymentService, ILogger<PaymentCo
     }
 
     /// <summary>
+    /// DODATKOWY ENDPOINT - Get payment history for user
     /// Epic 9: Authenticated users can view their payment history
     /// </summary>
     [HttpGet("payment-history")]

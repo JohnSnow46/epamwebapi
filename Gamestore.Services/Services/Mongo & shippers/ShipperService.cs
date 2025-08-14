@@ -1,71 +1,63 @@
-﻿using Gamestore.Services.Interfaces;
+﻿using Gamestore.Data.MongoDB;
+using Gamestore.Services.Interfaces;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using MongoDB.Bson;
 
 namespace Gamestore.Services.Services;
 
 /// <summary>
-/// Service for Shipper operations from MongoDB.
-/// Uses direct connection instead of complex repositories for simplified operations.
+/// Service for Shipper operations - REFACTORED
+/// Now follows Single Responsibility Principle:
+/// - Repository handles data access
+/// - Service handles business logic and data transformation
 /// </summary>
-public class ShipperService : IShipperService
+public class ShipperService(
+    ILogger<ShipperService> logger,
+    IShipperRepository shipperRepository) : IShipperService
 {
-    private readonly ILogger<ShipperService> _logger;
-    private readonly IMongoCollection<BsonDocument> _shippersCollection;
-
-    public ShipperService(ILogger<ShipperService> logger)
-    {
-        _logger = logger;
-
-        var client = new MongoClient("mongodb://localhost:27017");
-        var database = client.GetDatabase("Northwind");
-        _shippersCollection = database.GetCollection<BsonDocument>("shippers");
-    }
+    private readonly ILogger<ShipperService> _logger = logger;
+    private readonly IShipperRepository _shipperRepository = shipperRepository;
 
     /// <summary>
     /// Gets all shippers with dynamic content structure as per E08 US1
+    /// Service responsibility: Transform raw MongoDB data to business objects
     /// </summary>
     public async Task<IEnumerable<object>> GetAllShippersAsync()
     {
         try
         {
-            _logger.LogInformation("Fetching all shippers from MongoDB");
+            _logger.LogInformation("Processing request for all shippers");
 
-            var documents = await _shippersCollection.Find(new BsonDocument()).ToListAsync();
+            // Repository handles data access
+            var documents = await _shipperRepository.GetAllShippersAsync();
 
-            _logger.LogInformation("Found {Count} shippers", documents.Count);
+            _logger.LogInformation("Retrieved {Count} shipper documents, transforming to business objects", documents.Count());
 
-            var result = documents.Select(doc => new
-            {
-                shipperId = doc.Contains("ShipperID") ? doc["ShipperID"].ToInt32() : 0,
-                companyName = doc.Contains("CompanyName") ? doc["CompanyName"].AsString : "N/A",
-                phone = doc.Contains("Phone") ? doc["Phone"].AsString : "N/A",
-                mongoId = doc["_id"].ToString()
-            });
+            // Service handles business logic - data transformation
+            var result = documents.Select(TransformDocumentToBusinessObject);
 
+            _logger.LogInformation("Successfully transformed {Count} shippers", result.Count());
             return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching shippers from MongoDB");
+            _logger.LogError(ex, "Error processing all shippers request");
             throw;
         }
     }
 
     /// <summary>
-    /// Gets shipper by ID with simplified implementation.
+    /// Gets shipper by ID with simplified implementation
+    /// Service responsibility: Transform raw MongoDB data to business object
     /// </summary>
-    /// <param name="shipperId">The shipper ID to search for</param>
-    /// <returns>Shipper data or null if not found</returns>
     public async Task<object?> GetShipperByIdAsync(int shipperId)
     {
         try
         {
-            _logger.LogInformation("Fetching shipper with ID: {ShipperId}", shipperId);
+            _logger.LogInformation("Processing request for shipper with ID: {ShipperId}", shipperId);
 
-            var filter = Builders<BsonDocument>.Filter.Eq("ShipperID", shipperId);
-            var document = await _shippersCollection.Find(filter).FirstOrDefaultAsync();
+            // Repository handles data access
+            var document = await _shipperRepository.GetShipperByIdAsync(shipperId);
 
             if (document == null)
             {
@@ -73,18 +65,31 @@ public class ShipperService : IShipperService
                 return null;
             }
 
-            return new
-            {
-                shipperId = document["ShipperID"].ToInt32(),
-                companyName = document["CompanyName"].AsString,
-                phone = document["Phone"].AsString,
-                mongoId = document["_id"].ToString()
-            };
+            // Service handles business logic - data transformation
+            var result = TransformDocumentToBusinessObject(document);
+
+            _logger.LogInformation("Successfully retrieved and transformed shipper {ShipperId}", shipperId);
+            return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching shipper {ShipperId} from MongoDB", shipperId);
+            _logger.LogError(ex, "Error processing shipper request for ID {ShipperId}", shipperId);
             throw;
         }
+    }
+
+    /// <summary>
+    /// Private method for transforming MongoDB document to business object
+    /// Centralized transformation logic
+    /// </summary>
+    private object TransformDocumentToBusinessObject(BsonDocument doc)
+    {
+        return new
+        {
+            shipperId = doc.Contains("ShipperID") ? doc["ShipperID"].ToInt32() : 0,
+            companyName = doc.Contains("CompanyName") ? doc["CompanyName"].AsString : "N/A",
+            phone = doc.Contains("Phone") ? doc["Phone"].AsString : "N/A",
+            mongoId = doc["_id"].ToString()
+        };
     }
 }

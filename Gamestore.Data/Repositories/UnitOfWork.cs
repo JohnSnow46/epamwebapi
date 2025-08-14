@@ -46,7 +46,6 @@ public class UnitOfWork : IUnitOfWork
         Orders = new OrderRepository(_context);
         OrderGames = new OrderGameRepository(_context);
         PaymentTransactions = new PaymentTransactionRepository(_context);
-        PaymentMethods = new PaymentMethodRepository(_context);
     }
 
     // Existing repositories
@@ -131,11 +130,6 @@ public class UnitOfWork : IUnitOfWork
     /// Gets the repository for managing PaymentTransaction entities and payment processing operations.
     /// </summary>
     public IPaymentTransactionRepository PaymentTransactions { get; }
-
-    /// <summary>
-    /// Gets the repository for managing PaymentMethod entities and payment method operations.
-    /// </summary>
-    public IPaymentMethodRepository PaymentMethods { get; }
 
     /// <summary>
     /// Commits all pending changes made through the repositories within this unit of work.

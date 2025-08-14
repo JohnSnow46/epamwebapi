@@ -38,6 +38,7 @@ public class OrdersController(IOrderService orderService,
 
             _logger.LogInformation("Getting orders history for user {UserEmail}", User.GetUserEmail());
 
+            // Użyj serwisu history zamiast zwykłego order service
             var orders = await _orderHistoryService.GetOrderHistoryAsync();
 
             return Ok(orders);
@@ -160,7 +161,7 @@ public class OrdersController(IOrderService orderService,
     /// UWAGA: UI wysyła parametry "start" i "end", nie "startDate" i "endDate"
     /// </summary>
     [HttpGet("history")]
-    [AllowAnonymous]
+    [AllowAnonymous] // Lub [Authorize] jeśli potrzebna autoryzacja
     public async Task<IActionResult> GetOrdersHistory(
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
         [FromQuery] string? start = null,
@@ -172,6 +173,7 @@ public class OrdersController(IOrderService orderService,
             _logger.LogInformation("GET /api/orders/history called - Start: {Start}, End: {End}",
                 start, end);
 
+            // Konwertuj string parametry na DateTime?
             DateTime? startDate = null;
             DateTime? endDate = null;
 
@@ -209,6 +211,7 @@ public class OrdersController(IOrderService orderService,
                 }
             }
 
+            // Walidacja dat
             if (startDate.HasValue && endDate.HasValue && startDate > endDate)
             {
                 return BadRequest(new ErrorResponseModel
