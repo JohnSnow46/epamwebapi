@@ -1,164 +1,128 @@
 ﻿using Gamestore.Data.Interfaces;
 using Gamestore.Services.Dto.OrdersDto;
 using Gamestore.Services.Interfaces;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;
-using MongoDB.Driver;
 
 namespace Gamestore.Services.Services.Orders;
 
 /// <summary>
 /// Service for combining order history from both SQL and MongoDB databases
-/// Implements E08 US2 requirements
+/// REFACTORED: Now follows Single Responsibility Principle
+/// - Repository handles MongoDB data access
+/// - Service handles business logic, data transformation and combining sources
 /// </summary>
-public class OrderHistoryService : IOrderHistoryService
+public class OrderHistoryService(
+    IUnitOfWork unitOfWork,
+    IOrderHistoryRepository orderHistoryRepository,
+    ILogger<OrderHistoryService> logger) : IOrderHistoryService
 {
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly ILogger<OrderHistoryService> _logger;
-    private readonly IMongoCollection<BsonDocument> _mongoOrdersCollection;
-
-    public OrderHistoryService(
-        IUnitOfWork unitOfWork,
-        ILogger<OrderHistoryService> logger,
-        IConfiguration configuration)
-    {
-        _unitOfWork = unitOfWork;
-        _logger = logger;
-
-        try
-        {
-            var connectionString = configuration.GetConnectionString("MongoDb") ?? "mongodb://localhost:27017";
-            var databaseName = configuration.GetValue<string>("MongoDb:DatabaseName") ?? "Northwind";
-
-            _logger.LogInformation("Connecting to MongoDB: {ConnectionString}, Database: {DatabaseName}",
-                connectionString, databaseName);
-
-            var client = new MongoClient(connectionString);
-            var database = client.GetDatabase(databaseName);
-            _mongoOrdersCollection = database.GetCollection<BsonDocument>("orders");
-
-            _logger.LogInformation("MongoDB connection established successfully");
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Failed to establish MongoDB connection");
-            _mongoOrdersCollection = null;
-        }
-    }
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IOrderHistoryRepository _orderHistoryRepository = orderHistoryRepository;
+    private readonly ILogger<OrderHistoryService> _logger = logger;
 
     /// <summary>
     /// Gets combined order history from both databases with optional date filtering
+    /// Service responsibility: Combine data from multiple sources and transform to business objects
     /// </summary>
     public async Task<IEnumerable<object>> GetOrderHistoryAsync(DateTime? startDate = null, DateTime? endDate = null)
     {
         try
         {
-            _logger.LogInformation("Fetching order history - StartDate: {StartDate}, EndDate: {EndDate}",
+            _logger.LogInformation("Processing order history request - StartDate: {StartDate}, EndDate: {EndDate}",
                 startDate, endDate);
 
+            // Get data from both sources using repositories
             var sqlOrders = await GetSqlOrdersAsync(startDate, endDate);
             _logger.LogInformation("Retrieved {SqlCount} orders from SQL database", sqlOrders.Count());
 
             var mongoOrders = await GetMongoOrdersAsync(startDate, endDate);
             _logger.LogInformation("Retrieved {MongoCount} orders from MongoDB", mongoOrders.Count());
 
+            // Business logic: combine data from multiple sources
             var combinedOrders = sqlOrders.Concat(mongoOrders).ToList();
 
             _logger.LogInformation("Combined total: {TotalCount} orders", combinedOrders.Count);
-
             return combinedOrders;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching combined order history");
+            _logger.LogError(ex, "Error processing combined order history request");
             throw;
         }
     }
 
     /// <summary>
-    /// Gets orders from SQL database
+    /// Gets orders from SQL database with transformation
+    /// Service responsibility: Transform SQL entities to business objects
     /// </summary>
     private async Task<IEnumerable<object>> GetSqlOrdersAsync(DateTime? startDate, DateTime? endDate)
     {
         try
         {
-            _logger.LogDebug("Fetching orders from SQL database");
+            _logger.LogDebug("Processing SQL orders request");
 
             var orders = await _unitOfWork.Orders.GetAllAsync();
 
+            // Business logic: date filtering
             if (startDate.HasValue || endDate.HasValue)
             {
                 orders = orders.Where(o =>
                 {
                     var orderDate = o.Date ?? o.CreatedAt;
-
-                    return (!startDate.HasValue || orderDate >= startDate.Value) && (!endDate.HasValue || orderDate <= endDate.Value);
+                    return (!startDate.HasValue || orderDate >= startDate.Value) &&
+                           (!endDate.HasValue || orderDate <= endDate.Value);
                 });
             }
 
-            var result = orders.Select(o => new
-            {
-                id = o.Id.ToString(),
-                customerId = o.CustomerId.ToString(),
-                date = (o.Date ?? o.CreatedAt).ToString("yyyy-MM-ddTHH:mm:ss.fffffffK"),
-                source = "SQL"
-            }).ToList();
+            // Business logic: transform to standardized format
+            var result = orders.Select(TransformSqlOrderToBusinessObject).ToList();
 
-            _logger.LogDebug("Converted {Count} SQL orders to required format", result.Count);
+            _logger.LogDebug("Transformed {Count} SQL orders to business objects", result.Count);
             return result;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching SQL orders");
+            _logger.LogError(ex, "Error processing SQL orders");
             throw;
         }
     }
 
     /// <summary>
-    /// Gets orders from MongoDB
+    /// Gets orders from MongoDB using repository with transformation
+    /// Service responsibility: Transform MongoDB documents to business objects
     /// </summary>
     private async Task<IEnumerable<object>> GetMongoOrdersAsync(DateTime? startDate, DateTime? endDate)
     {
         try
         {
-            if (!IsMongoCollectionAvailable())
+            if (!_orderHistoryRepository.IsMongoAvailable())
             {
+                _logger.LogWarning("MongoDB is not available, skipping MongoDB orders");
                 return Enumerable.Empty<object>();
             }
 
-            var documents = await FetchMongoDocumentsAsync();
+            // Repository handles data access
+            var documents = await _orderHistoryRepository.GetMongoOrdersByDateRangeAsync(startDate, endDate);
+
+            // Service handles business logic: document processing and transformation
             var orders = ProcessMongoDocuments(documents, startDate, endDate);
 
-            _logger.LogDebug("Converted {Count} MongoDB orders to required format", orders.Count);
+            _logger.LogDebug("Transformed {Count} MongoDB orders to business objects", orders.Count);
             return orders;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error fetching MongoDB orders");
+            _logger.LogError(ex, "Error processing MongoDB orders");
             return Enumerable.Empty<object>();
         }
     }
 
-    private bool IsMongoCollectionAvailable()
-    {
-        if (_mongoOrdersCollection == null)
-        {
-            _logger.LogWarning("MongoDB collection is not available, skipping MongoDB orders");
-            return false;
-        }
-        return true;
-    }
-
-    private async Task<List<BsonDocument>> FetchMongoDocumentsAsync()
-    {
-        _logger.LogDebug("Fetching orders from MongoDB");
-        var documents = await _mongoOrdersCollection.Find(new BsonDocument()).ToListAsync();
-        _logger.LogDebug("Retrieved {Count} documents from MongoDB", documents.Count);
-        return documents;
-    }
-
-    private List<object> ProcessMongoDocuments(List<BsonDocument> documents, DateTime? startDate, DateTime? endDate)
+    /// <summary>
+    /// Processes MongoDB documents and transforms them to business objects
+    /// Service responsibility: Business logic for document processing
+    /// </summary>
+    private List<object> ProcessMongoDocuments(IEnumerable<BsonDocument> documents, DateTime? startDate, DateTime? endDate)
     {
         var orders = new List<object>();
 
@@ -172,9 +136,10 @@ public class OrderHistoryService : IOrderHistoryService
                     continue;
                 }
 
+                // Additional business logic filtering (fallback if repository filtering didn't work)
                 if (IsOrderInDateRange(orderData.OrderDate, startDate, endDate))
                 {
-                    orders.Add(CreateOrderObject(orderData));
+                    orders.Add(TransformMongoOrderToBusinessObject(orderData));
                 }
             }
             catch (Exception ex)
@@ -186,6 +151,41 @@ public class OrderHistoryService : IOrderHistoryService
         return orders;
     }
 
+    // ===================================================================
+    // PRIVATE HELPER METHODS - Business Logic
+    // ===================================================================
+
+    /// <summary>
+    /// Transforms SQL order entity to standardized business object
+    /// </summary>
+    private object TransformSqlOrderToBusinessObject(dynamic order)
+    {
+        return new
+        {
+            id = order.Id.ToString(),
+            customerId = order.CustomerId.ToString(),
+            date = (order.Date ?? order.CreatedAt).ToString("yyyy-MM-ddTHH:mm:ss.fffffffK"),
+            source = "SQL"
+        };
+    }
+
+    /// <summary>
+    /// Transforms MongoDB order data to standardized business object
+    /// </summary>
+    private static object TransformMongoOrderToBusinessObject(OrderData orderData)
+    {
+        return new
+        {
+            id = orderData.OrderId,
+            customerId = orderData.CustomerId,
+            date = orderData.DateString,
+            source = "MongoDB"
+        };
+    }
+
+    /// <summary>
+    /// Extracts order data from MongoDB document
+    /// </summary>
     private OrderData? ExtractOrderData(BsonDocument doc)
     {
         var orderId = ExtractOrderId(doc);
@@ -250,17 +250,9 @@ public class OrderHistoryService : IOrderHistoryService
 
     private static bool IsOrderInDateRange(DateTime? orderDate, DateTime? startDate, DateTime? endDate)
     {
-        return !orderDate.HasValue || (!startDate.HasValue && !endDate.HasValue) || ((!startDate.HasValue || orderDate.Value >= startDate.Value) && (!endDate.HasValue || orderDate.Value <= endDate.Value));
-    }
-
-    private static object CreateOrderObject(OrderData orderData)
-    {
-        return new
-        {
-            id = orderData.OrderId,
-            customerId = orderData.CustomerId,
-            date = orderData.DateString,
-            source = "MongoDB"
-        };
+        return !orderDate.HasValue ||
+               (!startDate.HasValue && !endDate.HasValue) ||
+               ((!startDate.HasValue || orderDate.Value >= startDate.Value) &&
+                (!endDate.HasValue || orderDate.Value <= endDate.Value));
     }
 }

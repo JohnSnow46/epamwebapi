@@ -1,6 +1,6 @@
 ﻿using MongoDB.Bson;
 
-namespace Gamestore.Data.MongoDB;
+namespace Gamestore.Data.Interfaces;
 
 public interface IShipperRepository
 {

@@ -1,4 +1,4 @@
-﻿using Gamestore.Data.MongoDB;
+﻿using Gamestore.Data.Interfaces;
 using Gamestore.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 using MongoDB.Bson;

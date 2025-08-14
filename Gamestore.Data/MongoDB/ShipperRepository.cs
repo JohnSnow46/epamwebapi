@@ -2,6 +2,7 @@
 using MongoDB.Bson;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Gamestore.Data.Interfaces;
 
 namespace Gamestore.Data.MongoDB;
 
