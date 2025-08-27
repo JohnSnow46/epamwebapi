@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 
 namespace Gamestore.Data.Interfaces;
-// <summary>
+/// <summary>
 /// Repository interface for Order History MongoDB operations
 /// Handles MongoDB data access for order history
 /// </summary>
