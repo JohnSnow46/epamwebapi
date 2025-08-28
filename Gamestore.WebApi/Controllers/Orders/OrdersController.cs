@@ -38,7 +38,6 @@ public class OrdersController(IOrderService orderService,
 
             _logger.LogInformation("Getting orders history for user {UserEmail}", User.GetUserEmail());
 
-            // Użyj serwisu history zamiast zwykłego order service
             var orders = await _orderHistoryService.GetOrderHistoryAsync();
 
             return Ok(orders);
@@ -158,60 +157,24 @@ public class OrdersController(IOrderService orderService,
     /// <summary>
     /// E08 US2 - Get orders history from both databases (Epic 8)
     /// URL: GET /api/orders/history?startDate=2023-01-01&amp;endDate=2023-12-31
-    /// UWAGA: UI wysyła parametry "start" i "end", nie "startDate" i "endDate"
     /// </summary>
     [HttpGet("history")]
-    [AllowAnonymous] // Lub [Authorize] jeśli potrzebna autoryzacja
+    [AllowAnonymous]
     public async Task<IActionResult> GetOrdersHistory(
-#pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
         [FromQuery] string? start = null,
         [FromQuery] string? end = null)
-#pragma warning restore CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
     {
         try
         {
             _logger.LogInformation("GET /api/orders/history called - Start: {Start}, End: {End}",
                 start, end);
 
-            // Konwertuj string parametry na DateTime?
-            DateTime? startDate = null;
-            DateTime? endDate = null;
-
-            if (!string.IsNullOrEmpty(start))
+            var (startDate, endDate, errorResult) = ParseDateParameters(start, end);
+            if (errorResult != null)
             {
-                if (DateTime.TryParse(start, out var parsedStart))
-                {
-                    startDate = parsedStart;
-                }
-                else
-                {
-                    _logger.LogWarning("Could not parse start date: {Start}", start);
-                    return BadRequest(new ErrorResponseModel
-                    {
-                        Message = $"Invalid start date format: {start}",
-                        StatusCode = StatusCodes.Status400BadRequest
-                    });
-                }
+                return errorResult;
             }
 
-            if (!string.IsNullOrEmpty(end))
-            {
-                if (DateTime.TryParse(end, out var parsedEnd))
-                {
-                    endDate = parsedEnd;
-                }
-                else
-                {
-                    _logger.LogWarning("Could not parse end date: {End}", end);
-                    return BadRequest(new ErrorResponseModel
-                    {
-                        Message = $"Invalid end date format: {end}",
-                        StatusCode = StatusCodes.Status400BadRequest
-                    });
-                }
-            }
-
-            // Walidacja dat
             if (startDate.HasValue && endDate.HasValue && startDate > endDate)
             {
                 return BadRequest(new ErrorResponseModel
@@ -240,6 +203,26 @@ public class OrdersController(IOrderService orderService,
                 Details = ex.Message,
                 StatusCode = StatusCodes.Status500InternalServerError
             });
+        }
+    }
+
+    private (DateTime? startDate, DateTime? endDate, IActionResult? errorResult) ParseDateParameters(string? start, string? end)
+    {
+        try
+        {
+            DateTime? startDate = !string.IsNullOrEmpty(start) ? DateTime.Parse(start) : null;
+            DateTime? endDate = !string.IsNullOrEmpty(end) ? DateTime.Parse(end) : null;
+
+            return (startDate, endDate, null);
+        }
+        catch (FormatException ex)
+        {
+            _logger.LogWarning(ex, "Could not parse date parameters - Start: {Start}, End: {End}", start, end);
+            return (null, null, BadRequest(new ErrorResponseModel
+            {
+                Message = $"Invalid date format. Start: {start}, End: {end}",
+                StatusCode = StatusCodes.Status400BadRequest
+            }));
         }
     }
 

@@ -1,8 +1,8 @@
 ﻿using Gamestore.Data.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using MongoDB.Driver;
 using MongoDB.Bson;
+using MongoDB.Driver;
 
 namespace Gamestore.Data.MongoDB;
 
@@ -19,11 +19,33 @@ public class OrderHistoryRepository : IOrderHistoryRepository
     {
         _logger = logger;
 
+        var connectionString = configuration["MongoDB:ConnectionString"];
+        var databaseName = configuration["MongoDB:DatabaseName"];
+        var isEnabled = bool.TryParse(configuration["MongoDB:Enabled"], out var enabled) && enabled;
+
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            _logger.LogError("MongoDB:ConnectionString is missing in configuration");
+            _mongoOrdersCollection = null;
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(databaseName))
+        {
+            _logger.LogError("MongoDB:DatabaseName is missing in configuration");
+            _mongoOrdersCollection = null;
+            return;
+        }
+
+        if (!isEnabled)
+        {
+            _logger.LogInformation("MongoDB is disabled in configuration");
+            _mongoOrdersCollection = null;
+            return;
+        }
+
         try
         {
-            var connectionString = configuration.GetConnectionString("MongoDb") ?? "mongodb://localhost:27017";
-            var databaseName = configuration["MongoDb:DatabaseName"] ?? "Northwind";
-
             _logger.LogInformation("Connecting to MongoDB: {ConnectionString}, Database: {DatabaseName}",
                 connectionString, databaseName);
 
