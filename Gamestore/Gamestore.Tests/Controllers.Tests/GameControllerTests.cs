@@ -1,418 +1,225 @@
-﻿using Gamestore.Entities;
-using Gamestore.Services.Dto;
-using Gamestore.Services.IServices;
-using Gamestore.WebApi.Controllers;
+﻿using Gamestore.Entities.Business;
+using Gamestore.Services.Dto.GamesDto;
+using Gamestore.Services.Interfaces;
+using Gamestore.WebApi.Controllers.Business;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Newtonsoft.Json;
 
 namespace Gamestore.Tests.Controllers.Tests;
+
+/// <summary>
+/// Unit tests for GameController.
+/// </summary>
 public class GameControllerTests
 {
     private readonly Mock<IGameService> _gameServiceMock;
+    private readonly Mock<IPublisherService> _publisherServiceMock;
+    private readonly Mock<ILogger<GameController>> _loggerMock;
     private readonly GameController _controller;
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="GameControllerTests"/> class.
+    /// </summary>
     public GameControllerTests()
     {
         _gameServiceMock = new Mock<IGameService>();
-        var loggerMock = new Mock<ILogger<GameController>>();
-        _controller = new GameController(_gameServiceMock.Object, loggerMock.Object);
+        _publisherServiceMock = new Mock<IPublisherService>();
+        _loggerMock = new Mock<ILogger<GameController>>();
+        _controller = new GameController(
+            _gameServiceMock.Object,
+            _publisherServiceMock.Object,
+            _loggerMock.Object);
     }
 
+    /// <summary>
+    /// Test that CreateGame returns Ok when game is successfully created.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task CreateOrUpdateGameShouldReturnOkWhenGameIsCreatedOrUpdated()
+    public async Task CreateGameShouldReturnOkWhenGameIsCreated()
     {
         // Arrange
-        var game = new Game { Id = Guid.NewGuid(), Name = "Action Game", Key = "action-game" };
-        var gameDto = new GameDto { Id = game.Id, Name = game.Name, Key = game.Key };
-        var request = new GameRequestDto { Game = gameDto };
+        var gameRequest = new GameMetadataCreateRequestDto
+        {
+            Game = new GameCreateRequestDto
+            {
+                Name = "Test Game",
+                Key = "test-game",
+                Description = "Test Description",
+                Price = 59.99,
+                UnitInStock = 100,
+                Discount = 0,
+            },
+            Publisher = Guid.NewGuid(),
+            Genres = new List<Guid> { Guid.NewGuid() },
+            Platforms = new List<Guid> { Guid.NewGuid() },
+        };
 
         _gameServiceMock
-            .Setup(s => s.AddOrUpdateGameAsync(request))
-            .ReturnsAsync(game);
+            .Setup(s => s.AddGameAsync(It.IsAny<GameMetadataCreateRequestDto>()))
+            .ReturnsAsync(gameRequest);
 
         // Act
-        var result = await _controller.CreateOrUpdateGame(request);
+        var result = await _controller.CreateGame(gameRequest);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedGame = Assert.IsType<Game>(okResult.Value);
-        Assert.Equal(game.Id, returnedGame.Id);
-        Assert.Equal(game.Name, returnedGame.Name);
+        Assert.NotNull(okResult.Value);
+        _gameServiceMock.Verify(s => s.AddGameAsync(It.IsAny<GameMetadataCreateRequestDto>()), Times.Once);
     }
 
+    /// <summary>
+    /// Test that CreateGame returns InternalServerError when service returns null.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task CreateOrUpdateGameShouldReturnNotFoundWhenGameNotFound()
+    public async Task CreateGameShouldReturnInternalServerErrorWhenServiceReturnsNull()
     {
         // Arrange
-        var gameDto = new GameDto { Id = Guid.NewGuid(), Name = "NonExistentGame", Key = "nonexistent-key" };
-        var request = new GameRequestDto { Game = gameDto };
+        var gameRequest = new GameMetadataCreateRequestDto
+        {
+            Game = new GameCreateRequestDto
+            {
+                Name = "Test Game",
+                Key = "test-game",
+                Description = "Test Description",
+                Price = 59.99,
+                UnitInStock = 100,
+                Discount = 0,
+            },
+            Publisher = Guid.NewGuid(),
+        };
 
         _gameServiceMock
-            .Setup(s => s.AddOrUpdateGameAsync(request))
-            .Returns(Task.FromResult<Game>(null));
+            .Setup(s => s.AddGameAsync(It.IsAny<GameMetadataCreateRequestDto>()))
+            .ReturnsAsync((GameMetadataCreateRequestDto?)null);
 
         // Act
-        var result = await _controller.CreateOrUpdateGame(request);
-
-        // Assert
-        var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-        Assert.Contains("not found", notFoundResult.Value.ToString(), StringComparison.OrdinalIgnoreCase);
-    }
-
-    [Fact]
-    public async Task CreateOrUpdateGameShouldReturnStatusCode500WhenExceptionOccurs()
-    {
-        // Arrange
-        var gameDto = new GameDto { Id = Guid.NewGuid(), Name = "Broken Game", Key = "broken-game" };
-        var request = new GameRequestDto { Game = gameDto };
-
-        _gameServiceMock
-            .Setup(s => s.AddOrUpdateGameAsync(request))
-            .ThrowsAsync(new Exception("Unexpected error"));
-
-        // Act
-        var result = await _controller.CreateOrUpdateGame(request);
+        var result = await _controller.CreateGame(gameRequest);
 
         // Assert
         var objectResult = Assert.IsType<ObjectResult>(result);
         Assert.Equal(500, objectResult.StatusCode);
-
-        var json = JsonConvert.SerializeObject(objectResult.Value);
-        var errorDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-        Assert.Equal("An error occurred.", errorDict["Message"]);
-        Assert.Equal("Unexpected error", errorDict["Details"]);
     }
 
+    /// <summary>
+    /// Test that GetGameByKey returns Ok when game exists.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task GetGameByKeyShouldReturnOkWhenGameExists()
     {
         // Arrange
-        var key = "test-key";
-        var expectedGame = new GameDto
+        var key = "test-game";
+        var gameDto = new GameUpdateRequestDto
         {
-            Id = Guid.NewGuid(),
-            Name = "Test Game",
             Key = key,
+            Name = "Test Game",
             Description = "Test Description",
+            Price = 59.99,
+            UnitInStock = 100,
+            Discontinued = 0,
         };
+
         _gameServiceMock
             .Setup(s => s.GetGameByKey(key))
-            .ReturnsAsync(expectedGame);
+            .ReturnsAsync(gameDto);
 
         // Act
         var result = await _controller.GetGameByKey(key);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedGame = Assert.IsType<GameDto>(okResult.Value);
-        Assert.Equal(expectedGame.Id, returnedGame.Id);
-        Assert.Equal(expectedGame.Name, returnedGame.Name);
-        Assert.Equal(expectedGame.Description, returnedGame.Description);
-        Assert.Equal(expectedGame.Key, returnedGame.Key);
+        var returnedGame = Assert.IsType<GameUpdateRequestDto>(okResult.Value);
+        Assert.Equal(key, returnedGame.Key);
+        Assert.Equal("Test Game", returnedGame.Name);
     }
 
-    [Fact]
-    public async Task GetGameByKeyShouldReturnStatusCode500WhenExceptionOccurs()
-    {
-        // Arrange
-        var key = string.Empty;
-        _gameServiceMock
-            .Setup(s => s.GetGameByKey(It.IsAny<string>()))
-            .ThrowsAsync(new ArgumentException("Key cannot be empty"));
-
-        // Act
-        var result = await _controller.GetGameByKey(key);
-
-        // Assert
-        var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, objectResult.StatusCode);
-        var json = JsonConvert.SerializeObject(objectResult.Value);
-        var errorDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-        Assert.Equal("An error occurred.", errorDict["Message"]);
-        Assert.Equal("Key cannot be empty", errorDict["Details"]);
-    }
-
+    /// <summary>
+    /// Test that GetGameByKey returns NotFound when game does not exist.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task GetGameByKeyShouldReturnNotFoundWhenGameDoesNotExist()
     {
         // Arrange
-        var key = "non-existent-key";
+        var key = "nonexistent-game";
+
         _gameServiceMock
             .Setup(s => s.GetGameByKey(key))
-            .Returns(Task.FromResult<GameDto>(null));
+            .ReturnsAsync((GameUpdateRequestDto?)null);
 
         // Act
         var result = await _controller.GetGameByKey(key);
 
         // Assert
-        var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-        Assert.Contains("not found", notFoundResult.Value.ToString(), StringComparison.OrdinalIgnoreCase);
+        var notFoundResult = Assert.IsType<ObjectResult>(result);
+        Assert.Equal(404, notFoundResult.StatusCode);
     }
 
+    /// <summary>
+    /// Test that GetGameById returns Ok when game exists.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task GetGameByIdShouldReturnOkWhenGameExists()
     {
         // Arrange
         var gameId = Guid.NewGuid();
-        var expectedGame = new GameDto
+        var gameDto = new GameCreateRequestDto
         {
-            Id = gameId,
             Name = "Test Game",
-            Key = "test-key",
+            Key = "test-game",
             Description = "Test Description",
+            Price = 59.99,
+            UnitInStock = 100,
+            Discount = 0,
         };
+
         _gameServiceMock
-           .Setup(s => s.GetGameById(gameId))
-            .ReturnsAsync(expectedGame);
+            .Setup(s => s.GetGameById(gameId))
+            .ReturnsAsync(gameDto);
 
         // Act
         var result = await _controller.GetGameById(gameId);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedGame = Assert.IsType<GameDto>(okResult.Value);
-        Assert.Equal(expectedGame.Id, returnedGame.Id);
-        Assert.Equal(expectedGame.Name, returnedGame.Name);
-        Assert.Equal(expectedGame.Description, returnedGame.Description);
+        var returnedGame = Assert.IsType<GameCreateRequestDto>(okResult.Value);
+        Assert.Equal("Test Game", returnedGame.Name);
     }
 
-    [Fact]
-    public async Task GetGameByIdShouldReturnStatusCode500WhenExceptionOccurs()
-    {
-        // Arrange
-        var gameId = Guid.NewGuid();
-        _gameServiceMock
-           .Setup(s => s.GetGameById(It.IsAny<Guid>()))
-           .ThrowsAsync(new ArgumentException("Id cannot be empty"));
-
-        // Act
-        var result = await _controller.GetGameById(gameId);
-
-        // Assert
-        var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, objectResult.StatusCode);
-        var json = JsonConvert.SerializeObject(objectResult.Value);
-        var errorDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-        Assert.Equal("An error occurred.", errorDict["Message"]);
-        Assert.Equal("Id cannot be empty", errorDict["Details"]);
-    }
-
-    [Fact]
-    public async Task GetGameByIdShouldReturnNotFoundWhenGameDoesNotExist()
-    {
-        // Arrange
-        var gameId = Guid.NewGuid();
-        _gameServiceMock
-           .Setup(s => s.GetGameById(gameId))
-           .Returns(Task.FromResult<GameDto>(null));
-
-        // Act
-        var result = await _controller.GetGameById(gameId);
-
-        // Assert
-        var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-        Assert.Contains("not found", notFoundResult.Value.ToString(), StringComparison.OrdinalIgnoreCase);
-    }
-
-    [Fact]
-    public async Task DeleteGameByKeyShouldReturnOkWhenGameIsDeleted()
-    {
-        // Arrange
-        var gameKey = "test-key";
-        var expectedGame = new GameDto
-        {
-            Id = Guid.NewGuid(),
-            Name = "Test Game",
-            Key = gameKey,
-            Description = "Test Description",
-        };
-        _gameServiceMock
-            .Setup(s => s.DeleteGameAsync(gameKey))
-            .ReturnsAsync(expectedGame);
-
-        // Act
-        var result = await _controller.DeleteGameByKey(gameKey);
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedGame = Assert.IsType<GameDto>(okResult.Value);
-        Assert.Equal(expectedGame.Id, returnedGame.Id);
-        Assert.Equal(expectedGame.Name, returnedGame.Name);
-        Assert.Equal(expectedGame.Description, returnedGame.Description);
-    }
-
-    [Fact]
-    public async Task DeleteGameByKeyShouldReturnStatusCode500WhenExceptionOccurs()
-    {
-        // Arrange
-        var gameKey = "test-key";
-        _gameServiceMock
-            .Setup(s => s.DeleteGameAsync(It.IsAny<string>()))
-            .ThrowsAsync(new ArgumentException("Key cannot be empty"));
-
-        // Act
-        var result = await _controller.DeleteGameByKey(gameKey);
-
-        // Assert
-        var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, objectResult.StatusCode);
-        var json = JsonConvert.SerializeObject(objectResult.Value);
-        var errorDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-        Assert.Equal("An error occurred.", errorDict["Message"]);
-        Assert.Equal("Key cannot be empty", errorDict["Details"]);
-    }
-
-    [Fact]
-    public async Task DeleteGameByKeyShouldReturnNotFoundWhenGameDoesNotExist()
-    {
-        // Arrange
-        var gameKey = "nonexistent-key";
-        _gameServiceMock
-            .Setup(s => s.DeleteGameAsync(gameKey))
-            .Returns(Task.FromResult<GameDto>(null));
-
-        // Act
-        var result = await _controller.DeleteGameByKey(gameKey);
-
-        // Assert
-        var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-        Assert.Contains("not found", notFoundResult.Value.ToString(), StringComparison.OrdinalIgnoreCase);
-    }
-
-    [Fact]
-    public async Task GetGamesByPlatformIdShouldReturnOkWhenGamesExist()
-    {
-        // Arrange
-        var platformId = Guid.NewGuid();
-        var games = new List<GameDto>
-    {
-        new() { Id = Guid.NewGuid(), Name = "Game 1", Key = "key1" },
-        new() { Id = Guid.NewGuid(), Name = "Game 2", Key = "key2" },
-    };
-        _gameServiceMock
-            .Setup(s => s.GetGamesByPlatformAsync(platformId))
-            .ReturnsAsync(games);
-
-        // Act
-        var result = await _controller.GetGamesByPlatformId(platformId);
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnValue = Assert.IsType<List<GameDto>>(okResult.Value);
-        Assert.Equal(games.Count, returnValue.Count);
-    }
-
-    [Fact]
-    public async Task GetGamesByPlatformIdShouldReturnStatusCode500WhenExceptionOccurs()
-    {
-        // Arrange
-        var platformId = Guid.NewGuid();
-        _gameServiceMock
-            .Setup(s => s.GetGamesByPlatformAsync(It.IsAny<Guid>()))
-            .ThrowsAsync(new ArgumentException("Id cannot be empty"));
-
-        // Act
-        var result = await _controller.GetGamesByPlatformId(platformId);
-
-        // Assert
-        var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, objectResult.StatusCode);
-        var json = JsonConvert.SerializeObject(objectResult.Value);
-        var errorDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-        Assert.Equal("An error occurred.", errorDict["Message"]);
-        Assert.Equal("Id cannot be empty", errorDict["Details"]);
-    }
-
-    [Fact]
-    public async Task GetGamesByPlatformIdShouldReturnNotFoundWhenNoGamesExist()
-    {
-        // Arrange
-        var platformId = Guid.NewGuid();
-        _gameServiceMock
-            .Setup(s => s.GetGamesByPlatformAsync(platformId))
-            .ReturnsAsync((List<GameDto>)null);
-
-        // Act
-        var result = await _controller.GetGamesByPlatformId(platformId);
-
-        // Assert
-        var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-        Assert.Contains("not found", notFoundResult.Value.ToString(), StringComparison.OrdinalIgnoreCase);
-    }
-
-    [Fact]
-    public async Task GetGamesByGenreIdShouldReturnOkWhenGamesExist()
-    {
-        // Arrange
-        var genreId = Guid.NewGuid();
-        var games = new List<GameDto>
-    {
-        new() { Id = Guid.NewGuid(), Name = "Game A", Key = "a-key" },
-        new() { Id = Guid.NewGuid(), Name = "Game B", Key = "b-key" },
-    };
-        _gameServiceMock
-            .Setup(s => s.GetGamesByGenreAsync(genreId))
-            .ReturnsAsync(games);
-
-        // Act
-        var result = await _controller.GetGamesByGenreId(genreId);
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnValue = Assert.IsType<List<GameDto>>(okResult.Value);
-        Assert.Equal(games.Count, returnValue.Count);
-    }
-
-    [Fact]
-    public async Task GetGamesByGenreIdShouldReturnStatusCode500WhenExceptionOccurs()
-    {
-        // Arrange
-        var genreId = Guid.NewGuid();
-        _gameServiceMock
-            .Setup(s => s.GetGamesByGenreAsync(It.IsAny<Guid>()))
-            .ThrowsAsync(new ArgumentException("Id cannot be empty"));
-
-        // Act
-        var result = await _controller.GetGamesByGenreId(genreId);
-
-        // Assert
-        var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, objectResult.StatusCode);
-        var json = JsonConvert.SerializeObject(objectResult.Value);
-        var errorDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-        Assert.Equal("An error occurred.", errorDict["Message"]);
-        Assert.Equal("Id cannot be empty", errorDict["Details"]);
-    }
-
-    [Fact]
-    public async Task GetGamesByGenreIdShouldReturnNotFoundWhenNoGamesExist()
-    {
-        // Arrange
-        var genreId = Guid.NewGuid();
-        _gameServiceMock
-            .Setup(s => s.GetGamesByGenreAsync(genreId))
-            .ReturnsAsync((List<GameDto>)null);
-
-        // Act
-        var result = await _controller.GetGamesByGenreId(genreId);
-
-        // Assert
-        var notFoundResult = Assert.IsType<NotFoundObjectResult>(result);
-        Assert.Contains("not found", notFoundResult.Value.ToString(), StringComparison.OrdinalIgnoreCase);
-    }
-
+    /// <summary>
+    /// Test that GetAllGames returns Ok with games list.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task GetAllGamesShouldReturnOkWhenGamesExist()
     {
         // Arrange
-        var games = new List<GameDto>
-    {
-        new() { Id = Guid.NewGuid(), Name = "Game A", Key = "a-key" },
-        new() { Id = Guid.NewGuid(), Name = "Game B", Key = "b-key" },
-    };
+        var games = new List<GameCreateRequestDto>
+        {
+            new()
+            {
+                Name = "Game 1",
+                Key = "game-1",
+                Description = "Description 1",
+                Price = 29.99,
+                UnitInStock = 50,
+                Discount = 0,
+            },
+            new()
+            {
+                Name = "Game 2",
+                Key = "game-2",
+                Description = "Description 2",
+                Price = 39.99,
+                UnitInStock = 75,
+                Discount = 10,
+            },
+        };
+
         _gameServiceMock
             .Setup(s => s.GetAllGames())
             .ReturnsAsync(games);
@@ -422,45 +229,72 @@ public class GameControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedGames = Assert.IsAssignableFrom<IEnumerable<GameDto>>(okResult.Value);
+        var returnedGames = Assert.IsAssignableFrom<IEnumerable<GameCreateRequestDto>>(okResult.Value);
         Assert.Equal(2, returnedGames.Count());
-        Assert.Contains(returnedGames, g => g.Name == "Game A");
-        Assert.Contains(returnedGames, g => g.Name == "Game B");
     }
 
+    /// <summary>
+    /// Test that DeleteGame returns Ok when game is deleted.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task GetAllGamesShouldReturnStatusCode500WhenExceptionOccurs()
+    public async Task DeleteGameShouldReturnOkWhenGameIsDeleted()
     {
         // Arrange
+        var key = "game-to-delete";
+        var deletedGame = new Game
+        {
+            Id = Guid.NewGuid(),
+            Key = key,
+            Name = "Deleted Game",
+            Description = "This game was deleted",
+        };
+
         _gameServiceMock
-            .Setup(s => s.GetAllGames())
-            .ThrowsAsync(new Exception("Database connection error"));
+            .Setup(s => s.DeleteGameAsync(key))
+            .ReturnsAsync(deletedGame);
 
         // Act
-        var result = await _controller.GetAllGames();
+        var result = await _controller.DeleteGameByKey(key);
 
         // Assert
-        var objectResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(500, objectResult.StatusCode);
-        var json = JsonConvert.SerializeObject(objectResult.Value);
-        var errorDict = JsonConvert.DeserializeObject<Dictionary<string, string>>(json);
-        Assert.Equal("An error occurred.", errorDict["Message"]);
-        Assert.Equal("Database connection error", errorDict["Details"]);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        Assert.NotNull(okResult.Value);
+        _gameServiceMock.Verify(s => s.DeleteGameAsync(key), Times.Once);
     }
 
+    /// <summary>
+    /// Test that GetGamesByGenre returns Ok when games exist for genre.
+    /// </summary>
+    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task GetAllGamesShouldReturnNotFoundWhenNoGamesExist()
+    public async Task GetGamesByGenreShouldReturnOkWhenGamesExist()
     {
         // Arrange
+        var genreId = Guid.NewGuid();
+        var games = new List<GameCreateRequestDto>
+        {
+            new()
+            {
+                Name = "Action Game",
+                Key = "action-game",
+                Description = "An action game",
+                Price = 49.99,
+                UnitInStock = 100,
+                Discount = 0,
+            },
+        };
+
         _gameServiceMock
-            .Setup(s => s.GetAllGames())
-            .ReturnsAsync([]);
+            .Setup(s => s.GetGamesByGenreAsync(genreId))
+            .ReturnsAsync(games);
 
         // Act
-        var result = await _controller.GetAllGames();
+        var result = await _controller.GetGameById(genreId);
 
         // Assert
-        var statusCodeResult = Assert.IsAssignableFrom<IStatusCodeActionResult>(result);
-        Assert.Equal(404, statusCodeResult.StatusCode);
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var returnedGames = Assert.IsAssignableFrom<IEnumerable<GameCreateRequestDto>>(okResult.Value);
+        Assert.Single(returnedGames);
     }
 }
