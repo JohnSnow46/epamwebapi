@@ -1,151 +1,59 @@
-# Epic 8 - NoSQL database
-Our customer has bought the Northwind Online Store, which is still in active use.
-Extend Online Game Store with their database and the application must work with 2 databases from now.
-You can find all the needed information in mongo.zip.
+# Game Store Application
+
+## Description
+
+The `GameStore` application is a web-based platform that allows users to browse, purchase, and manage digital games. It provides a seamless shopping experience with various features such as filtering, searching, user authentication, and payment integration. Additionally, the application includes an admin panel for managing game listings, user permissions, and content moderation.
+
+## Application Features
+
+As a result of completing this task, you will receive an application that implements the following features:
+
+- **Game Management**: Admin users can add, edit, and delete game listings.
+- **User Authentication and Authorization**: Users can register, log in, and manage their profiles.
+- **Search and Filtering**: Users can search for games based on categories, price range, and ratings.
+- **Shopping Cart and Checkout**: Customers can add games to their cart and complete purchases using various payment methods.
+- **Unit Testing**: The application includes unit tests to ensure functionality and reliability.
+- **API Documentation**: Swagger is integrated for clear and structured API documentation.
+- **Logging and Error Handling**: The system logs critical events and handles errors effectively.
+- **Multi-language Support**: Localization is implemented to support multiple languages.
+- **NoSQL Integration**: The application works with multiple databases, including a NoSQL database.
+- **Notifications**: Users receive notifications for game updates, promotions, and purchases.
+- **UI Design Implementation**: The application follows a structured UI design based on provided mock-ups.
+- **Game Reviews and Moderation**: Users can leave reviews and admins can moderate content.
+- **Game Image Support**: Each game has an associated image for better user experience.
+- **Big Data Processing**: The system is designed to handle large amounts of data efficiently.
+
+## .NET Platform
+
+The task uses the .NET Core CLI command-line tool and references applications that target .NET 8.
+
+Visual Studio 2022 is the most convenient tool to get the task done. However, if your work machine is not configured to run this IDE, development can be done with Visual Studio Code and the .NET Core SDK (or another IDE).
+
+## Branching
+
+The task consists of multiple epics. The description of each epic is in the corresponding `epic-##.md` file in the respective branch.
+
+| Epic | Epic Title | Epic Description | Feature Branch Name              |
+|------|-----------|------------------|----------------------------------|
+| 1.   | Admin Panel with Services | Implement an admin panel for managing the store. | [game-store-epic-01](epic-01.md) |
+| 2.   | Headers and Unit Testing | Implement proper headers and unit tests for API endpoints. | [game-store-epic-02](epic-02.md) |
+| 3.   | Logging and Swagger | Add structured logging and API documentation with Swagger. | [game-store-epic-03](epic-03.md) |
+| 4.   | Enhancements and UI Integration | Improve UI elements and overall user experience. | [game-store-epic-04](epic-04.md) |
+| 5.   | Payment Methods | Extend functionality by adding payment gateway support. | [game-store-epic-05](epic-05.md) |
+| 6.   | Comments and Moderation | Add user comments and content moderation features. | [game-store-epic-06](epic-06.md) |
+| 7.   | Filters | Implement game filtering and pagination features. | [game-store-epic-07](epic-07.md) |
+| 8.   | NoSQL Database | Integrate a NoSQL database alongside the existing relational database. | [game-store-epic-08](epic-08.md) |
+| 9.   | Authorization | Implement role-based access control for different user types. | [game-store-epic-09](epic-09.md) |
+| 10.  | Game Picture [Microsoft Azure] | Enable game image uploads and display them on game details pages. | [game-store-epic-10](epic-10.md) |
+|      | Game Picture [AWS] | Enable game image uploads and display them on game details pages. | [game-store-epic-10-aws](epic-10.md) |
+| 11.  | Big Data [Microsoft Azure] | Optimize the system for handling large-scale game data. | [game-store-epic-11](epic-11.md) |
+|      | Big Data [AWS]  | Optimize the system for handling large-scale game data. | [game-store-epic-11-aws](epic-11.md) |
+| 12.  | Notifications [Microsoft Azure] | Implement user notifications for important events. | [game-store-epic-12](epic-12.md) |
+|      | Notifications [AWS] | Implement user notifications for important events. | [game-store-epic-12-aws](epic-12.md) |
+| 13.  | UI Design [Angular] | Apply UI designs based on given mock-ups. | [game-store-epic-13](epic-13.md) |
+|      | UI Design [React] | Apply UI designs based on given mock-ups. | [game-store-epic-13-react](epic-13.md) |
+| 14.  | Localization [Angular]| Support multiple languages for the application. | [game-store-epic-14](epic-14.md) |
+|      | Localization [React] | Support multiple languages for the application. | [game-store-epic-14-react](epic-14.md) |
 
 
-## General requirements
-
-Please use the following Angular Front-end: [gamestore-ui-app](gamestore-ui-app)
-
-Existing [MongoDB](mongo)
-
-System should support the following features: 
-* Two databases as data storage.
-* Operations logging.   
-
-## Additional Requirements
-#### Products
-	A user should be able to perform the same actions with products from Northwind Online Store in Game Store: view, edit, delete, buy, comment, use the same filter options, etc.  
-
-
-#### Orders History
-	Order history should contain orders from both databases.
-	Start/end date query parameters are optional, if the value is not populated then should be treated as unlimited.
-
-
-#### Northwind database entities
-	Northwind database is read-only, neither the data scheme nor the data content must be changed. Only changes required by task description are allowed.
-
-
-#### Entity changes logs
-	A new model should be created for logs inside the Northwind database.
-
-
-#### Shippers
-	Shippers should be stored only in the Northwind database, the game store app will not add new ones.
-
-
-#### Game store Database Entities
-	Entities in an SQL database must have the same set of attributes as in NoSQL: Suppliers, Products, Orders, 		Order details, and Categories.	
-
-
-#### Operations
-	Products, Suppliers, and Categories must have CRUD as before, regardless database.
-
-
-#### Product mapping
-	Product can be used as game in our system.
-	Northwind does not guarantee any product property is unique,	
-	Add a new game key field into Northwind db managed only by the game store app. This field should be used for mapping products and should be unique for two databases.
-
-
-#### Product view counter
-	Product views count field can be added in Mongo schema.
-
-
-#### Supplier
-	Supplier can be used as publisher in our system.
-	Use supplier name as unique key for mapping entities in two databases.
-
-
-#### Orders
-	All orders from Northwind should be used only for reading.
-
-
-#### Data Transfer Objects
-	Any existing endpoint results should not be changed in this task.
-
-
-#### Categories
-	Category can be used as genre in our system.
-
-
-#### Product count 
-	Products count value should be synced for both databases and recalculated after order payment.
-
-
-#### Damaged data                                      
-	After years of using Northwind contains some broken data, this should be handled by the Game store app.
-
-
-
-
-## Task Description
-
-### E08 US1 - User story 1
-
-Get Shippers endpoint.
-```{xml} 
-Url: /shippers
-Type: GET
-Response: Since shipper model can be dynamic, use a free content structure.
-```
-
-### E08 US2 - User story 2
-Get orders history endpoint.
-```{xml} 
-Url: /orders/history
-Type: GET
-Response example:
-[
-  {
-    "id": "769d6ae7-9ec1-4c78-8401-25c672afc10b",
-    "customerId": "4dee81a7-10cc-44b9-8866-920711f70b98",
-    "date": "2023-11-26T12:15:28.8416459+02:00"
-  },
-  {
-    "id": "33f3a9d1-0c84-4dc1-8861-ae46cb15391f",
-    "customerId": "510f9d71-8fc3-470c-a34d-02795ffa66e0",
-    "date": "2023-11-24T12:15:28.8416998+02:00"
-  }
-]
-```
-
-### E08 US3 - User story 3
-Extend SQL database with the fields presented in MongoDB
-
-
-### E08 US4 - User story 4
-Extend CRUD operations to perform them for entities for any database.
-
-
-### E08 US5 - User story 5
-Implement unit-in-stock count sync for two databases.
-
-
-### E08 US6 - User story 6
-Implement duplicate management by the next criteria:
-* If there is a duplicate between our DB and MongoDB – the item in our DB is a priority.
-* If there are two same items in MongoDB – the first found item must be used.
-
-
-### E08 US7 - User story 7
-Implement Mongo DB items update by the next schema:
-* Once the User edits the items in Mongo DB – the item must be copied to the game store database and the update performed.
-* Mongo DB data should be not affected by any game store CRUD operations.
- 
- 
-## Non-functional requirement
-**E08 NFR1**  
-A C# driver with IQueryable for read operations in MongoDB should be used.  
-**E08 NFR2**  
-	A FilterDefinition/UpdateDefinition for update operations in MongoDB should be used.  
-**E08 NFR3**  
-	A raw query for insert/delete in the MongoDB should be used.  
-**E08 NFR4**  
-	All entity changes in both databases must be logged into the NoSQL database. The log should include the date and time, action name, entity type, old version, and new version.  
-**E08 NFR5 [Optional]**  
-	Use a structural logging approach for entity change logs.  
-**E08 NFR6 [Optional]**  
-	Use the Database First approach for Northwind database integration.  
+Each feature is developed in its corresponding branch. Once all features are completed and merged, you will get the final version of the application in the `main` branch.
