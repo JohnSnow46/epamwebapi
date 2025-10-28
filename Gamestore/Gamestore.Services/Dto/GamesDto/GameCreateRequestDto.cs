@@ -20,4 +20,7 @@ public class GameCreateRequestDto
 
     [Required]
     public int Discount { get; set; }
+
+    // Epic 10: Add image support
+    public string? Image { get; set; }
 }

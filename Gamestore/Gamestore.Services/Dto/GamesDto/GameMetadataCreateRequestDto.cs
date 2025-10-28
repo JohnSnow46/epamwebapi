@@ -9,4 +9,7 @@ public class GameMetadataCreateRequestDto
     public List<Guid>? Genres { get; set; }
 
     public List<Guid>? Platforms { get; set; }
+
+    // Epic 10: Add image support
+    public string? Image { get; set; }
 }

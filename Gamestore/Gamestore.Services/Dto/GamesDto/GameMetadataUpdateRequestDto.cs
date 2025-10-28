@@ -16,4 +16,7 @@ public class GameMetadataUpdateRequestDto
 
     [JsonPropertyName("platforms")]
     public List<Guid>? Platforms { get; set; }
+
+    // Epic 10: Add image support
+    public string? Image { get; set; }
 }

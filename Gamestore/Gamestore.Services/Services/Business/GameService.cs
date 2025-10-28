@@ -11,27 +11,40 @@ namespace Gamestore.Services.Services.Business;
 
 /// <summary>
 /// Service for managing games in the Gamestore.
+/// Epic 10: Added Azure Blob Storage integration for game images.
 /// </summary>
-public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> logger) : IGameService
+public partial class GameService(
+    IUnitOfWork unitOfWork,
+    ILogger<GameService> logger,
+    IBlobStorageService blobStorageService) : IGameService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ILogger<GameService> _logger = logger;
+    private readonly IBlobStorageService _blobStorageService = blobStorageService;
 
     /// <summary>
     /// Adds a new game with associated genres and platforms.
+    /// Epic 10 US1: Now supports image upload in base64 format.
     /// </summary>
     public async Task<GameMetadataCreateRequestDto?> AddGameAsync(GameMetadataCreateRequestDto gameRequest)
     {
         _logger.LogInformation("Starting add game operation for game: {GameName}", gameRequest.Game?.Name);
 
         ValidateObject(gameRequest, "Game request");
-        ValidateObject(gameRequest.Game, "Game data");
+
+        if (gameRequest.Game == null)
+        {
+            throw new ArgumentNullException(nameof(gameRequest.Game), "Game data cannot be null");
+        }
 
         if (string.IsNullOrWhiteSpace(gameRequest.Game.Key))
         {
             ValidateString(gameRequest.Game.Name, "Game name");
             gameRequest.Game.Key = GenerateKeyFromName(gameRequest.Game.Name);
-            _logger.LogInformation("Key was not provided, generated key: {Key} from name: {Name}", gameRequest.Game.Key, gameRequest.Game.Name);
+            _logger.LogInformation(
+                "Key was not provided, generated key: {Key} from name: {Name}",
+                gameRequest.Game.Key,
+                gameRequest.Game.Name);
         }
 
         await ValidateGameKeyUniqueness(gameRequest.Game.Key!);
@@ -43,18 +56,39 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
         await AddGamePlatforms(newGame.Id, gameRequest.Platforms);
         await AddGameGenres(newGame.Id, gameRequest.Genres);
 
+        // Epic 10 US1: Upload image if provided
+        if (!string.IsNullOrEmpty(gameRequest.Image))
+        {
+            try
+            {
+                await _blobStorageService.UploadImageAsync(gameRequest.Image, gameRequest.Game.Key);
+                _logger.LogInformation("Successfully uploaded image for game: {GameKey}", gameRequest.Game.Key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to upload image for game: {GameKey}. Game will be created without image.", gameRequest.Game.Key);
+            }
+        }
+
         await _unitOfWork.CompleteAsync();
         return gameRequest;
     }
 
     /// <summary>
     /// Updates an existing game by its key.
+    /// Epic 10 US2: Now supports image update in base64 format.
     /// </summary>
     public async Task<GameUpdateRequestDto> UpdateGameAsync(string key, GameMetadataUpdateRequestDto gameRequest)
     {
         _logger.LogInformation("Starting update game operation for key: {GameKey}", key);
 
         ValidateString(key, "Game key");
+
+        if (gameRequest?.Game == null)
+        {
+            throw new ArgumentNullException(nameof(gameRequest.Game), "Game data cannot be null");
+        }
+
         var existingGame = await GetGameByKeyOrNull(key);
         if (existingGame == null)
         {
@@ -63,6 +97,21 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
 
         UpdateGameFromDto(existingGame, gameRequest);
         await UpdateGameRelations(existingGame.Id, gameRequest);
+
+        // Epic 10 US2: Update image if provided
+        if (!string.IsNullOrEmpty(gameRequest.Image))
+        {
+            try
+            {
+                await _blobStorageService.UploadImageAsync(gameRequest.Image, key);
+                _logger.LogInformation("Successfully updated image for game: {GameKey}", key);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to update image for game: {GameKey}", key);
+            }
+        }
+
         await _unitOfWork.CompleteAsync();
 
         _logger.LogInformation("Game updated successfully with ID: {GameId}", existingGame.Id);
@@ -104,6 +153,7 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
 
     /// <summary>
     /// Deletes a game by its key.
+    /// Epic 10 US3: Now removes associated image from blob storage.
     /// </summary>
     public async Task<Game> DeleteGameAsync(string key)
     {
@@ -111,7 +161,26 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
 
         ValidateString(key, "Game key");
 
-        var game = await GetGameByKeyOrNull(key);
+        var game = await GetGameByKeyOrNull(key) ?? throw new KeyNotFoundException($"Game with key '{key}' not found");
+
+        // Epic 10 US3: Delete associated image from blob storage
+        try
+        {
+            var blobName = _blobStorageService.GetBlobNameFromGameKey(key);
+            if (await _blobStorageService.ImageExistsAsync(blobName))
+            {
+                await _blobStorageService.DeleteImageAsync(blobName);
+                _logger.LogInformation("Successfully deleted image for game: {GameKey}", key);
+            }
+            else
+            {
+                _logger.LogInformation("No image found for game: {GameKey}, skipping image deletion", key);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to delete image for game: {GameKey}. Continuing with game deletion.", key);
+        }
 
         await RemoveGameRelations(game);
         await _unitOfWork.Games.DeleteGameByKey(game);
@@ -168,8 +237,11 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
         _logger.LogInformation("Starting get games by platform operation for platform ID: {PlatformId}", platformId);
 
         ValidateGuid(platformId, "Platform ID");
+
         var gamePlatforms = await GetGamePlatformRelationsAsync(platformId);
-        return await GetGamesByRelations(gamePlatforms.Select(gp => gp.GameId).ToList());
+        var gameIds = gamePlatforms.Select(gp => gp.GameId).ToList();
+
+        return await GetGamesByRelations(gameIds);
     }
 
     /// <summary>
@@ -180,8 +252,11 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
         _logger.LogInformation("Starting get games by genre operation for genre ID: {GenreId}", genreId);
 
         ValidateGuid(genreId, "Genre ID");
+
         var gameGenres = await GetGameGenreRelationsAsync(genreId);
-        return await GetGamesByRelations(gameGenres.Select(gg => gg.GameId).ToList());
+        var gameIds = gameGenres.Select(gg => gg.GameId).ToList();
+
+        return await GetGamesByRelations(gameIds);
     }
 
     /// <summary>
@@ -189,38 +264,120 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
     /// </summary>
     public async Task<int> GetTotalGamesCountAsync()
     {
-        _logger.LogInformation("Starting get total games count operation");
-
+        _logger.LogInformation("Getting total games count");
         var count = await _unitOfWork.Games.CountAsync();
-        _logger.LogInformation("Total games count: {GameCount}", count);
+        _logger.LogInformation("Total games count: {Count}", count);
         return count;
     }
 
-    private void ValidateObject(object? obj, string paramName)
+    // Private helper methods below...
+    private static void ValidateObject(object? obj, string paramName)
     {
         if (obj == null)
         {
-            _logger.LogWarning("{ParamName} is null", paramName);
-            throw new ArgumentNullException(paramName.ToLower(System.Globalization.CultureInfo.CurrentCulture).Replace(" ", string.Empty), $"{paramName} cannot be null");
+            throw new ArgumentNullException(paramName, $"{paramName} cannot be null");
         }
     }
 
-    private void ValidateString(string value, string paramName)
+    private static void ValidateString(string? value, string paramName)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            _logger.LogWarning("Provided {ParamName} is null or empty", paramName);
-            throw new ArgumentException($"{paramName} cannot be null or empty", paramName.ToLower(System.Globalization.CultureInfo.CurrentCulture).Replace(" ", string.Empty));
+            throw new ArgumentException($"{paramName} cannot be null or empty", paramName);
         }
     }
 
-    private void ValidateGuid(Guid id, string paramName)
+    private static void ValidateGuid(Guid value, string paramName)
     {
-        if (id == Guid.Empty)
+        if (value == Guid.Empty)
         {
-            _logger.LogWarning("Provided {ParamName} is empty", paramName);
-            throw new ArgumentException($"{paramName} cannot be empty", paramName.ToLower(System.Globalization.CultureInfo.CurrentCulture).Replace(" ", string.Empty));
+            throw new ArgumentException($"{paramName} cannot be empty", paramName);
         }
+    }
+
+    [GeneratedRegex(@"[^a-zA-Z0-9\s-]")]
+    private static partial Regex InvalidCharactersRegex();
+
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex WhitespaceRegex();
+
+    private static string GenerateKeyFromName(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            throw new ArgumentException("Name cannot be null or empty", nameof(name));
+        }
+
+        var normalizedName = name.ToLowerInvariant();
+        normalizedName = InvalidCharactersRegex().Replace(normalizedName, string.Empty);
+        normalizedName = WhitespaceRegex().Replace(normalizedName, "-");
+
+        return normalizedName.Trim('-');
+    }
+
+    private static Game CreateGameEntity(GameMetadataCreateRequestDto gameRequest)
+    {
+        return new Game
+        {
+            Key = gameRequest.Game.Key!,
+            Name = gameRequest.Game.Name,
+            Description = gameRequest.Game.Description ?? throw new NullReferenceException("Description is null"),
+            Price = gameRequest.Game.Price,
+            UnitInStock = gameRequest.Game.UnitInStock,
+            Discontinued = gameRequest.Game.Discount,
+            PublisherId = gameRequest.Publisher,
+        };
+    }
+
+    private static void UpdateGameFromDto(Game game, GameMetadataUpdateRequestDto gameRequest)
+    {
+        game.Name = gameRequest.Game.Name;
+        game.Description = gameRequest.Game.Description ?? throw new NullReferenceException("Description is null");
+        game.Price = gameRequest.Game.Price;
+        game.UnitInStock = gameRequest.Game.UnitInStock;
+        game.Discontinued = gameRequest.Game.Discontinued;
+        game.Discontinued = gameRequest.Game.Discontinued;
+        game.PublisherId = gameRequest.Publisher;
+    }
+
+    private static GameCreateRequestDto MapToGameDto(Game game)
+    {
+        return new GameCreateRequestDto
+        {
+            Id = game.Id,
+            Key = game.Key,
+            Name = game.Name,
+            Description = game.Description,
+            Price = game.Price,
+            UnitInStock = game.UnitInStock,
+            Discount = game.Discount,
+            PublishDate = game.PublishDate,
+        };
+    }
+
+    private static GameUpdateRequestDto MapToGameDtoUpdate(Game game)
+    {
+        return new GameUpdateRequestDto
+        {
+            Key = game.Key,
+            Name = game.Name,
+            Description = game.Description,
+            Price = game.Price,
+            UnitInStock = game.UnitInStock,
+            Discount = game.Discontinued,
+            PublishDate = game.PublishDate,
+        };
+    }
+
+    private static string GenerateGameFilePath(Game game)
+    {
+        var sanitizedFileName = SanitizeFileName(game.Name);
+        return Path.Combine(Environment.CurrentDirectory, $"{sanitizedFileName}.json");
+    }
+
+    private static async Task SaveGameFile(string filePath, string content)
+    {
+        await File.WriteAllTextAsync(filePath, content);
     }
 
     private async Task ValidateGameKeyUniqueness(string key)
@@ -246,11 +403,11 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
         catch (KeyNotFoundException)
         {
             _logger.LogWarning("Game not found with ID: {GameId}", id);
-            throw new KeyNotFoundException($"Game with ID '{id}' not found");
+            throw;
         }
     }
 
-    private async Task<Game> GetGameByKeyOrNull(string key)
+    private async Task<Game?> GetGameByKeyOrNull(string key)
     {
         var game = await _unitOfWork.Games.GetKeyAsync(key);
 
@@ -269,14 +426,20 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
     private async Task<IEnumerable<GamePlatform>> GetGamePlatformRelationsAsync(Guid platformId)
     {
         var gamePlatforms = await _unitOfWork.GamePlatforms.GetByPlatformIdAsync(platformId);
-        _logger.LogInformation("Found {Count} game-platform relations for platform ID: {PlatformId}", gamePlatforms.Count(), platformId);
+        _logger.LogInformation(
+            "Found {Count} game-platform relations for platform ID: {PlatformId}",
+            gamePlatforms.Count(),
+            platformId);
         return gamePlatforms;
     }
 
     private async Task<IEnumerable<GameGenre>> GetGameGenreRelationsAsync(Guid genreId)
     {
         var gameGenres = await _unitOfWork.GameGenres.GetByGenreIdAsync(genreId);
-        _logger.LogInformation("Found {Count} game-genre relations for genre ID: {GenreId}", gameGenres.Count(), genreId);
+        _logger.LogInformation(
+            "Found {Count} game-genre relations for genre ID: {GenreId}",
+            gameGenres.Count(),
+            genreId);
         return gameGenres;
     }
 
@@ -336,7 +499,10 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
         if (existingGenres.Count != 0)
         {
             await _unitOfWork.GameGenres.RemoveRangeAsync(existingGenres);
-            _logger.LogInformation("Removed {Count} existing genres from game: {GameId}", existingGenres.Count, gameId);
+            _logger.LogInformation(
+                "Removed {Count} existing genres from game: {GameId}",
+                existingGenres.Count,
+                gameId);
         }
 
         await AddGameGenres(gameId, genreIds);
@@ -348,7 +514,10 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
         if (existingPlatforms.Count != 0)
         {
             await _unitOfWork.GamePlatforms.RemoveRangeAsync(existingPlatforms);
-            _logger.LogInformation("Removed {Count} existing platforms from game: {GameId}", existingPlatforms.Count, gameId);
+            _logger.LogInformation(
+                "Removed {Count} existing platforms from game: {GameId}",
+                existingPlatforms.Count,
+                gameId);
         }
 
         await AddGamePlatforms(gameId, platformIds);
@@ -364,13 +533,19 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
     {
         if (game.GameGenres?.Count > 0)
         {
-            _logger.LogInformation("Removing {Count} genre associations for game ID: {GameId}", game.GameGenres.Count, game.Id);
+            _logger.LogInformation(
+                "Removing {Count} genre associations for game ID: {GameId}",
+                game.GameGenres.Count,
+                game.Id);
             await _unitOfWork.GameGenres.RemoveRangeAsync(game.GameGenres);
         }
 
         if (game.GamePlatforms?.Count > 0)
         {
-            _logger.LogInformation("Removing {Count} platform associations for game ID: {GameId}", game.GamePlatforms.Count, game.Id);
+            _logger.LogInformation(
+                "Removing {Count} platform associations for game ID: {GameId}",
+                game.GamePlatforms.Count,
+                game.Id);
             await _unitOfWork.GamePlatforms.RemoveRangeAsync(game.GamePlatforms);
         }
     }
@@ -409,110 +584,5 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
         var sanitized = string.Join("_", fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries));
 
         return sanitized.Length > 50 ? sanitized[..50] : sanitized;
-    }
-
-    private static string GenerateGameFilePath(Game game)
-    {
-        var sanitizedName = SanitizeFileName(game.Name);
-        var uniqueFileName = $"{sanitizedName}_{game.Id}.txt";
-        return Path.Combine(Directory.GetCurrentDirectory(), "GameFiles", uniqueFileName);
-    }
-
-    private async Task SaveGameFile(string filePath, string content)
-    {
-        _logger.LogInformation("Preparing to save file at path: {FilePath}", filePath);
-
-        var directoryPath = Path.GetDirectoryName(filePath);
-        if (!string.IsNullOrEmpty(directoryPath) && !Directory.Exists(directoryPath))
-        {
-            Directory.CreateDirectory(directoryPath);
-            _logger.LogInformation("Created directory for game files at: {DirectoryPath}", directoryPath);
-        }
-
-        await File.WriteAllTextAsync(filePath, content);
-    }
-
-    private static Game CreateGameEntity(GameMetadataCreateRequestDto gameRequest)
-    {
-        return new Game
-        {
-            Id = Guid.NewGuid(),
-            Name = gameRequest.Game.Name,
-            Key = gameRequest.Game.Key,
-            Description = gameRequest.Game.Description ?? string.Empty,
-            Price = gameRequest.Game.Price,
-            UnitInStock = gameRequest.Game.UnitInStock,
-            Discontinued = gameRequest.Game.Discount,
-            PublisherId = gameRequest.Publisher != Guid.Empty ? gameRequest.Publisher : null,
-        };
-    }
-
-    private static void UpdateGameFromDto(Game game, GameMetadataUpdateRequestDto gameRequest)
-    {
-        game.Name = gameRequest.Game.Name;
-        game.Description = gameRequest.Game.Description ?? string.Empty;
-        game.Price = gameRequest.Game.Price;
-        game.UnitInStock = gameRequest.Game.UnitInStock;
-        game.Discontinued = gameRequest.Game.Discontinued;
-        game.PublisherId = gameRequest.Publisher != Guid.Empty ? gameRequest.Publisher : null;
-    }
-
-    private static GameCreateRequestDto MapToGameDto(Game game)
-    {
-        ArgumentNullException.ThrowIfNull(game);
-
-        return new GameCreateRequestDto
-        {
-            Description = game.Description,
-            Key = game.Key,
-            Name = game.Name,
-            Price = game.Price,
-            UnitInStock = game.UnitInStock,
-            Discount = game.Discontinued,
-        };
-    }
-
-    private static GameUpdateRequestDto MapToGameDtoUpdate(Game game)
-    {
-        ArgumentNullException.ThrowIfNull(game);
-
-        return new GameUpdateRequestDto
-        {
-            Id = game.Id,
-            Name = game.Name,
-            Key = game.Key,
-            Description = game.Description,
-            Price = game.Price,
-            UnitInStock = game.UnitInStock,
-            Discontinued = game.Discontinued,
-        };
-    }
-
-    /// <summary>
-    /// Generates a URL-friendly key from a game name.
-    /// </summary>
-    private static string GenerateKeyFromName(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name))
-        {
-            throw new ArgumentException("Game name cannot be empty when generating a key", nameof(name));
-        }
-
-        // Convert to lowercase
-        var key = name.ToLowerInvariant();
-
-        // Replace spaces with hyphens
-        key = key.Replace(" ", "-");
-
-        // Remove any special characters and keep only alphanumeric and hyphens
-        key = Regex.Replace(key, "[^a-z0-9-]", string.Empty);
-
-        // Replace multiple hyphens with a single hyphen
-        key = Regex.Replace(key, "-+", "-");
-
-        // Trim hyphens from start and end
-        key = key.Trim('-');
-
-        return key;
     }
 }
