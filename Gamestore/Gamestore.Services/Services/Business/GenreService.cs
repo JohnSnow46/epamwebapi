@@ -13,7 +13,7 @@ namespace Gamestore.Services.Services.Business;
 public class GenreService(IUnitOfWork unitOfWork, ILogger<GenreService> logger) : IGenreService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly ILogger<GenreService> _logger = logger;
+    private readonly ILogger<GenreService?> _logger = logger;
 
     /// <summary>
     /// Creates a new genre.
@@ -73,7 +73,7 @@ public class GenreService(IUnitOfWork unitOfWork, ILogger<GenreService> logger) 
     /// <summary>
     /// Gets a genre by its ID.
     /// </summary>
-    public async Task<GenreUpdateRequestDto> GetGenreById(Guid id)
+    public async Task<GenreUpdateRequestDto?> GetGenreById(Guid id)
     {
         _logger.LogInformation("Starting get genre by ID operation for ID: {GenreId}", id);
 
@@ -110,7 +110,7 @@ public class GenreService(IUnitOfWork unitOfWork, ILogger<GenreService> logger) 
     /// <summary>
     /// Deletes a genre by its ID.
     /// </summary>
-    public async Task<GenreUpdateRequestDto> DeleteGenreById(Guid id)
+    public async Task<GenreUpdateRequestDto?> DeleteGenreById(Guid id)
     {
         _logger.LogInformation("Starting delete genre operation for ID: {GenreId}", id);
 
@@ -229,7 +229,7 @@ public class GenreService(IUnitOfWork unitOfWork, ILogger<GenreService> logger) 
     private async Task CheckForCircularReference(Guid genreId, Guid startParentId)
     {
         var currentParentId = startParentId;
-        var visitedIds = new HashSet<Guid> { genreId };
+        var visitedIds = new HashSet<Guid?> { genreId };
 
         _logger.LogInformation("Checking for circular references in genre hierarchy");
 
@@ -305,7 +305,7 @@ public class GenreService(IUnitOfWork unitOfWork, ILogger<GenreService> logger) 
         return isUsed;
     }
 
-    private async Task<Game> GetGameByKeyAsync(string key)
+    private async Task<Game?> GetGameByKeyAsync(string key)
     {
         var game = await _unitOfWork.Games.GetKeyAsync(key);
 

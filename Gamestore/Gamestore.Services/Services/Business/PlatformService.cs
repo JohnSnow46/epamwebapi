@@ -13,7 +13,7 @@ namespace Gamestore.Services.Services.Business;
 public class PlatformService(IUnitOfWork unitOfWork, ILogger<PlatformService> logger) : IPlatformService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
-    private readonly ILogger<PlatformService> _logger = logger;
+    private readonly ILogger<PlatformService?> _logger = logger;
 
     /// <summary>
     /// Updates an existing platform.
@@ -41,7 +41,7 @@ public class PlatformService(IUnitOfWork unitOfWork, ILogger<PlatformService> lo
     /// <summary>
     /// Creates a new platform.
     /// </summary>
-    public async Task<PlatformCreateRequestDto> CreatePlatform(PlatformMetadataCreateRequestDto platformRequest)
+    public async Task<PlatformCreateRequestDto?> CreatePlatform(PlatformMetadataCreateRequestDto platformRequest)
     {
         _logger.LogInformation("Starting create platform operation");
 
@@ -64,7 +64,7 @@ public class PlatformService(IUnitOfWork unitOfWork, ILogger<PlatformService> lo
     /// <summary>
     /// Deletes a platform by its ID.
     /// </summary>
-    public async Task<Platform> DeletePlatformById(Guid id)
+    public async Task<Platform?> DeletePlatformById(Guid id)
     {
         _logger.LogInformation("Starting delete platform operation for ID: {PlatformId}", id);
 
@@ -96,7 +96,7 @@ public class PlatformService(IUnitOfWork unitOfWork, ILogger<PlatformService> lo
     /// <summary>
     /// Gets a platform by its ID.
     /// </summary>
-    public async Task<Platform> GetPlatformById(Guid id)
+    public async Task<Platform?> GetPlatformById(Guid id)
     {
         _logger.LogInformation("Starting get platform by ID operation for ID: {PlatformId}", id);
 
@@ -196,7 +196,7 @@ public class PlatformService(IUnitOfWork unitOfWork, ILogger<PlatformService> lo
         }
     }
 
-    private async Task<Game> GetGameByKeyAsync(string key)
+    private async Task<Game?> GetGameByKeyAsync(string key)
     {
         var game = await _unitOfWork.Games.GetKeyAsync(key);
 

@@ -5,11 +5,11 @@ namespace Gamestore.Services.Interfaces;
 
 public interface IGameService
 {
-    Task<GameMetadataCreateRequestDto> AddGameAsync(GameMetadataCreateRequestDto gameRequest);
+    Task<GameMetadataCreateRequestDto?> AddGameAsync(GameMetadataCreateRequestDto gameRequest);
 
     Task<GameUpdateRequestDto> UpdateGameAsync(string key, GameMetadataUpdateRequestDto gameRequest);
 
-    Task<GameUpdateRequestDto> GetGameByKey(string key);
+    Task<GameUpdateRequestDto?> GetGameByKey(string key);
 
     Task<GameCreateRequestDto> GetGameById(Guid id);
 

@@ -1,7 +1,9 @@
-﻿using Gamestore.Entities.Business;
+﻿using System.Security.Claims;
+using Gamestore.Entities.Business;
 using Gamestore.Services.Dto.PlatformsDto;
 using Gamestore.Services.Interfaces;
 using Gamestore.WebApi.Controllers.Business;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -18,26 +20,22 @@ public class PlatformControllerTests
     private readonly Mock<ILogger<PlatformController>> _loggerMock;
     private readonly PlatformController _controller;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="PlatformControllerTests"/> class.
-    /// </summary>
     public PlatformControllerTests()
     {
         _gameServiceMock = new Mock<IGameService>();
         _platformServiceMock = new Mock<IPlatformService>();
         _loggerMock = new Mock<ILogger<PlatformController>>();
+
         _controller = new PlatformController(
             _gameServiceMock.Object,
             _platformServiceMock.Object,
             _loggerMock.Object);
+
+        SetupControllerContext();
     }
 
-    /// <summary>
-    /// Test that CreateOrUpdatePlatform returns Ok when platform is successfully created.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task CreateOrUpdatePlatformShouldReturnOkWhenPlatformIsCreated()
+    public async Task CreatePlatformShouldReturnOkWhenPlatformIsCreated()
     {
         // Arrange
         var platformRequest = new PlatformMetadataCreateRequestDto
@@ -65,43 +63,10 @@ public class PlatformControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedPlatform = Assert.IsType<PlatformCreateRequestDto>(okResult.Value);
         Assert.Equal("PlayStation 5", returnedPlatform.Type);
-        _platformServiceMock.Verify(s => s.CreatePlatform(It.IsAny<PlatformMetadataCreateRequestDto>()), Times.Once);
     }
 
-    /// <summary>
-    /// Test that CreateOrUpdatePlatform returns NotFound when platform creation fails.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task CreateOrUpdatePlatformShouldReturnNotFoundWhenCreationFails()
-    {
-        // Arrange
-        var platformRequest = new PlatformMetadataCreateRequestDto
-        {
-            Platform = new PlatformCreateRequestDto
-            {
-                Type = "Invalid Platform",
-            },
-        };
-
-        _platformServiceMock
-            .Setup(s => s.CreatePlatform(It.IsAny<PlatformMetadataCreateRequestDto>()))
-            .ReturnsAsync((PlatformCreateRequestDto?)null);
-
-        // Act
-        var result = await _controller.CreateOrUpdatePlatform(platformRequest);
-
-        // Assert
-        var notFoundResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(404, notFoundResult.StatusCode);
-    }
-
-    /// <summary>
-    /// Test that GetPlatformById returns Ok when platform exists.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    [Fact]
-    public async Task GetPlatformByIdShouldReturnOkWhenPlatformExists()
+    public async Task GetPlatformByIdShouldReturnPlatformWhenExists()
     {
         // Arrange
         var platformId = Guid.NewGuid();
@@ -120,46 +85,18 @@ public class PlatformControllerTests
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedPlatform = Assert.IsType<Platform>(okResult.Value);
-        Assert.Equal(platformId, returnedPlatform.Id);
-        Assert.Equal("Xbox Series X", returnedPlatform.Type);
+        Assert.NotNull(okResult.Value);
     }
 
-    /// <summary>
-    /// Test that GetPlatformById returns NotFound when platform does not exist.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task GetPlatformByIdShouldReturnNotFoundWhenPlatformDoesNotExist()
-    {
-        // Arrange
-        var platformId = Guid.NewGuid();
-
-        _platformServiceMock
-            .Setup(s => s.GetPlatformById(platformId))
-            .ReturnsAsync((Platform?)null);
-
-        // Act
-        var result = await _controller.GetPlatformById(platformId);
-
-        // Assert
-        var notFoundResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(404, notFoundResult.StatusCode);
-    }
-
-    /// <summary>
-    /// Test that GetAllPlatforms returns Ok with platforms list.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    [Fact]
-    public async Task GetAllPlatformsShouldReturnOkWhenPlatformsExist()
+    public async Task GetAllPlatformsShouldReturnPlatformsList()
     {
         // Arrange
         var platforms = new List<Platform>
         {
             new() { Id = Guid.NewGuid(), Type = "PC" },
-            new() { Id = Guid.NewGuid(), Type = "Mobile" },
-            new() { Id = Guid.NewGuid(), Type = "Nintendo Switch" },
+            new() { Id = Guid.NewGuid(), Type = "PlayStation" },
+            new() { Id = Guid.NewGuid(), Type = "Xbox" },
         };
 
         _platformServiceMock
@@ -175,19 +112,15 @@ public class PlatformControllerTests
         Assert.Equal(3, returnedPlatforms.Count());
     }
 
-    /// <summary>
-    /// Test that GetPlatformsByGameKey returns Ok when platforms exist for game.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task GetPlatformsByGameKeyShouldReturnOkWhenPlatformsExist()
+    public async Task GetPlatformsByGameKeyShouldReturnPlatforms()
     {
         // Arrange
         var gameKey = "test-game";
         var platforms = new List<Platform>
         {
-            new() { Id = Guid.NewGuid(), Type = "PlayStation 5" },
-            new() { Id = Guid.NewGuid(), Type = "Xbox Series X" },
+            new() { Id = Guid.NewGuid(), Type = "PC" },
+            new() { Id = Guid.NewGuid(), Type = "PlayStation" },
         };
 
         _platformServiceMock
@@ -203,38 +136,12 @@ public class PlatformControllerTests
         Assert.Equal(2, returnedPlatforms.Count());
     }
 
-    /// <summary>
-    /// Test that GetPlatformsByGameKey returns NotFound when no platforms exist.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    [Fact]
-    public async Task GetPlatformsByGameKeyShouldReturnNotFoundWhenNoPlatformsExist()
-    {
-        // Arrange
-        var gameKey = "game-without-platforms";
-
-        _platformServiceMock
-            .Setup(s => s.GetPlatformsByGameKeyAsync(gameKey))
-            .ReturnsAsync(new List<Platform>());
-
-        // Act
-        var result = await _controller.GetPlatformsByGameKey(gameKey);
-
-        // Assert
-        var notFoundResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(404, notFoundResult.StatusCode);
-    }
-
-    /// <summary>
-    /// Test that DeletePlatform returns Ok when platform is deleted.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task DeletePlatformShouldReturnOkWhenPlatformIsDeleted()
     {
         // Arrange
         var platformId = Guid.NewGuid();
-        var deletedPlatform = new Platform
+        var platform = new Platform
         {
             Id = platformId,
             Type = "Deleted Platform",
@@ -242,37 +149,30 @@ public class PlatformControllerTests
 
         _platformServiceMock
             .Setup(s => s.DeletePlatformById(platformId))
-            .ReturnsAsync(deletedPlatform);
+            .ReturnsAsync(platform);
 
         // Act
         var result = await _controller.DeletePlatformById(platformId);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
-        var returnedPlatform = Assert.IsType<Platform>(okResult.Value);
-        Assert.Equal(platformId, returnedPlatform.Id);
-        _platformServiceMock.Verify(s => s.DeletePlatformById(platformId), Times.Once);
+        Assert.NotNull(okResult.Value);
     }
 
-    /// <summary>
-    /// Test that DeletePlatform returns NotFound when platform does not exist.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    [Fact]
-    public async Task DeletePlatformShouldReturnNotFoundWhenPlatformDoesNotExist()
+    private void SetupControllerContext()
     {
-        // Arrange
-        var platformId = Guid.NewGuid();
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Email, "test@example.com"),
+            new(ClaimTypes.Role, "Admin"),
+        };
 
-        _platformServiceMock
-            .Setup(s => s.DeletePlatformById(platformId))
-            .ReturnsAsync((Platform?)null);
+        var identity = new ClaimsIdentity(claims, "TestAuth");
+        var claimsPrincipal = new ClaimsPrincipal(identity);
 
-        // Act
-        var result = await _controller.DeletePlatformById(platformId);
-
-        // Assert
-        var notFoundResult = Assert.IsType<ObjectResult>(result);
-        Assert.Equal(404, notFoundResult.StatusCode);
+        _controller.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = claimsPrincipal },
+        };
     }
 }

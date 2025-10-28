@@ -20,7 +20,7 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
     /// <summary>
     /// Adds a new game with associated genres and platforms.
     /// </summary>
-    public async Task<GameMetadataCreateRequestDto> AddGameAsync(GameMetadataCreateRequestDto gameRequest)
+    public async Task<GameMetadataCreateRequestDto?> AddGameAsync(GameMetadataCreateRequestDto gameRequest)
     {
         _logger.LogInformation("Starting add game operation for game: {GameName}", gameRequest.Game?.Name);
 
@@ -72,7 +72,7 @@ public partial class GameService(IUnitOfWork unitOfWork, ILogger<GameService> lo
     /// <summary>
     /// Gets a game by its key.
     /// </summary>
-    public async Task<GameUpdateRequestDto> GetGameByKey(string key)
+    public async Task<GameUpdateRequestDto?> GetGameByKey(string key)
     {
         _logger.LogInformation("Starting get game operation by key: {GameKey}", key);
 

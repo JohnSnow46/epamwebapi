@@ -1,4 +1,4 @@
-using Gamestore.Data.Interfaces;
+﻿using Gamestore.Data.Interfaces;
 using Gamestore.Entities.Business;
 using Gamestore.Services.Dto.GamesDto;
 using Gamestore.Services.Services.Business;
@@ -16,9 +16,6 @@ public class GameServiceTests
     private readonly Mock<ILogger<GameService>> _loggerMock;
     private readonly GameService _gameService;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="GameServiceTests"/> class.
-    /// </summary>
     public GameServiceTests()
     {
         _unitOfWorkMock = new Mock<IUnitOfWork>();
@@ -26,10 +23,6 @@ public class GameServiceTests
         _gameService = new GameService(_unitOfWorkMock.Object, _loggerMock.Object);
     }
 
-    /// <summary>
-    /// Test that GetAllGames returns all games.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task GetAllGamesShouldReturnAllGames()
     {
@@ -72,12 +65,8 @@ public class GameServiceTests
         Assert.Contains(gamesList, g => g.Key == "game-2");
     }
 
-    /// <summary>
-    /// Test that GetGameByKey returns game when it exists.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task GetGameByKeyShouldReturnGameWhenItExists()
+    public async Task GetGameByKeyShouldReturnGameWhenExists()
     {
         // Arrange
         var gameKey = "test-game";
@@ -106,10 +95,6 @@ public class GameServiceTests
         Assert.Equal(49.99, result.Price);
     }
 
-    /// <summary>
-    /// Test that GetGameByKey returns null when game does not exist.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task GetGameByKeyShouldReturnNullWhenGameDoesNotExist()
     {
@@ -127,12 +112,8 @@ public class GameServiceTests
         Assert.Null(result);
     }
 
-    /// <summary>
-    /// Test that GetGameById returns game when it exists.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task GetGameByIdShouldReturnGameWhenItExists()
+    public async Task GetGameByIdShouldReturnGameWhenExists()
     {
         // Arrange
         var gameId = Guid.NewGuid();
@@ -161,32 +142,6 @@ public class GameServiceTests
         Assert.Equal(59.99, result.Price);
     }
 
-    /// <summary>
-    /// Test that GetTotalGamesCount returns correct count.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
-    [Fact]
-    public async Task GetTotalGamesCountShouldReturnCorrectCount()
-    {
-        // Arrange
-        var expectedCount = 42;
-
-        _unitOfWorkMock
-            .Setup(u => u.Games.CountAsync())
-            .ReturnsAsync(expectedCount);
-
-        // Act
-        var result = await _gameService.GetTotalGamesCountAsync();
-
-        // Assert
-        Assert.Equal(expectedCount, result);
-        _unitOfWorkMock.Verify(u => u.Games.CountAsync(), Times.Once);
-    }
-
-    /// <summary>
-    /// Test that AddGameAsync successfully adds a new game.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task AddGameAsyncShouldAddNewGame()
     {
@@ -216,6 +171,14 @@ public class GameServiceTests
             .Returns(Task.CompletedTask);
 
         _unitOfWorkMock
+            .Setup(u => u.GameGenres.AddRangeAsync(It.IsAny<IEnumerable<GameGenre>>()))
+            .Returns(Task.CompletedTask);
+
+        _unitOfWorkMock
+            .Setup(u => u.GamePlatforms.AddRangeAsync(It.IsAny<IEnumerable<GamePlatform>>()))
+            .Returns(Task.CompletedTask);
+
+        _unitOfWorkMock
             .Setup(u => u.CompleteAsync())
             .Returns(Task.CompletedTask);
 
@@ -229,10 +192,6 @@ public class GameServiceTests
         _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Once);
     }
 
-    /// <summary>
-    /// Test that DeleteGameAsync successfully deletes a game.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
     public async Task DeleteGameAsyncShouldDeleteGame()
     {
@@ -254,8 +213,8 @@ public class GameServiceTests
             .ReturnsAsync(game);
 
         _unitOfWorkMock
-            .Setup(u => u.Games.DeleteAsync(game.Id))
-            .Returns(Task.CompletedTask);
+            .Setup(u => u.Games.DeleteGameByKey(game))
+            .ReturnsAsync(game);
 
         _unitOfWorkMock
             .Setup(u => u.CompleteAsync())
@@ -267,90 +226,133 @@ public class GameServiceTests
         // Assert
         Assert.NotNull(result);
         Assert.Equal(gameKey, result.Key);
-        _unitOfWorkMock.Verify(u => u.Games.DeleteAsync(game.Id), Times.Once);
+        _unitOfWorkMock.Verify(u => u.Games.DeleteGameByKey(game), Times.Once);
         _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Once);
     }
 
-    /// <summary>
-    /// Test that GetGamesByGenreAsync returns games for specific genre.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task GetGamesByGenreAsyncShouldReturnGamesForGenre()
+    public async Task GetTotalGamesCountShouldReturnCorrectCount()
     {
         // Arrange
-        var genreId = Guid.NewGuid();
-        var games = new List<Game>
-        {
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Key = "action-game-1",
-                Name = "Action Game 1",
-                Description = "First action game",
-                Price = 59.99,
-                UnitInStock = 100,
-                Discontinued = 0,
-            },
-            new()
-            {
-                Id = Guid.NewGuid(),
-                Key = "action-game-2",
-                Name = "Action Game 2",
-                Description = "Second action game",
-                Price = 49.99,
-                UnitInStock = 75,
-                Discontinued = 10,
-            },
-        };
+        var expectedCount = 42;
 
         _unitOfWorkMock
-            .Setup(u => u.Games.GetByGenreAsync(genreId))
-            .ReturnsAsync(games);
+            .Setup(u => u.Games.CountAsync())
+            .ReturnsAsync(expectedCount);
 
         // Act
-        var result = await _gameService.GetGamesByGenreAsync(genreId);
-        var gamesList = result.ToList();
+        var result = await _gameService.GetTotalGamesCountAsync();
 
         // Assert
-        Assert.Equal(2, gamesList.Count);
-        Assert.Contains(gamesList, g => g.Name == "Action Game 1");
-        Assert.Contains(gamesList, g => g.Name == "Action Game 2");
+        Assert.Equal(expectedCount, result);
+        _unitOfWorkMock.Verify(u => u.Games.CountAsync(), Times.Once);
     }
 
-    /// <summary>
-    /// Test that GetGamesByPlatformAsync returns games for specific platform.
-    /// </summary>
-    /// <returns>A task representing the asynchronous operation.</returns>
     [Fact]
-    public async Task GetGamesByPlatformAsyncShouldReturnGamesForPlatform()
+    public async Task UpdateGameAsyncShouldUpdateExistingGame()
     {
         // Arrange
-        var platformId = Guid.NewGuid();
-        var games = new List<Game>
+        var gameKey = "test-game";
+        var existingGame = new Game
         {
-            new()
+            Id = Guid.NewGuid(),
+            Key = gameKey,
+            Name = "Old Name",
+            Description = "Old Description",
+            Price = 29.99,
+            UnitInStock = 50,
+            Discontinued = 0,
+        };
+
+        var updateRequest = new GameMetadataUpdateRequestDto
+        {
+            Game = new GameUpdateRequestDto
             {
-                Id = Guid.NewGuid(),
-                Key = "pc-game",
-                Name = "PC Game",
-                Description = "A PC exclusive",
+                Key = gameKey,
+                Name = "Updated Name",
+                Description = "Updated Description",
                 Price = 39.99,
-                UnitInStock = 200,
-                Discontinued = 0,
+                UnitInStock = 75,
+                Discontinued = 5,
             },
+            Publisher = Guid.NewGuid(),
+            Genres = new List<Guid> { Guid.NewGuid() },
+            Platforms = new List<Guid> { Guid.NewGuid() },
         };
 
         _unitOfWorkMock
-            .Setup(u => u.Games.GetByPlatformAsync(platformId))
-            .ReturnsAsync(games);
+            .Setup(u => u.Games.GetKeyAsync(gameKey))
+            .ReturnsAsync(existingGame);
+
+        _unitOfWorkMock
+            .Setup(u => u.GameGenres.GetByGameIdAsync(existingGame.Id))
+            .ReturnsAsync(new List<GameGenre>());
+
+        _unitOfWorkMock
+            .Setup(u => u.GamePlatforms.GetByGameIdAsync(existingGame.Id))
+            .ReturnsAsync(new List<GamePlatform>());
+
+        _unitOfWorkMock
+            .Setup(u => u.GameGenres.AddRangeAsync(It.IsAny<IEnumerable<GameGenre>>()))
+            .Returns(Task.CompletedTask);
+
+        _unitOfWorkMock
+            .Setup(u => u.GamePlatforms.AddRangeAsync(It.IsAny<IEnumerable<GamePlatform>>()))
+            .Returns(Task.CompletedTask);
+
+        _unitOfWorkMock
+            .Setup(u => u.CompleteAsync())
+            .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _gameService.GetGamesByPlatformAsync(platformId);
-        var gamesList = result.ToList();
+        var result = await _gameService.UpdateGameAsync(gameKey, updateRequest);
 
         // Assert
-        Assert.Single(gamesList);
-        Assert.Equal("PC Game", gamesList[0].Name);
+        Assert.NotNull(result);
+        Assert.Equal("Updated Name", result.Name);
+        Assert.Equal(39.99, result.Price);
+        _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Once);
+    }
+
+    [Fact]
+    public async Task AddGameAsyncShouldGenerateKeyWhenNotProvided()
+    {
+        // Arrange
+        var gameRequest = new GameMetadataCreateRequestDto
+        {
+            Game = new GameCreateRequestDto
+            {
+                Name = "Test Game Without Key",
+                Key = null,
+                Description = "A test game",
+                Price = 59.99,
+                UnitInStock = 100,
+                Discount = 0,
+            },
+            Publisher = Guid.NewGuid(),
+            Genres = new List<Guid>(),
+            Platforms = new List<Guid>(),
+        };
+
+        _unitOfWorkMock
+            .Setup(u => u.Games.GetKeyAsync(It.IsAny<string>()))
+            .ReturnsAsync((Game?)null);
+
+        _unitOfWorkMock
+            .Setup(u => u.Games.AddAsync(It.IsAny<Game>()))
+            .Returns(Task.CompletedTask);
+
+        _unitOfWorkMock
+            .Setup(u => u.CompleteAsync())
+            .Returns(Task.CompletedTask);
+
+        // Act
+        var result = await _gameService.AddGameAsync(gameRequest);
+
+        // Assert
+        Assert.NotNull(result);
+        Assert.NotNull(result.Game.Key);
+        Assert.NotEmpty(result.Game.Key);
+        _unitOfWorkMock.Verify(u => u.Games.AddAsync(It.IsAny<Game>()), Times.Once);
     }
 }

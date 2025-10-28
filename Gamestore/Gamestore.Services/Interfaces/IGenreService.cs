@@ -4,7 +4,7 @@ namespace Gamestore.Services.Interfaces;
 
 public interface IGenreService
 {
-    Task<GenreUpdateRequestDto> GetGenreById(Guid id);
+    Task<GenreUpdateRequestDto?> GetGenreById(Guid id);
 
     Task<GenreUpdateRequestDto> UpdateGenre(Guid id, GenreMetadataUpdateRequestDto genreRequest);
 
@@ -14,7 +14,7 @@ public interface IGenreService
 
     Task<IEnumerable<GenreUpdateRequestDto>> GetSubGenresAsync(Guid id);
 
-    Task<GenreUpdateRequestDto> DeleteGenreById(Guid id);
+    Task<GenreUpdateRequestDto?> DeleteGenreById(Guid id);
 
     Task<IEnumerable<GenreUpdateRequestDto>> GetGenresByGameKeyAsync(string gameKey);
 }
