@@ -216,6 +216,46 @@ public class PlatformController(IGameService gameService, IPlatformService platf
         }
     }
 
+    /// <summary>
+    /// US14 - Delete platform endpoint
+    /// Epic 10: Admin and Manager can delete platforms.
+    /// </summary>
+    [HttpDelete("platforms/{id}")]
+    [Authorize(Policy = "CanManageBusinessEntities")]
+    public async Task<IActionResult> DeletePlatform(Guid id)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "Deleting platform with ID: {PlatformId} by user: {User}",
+                id,
+                User.GetUserEmail());
+
+            var platform = await _platformService.DeletePlatformById(id);
+
+            if (platform == null)
+            {
+                return NotFound(new ErrorResponseModel
+                {
+                    Message = $"Platform with ID '{id}' not found",
+                    StatusCode = StatusCodes.Status404NotFound,
+                });
+            }
+
+            _logger.LogInformation("Successfully deleted platform with ID: {PlatformId}", id);
+            return Ok(platform);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting platform with ID: {PlatformId}", id);
+            return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponseModel
+            {
+                Message = "An error occurred while deleting the platform",
+                StatusCode = StatusCodes.Status500InternalServerError,
+            });
+        }
+    }
+
     private NotFoundObjectResult ResourceNotFound(string message)
     {
         _logger.LogWarning(message);

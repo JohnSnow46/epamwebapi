@@ -332,10 +332,9 @@ public partial class GameService(
     private static void UpdateGameFromDto(Game game, GameMetadataUpdateRequestDto gameRequest)
     {
         game.Name = gameRequest.Game.Name;
-        game.Description = gameRequest.Game.Description ?? throw new NullReferenceException("Description is null");
+        game.Description = gameRequest.Game.Description ?? string.Empty;
         game.Price = gameRequest.Game.Price;
         game.UnitInStock = gameRequest.Game.UnitInStock;
-        game.Discontinued = gameRequest.Game.Discontinued;
         game.Discontinued = gameRequest.Game.Discontinued;
         game.PublisherId = gameRequest.Publisher;
     }
@@ -344,14 +343,12 @@ public partial class GameService(
     {
         return new GameCreateRequestDto
         {
-            Id = game.Id,
-            Key = game.Key,
             Name = game.Name,
+            Key = game.Key,
             Description = game.Description,
             Price = game.Price,
             UnitInStock = game.UnitInStock,
-            Discount = game.Discount,
-            PublishDate = game.PublishDate,
+            Discount = game.Discontinued,
         };
     }
 
@@ -359,13 +356,13 @@ public partial class GameService(
     {
         return new GameUpdateRequestDto
         {
+            Id = game.Id,
             Key = game.Key,
             Name = game.Name,
             Description = game.Description,
             Price = game.Price,
             UnitInStock = game.UnitInStock,
-            Discount = game.Discontinued,
-            PublishDate = game.PublishDate,
+            Discontinued = game.Discontinued,
         };
     }
 

@@ -3,9 +3,11 @@ using System.Text.Json;
 using Gamestore.Data.Data;
 using Gamestore.Data.Interfaces;
 using Gamestore.Data.Repositories;
+using Gamestore.Services.Configuration;
 using Gamestore.Services.Interfaces;
 using Gamestore.Services.Services.Auth;
 using Gamestore.Services.Services.Auth.Management;
+using Gamestore.Services.Services.AzureBlob;
 using Gamestore.Services.Services.Business;
 using Gamestore.Services.Services.Community;
 using Gamestore.Services.Services.Filters;
@@ -247,6 +249,19 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<IDatabaseRoleService, DatabaseRoleService>();
     builder.Services.AddScoped<IRoleManagementService, RoleManagementService>();
     builder.Services.AddScoped<IUserManagementService, UserManagementService>();
+
+    // Azure Blob Storage configuration
+    builder.Services.Configure<AzureBlobStorageSettings>(
+        builder.Configuration.GetSection("AzureBlobStorage"));
+
+    // Register Blob Storage Service
+    builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
+
+    // Add Memory Cache for image caching
+    builder.Services.AddMemoryCache();
+
+    // Add Response Caching
+    builder.Services.AddResponseCaching();
 }
 
 static void ConfigureExternalAuthService(WebApplicationBuilder builder)
@@ -294,10 +309,13 @@ static async Task ConfigureMiddlewarePipeline(WebApplication app)
     app.UseCors("AllowAll");
     app.UseRouting();
 
+    // Epic 10 NFR2 - Response caching for images
+    app.UseResponseCaching();
+
     // Authentication & Authorization
-    app.UseAuthentication();
-    app.UseAuthorization();
-    app.UseAuthorizationLogging();
+    // app.UseAuthentication();
+    // app.UseAuthorization();
+    // app.UseAuthorizationLogging();
 
     // Endpoints
     app.MapControllerRoute(

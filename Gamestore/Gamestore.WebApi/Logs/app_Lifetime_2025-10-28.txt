@@ -3,3 +3,38 @@
 [2025-10-28 02:07:39.839] [INFO] [Microsoft.Hosting.Lifetime] Application started. Press Ctrl+C to shut down.
 [2025-10-28 02:07:39.840] [INFO] [Microsoft.Hosting.Lifetime] Hosting environment: Development
 [2025-10-28 02:07:39.841] [INFO] [Microsoft.Hosting.Lifetime] Content root path: C:\Users\frane\Desktop\EPAM - AZURE\game-store-v2-with-branches\Gamestore\Gamestore.WebApi
+[2025-10-28 05:28:00.871] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: https://localhost:54262
+[2025-10-28 05:28:00.872] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: http://localhost:54263
+[2025-10-28 05:28:00.935] [INFO] [Microsoft.Hosting.Lifetime] Application started. Press Ctrl+C to shut down.
+[2025-10-28 05:28:00.937] [INFO] [Microsoft.Hosting.Lifetime] Hosting environment: Development
+[2025-10-28 05:28:00.938] [INFO] [Microsoft.Hosting.Lifetime] Content root path: C:\Users\frane\Desktop\EPAM - AZURE\game-store-v2-with-branches\Gamestore\Gamestore.WebApi
+[2025-10-28 05:31:20.255] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: https://localhost:54262
+[2025-10-28 05:31:20.256] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: http://localhost:54263
+[2025-10-28 05:31:20.314] [INFO] [Microsoft.Hosting.Lifetime] Application started. Press Ctrl+C to shut down.
+[2025-10-28 05:31:20.315] [INFO] [Microsoft.Hosting.Lifetime] Hosting environment: Development
+[2025-10-28 05:31:20.317] [INFO] [Microsoft.Hosting.Lifetime] Content root path: C:\Users\frane\Desktop\EPAM - AZURE\game-store-v2-with-branches\Gamestore\Gamestore.WebApi
+[2025-10-28 05:35:43.724] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: https://localhost:54262
+[2025-10-28 05:35:43.725] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: http://localhost:54263
+[2025-10-28 05:35:43.787] [INFO] [Microsoft.Hosting.Lifetime] Application started. Press Ctrl+C to shut down.
+[2025-10-28 05:35:43.789] [INFO] [Microsoft.Hosting.Lifetime] Hosting environment: Development
+[2025-10-28 05:35:43.792] [INFO] [Microsoft.Hosting.Lifetime] Content root path: C:\Users\frane\Desktop\EPAM - AZURE\game-store-v2-with-branches\Gamestore\Gamestore.WebApi
+[2025-10-28 05:48:20.160] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: https://localhost:54262
+[2025-10-28 05:48:20.161] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: http://localhost:54263
+[2025-10-28 05:48:20.211] [INFO] [Microsoft.Hosting.Lifetime] Application started. Press Ctrl+C to shut down.
+[2025-10-28 05:48:20.213] [INFO] [Microsoft.Hosting.Lifetime] Hosting environment: Development
+[2025-10-28 05:48:20.214] [INFO] [Microsoft.Hosting.Lifetime] Content root path: C:\Users\frane\Desktop\EPAM - AZURE\game-store-v2-with-branches\Gamestore\Gamestore.WebApi
+[2025-10-28 05:50:08.671] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: https://localhost:54262
+[2025-10-28 05:50:08.672] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: http://localhost:54263
+[2025-10-28 05:50:08.725] [INFO] [Microsoft.Hosting.Lifetime] Application started. Press Ctrl+C to shut down.
+[2025-10-28 05:50:08.727] [INFO] [Microsoft.Hosting.Lifetime] Hosting environment: Development
+[2025-10-28 05:50:08.728] [INFO] [Microsoft.Hosting.Lifetime] Content root path: C:\Users\frane\Desktop\EPAM - AZURE\game-store-v2-with-branches\Gamestore\Gamestore.WebApi
+[2025-10-28 06:15:18.440] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: https://localhost:54262
+[2025-10-28 06:15:18.441] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: http://localhost:54263
+[2025-10-28 06:15:18.501] [INFO] [Microsoft.Hosting.Lifetime] Application started. Press Ctrl+C to shut down.
+[2025-10-28 06:15:18.502] [INFO] [Microsoft.Hosting.Lifetime] Hosting environment: Development
+[2025-10-28 06:15:18.504] [INFO] [Microsoft.Hosting.Lifetime] Content root path: C:\Users\frane\Desktop\EPAM - AZURE\game-store-v2-with-branches\Gamestore\Gamestore.WebApi
+[2025-10-28 06:21:50.131] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: https://localhost:54262
+[2025-10-28 06:21:50.132] [INFO] [Microsoft.Hosting.Lifetime] Now listening on: http://localhost:54263
+[2025-10-28 06:21:50.202] [INFO] [Microsoft.Hosting.Lifetime] Application started. Press Ctrl+C to shut down.
+[2025-10-28 06:21:50.203] [INFO] [Microsoft.Hosting.Lifetime] Hosting environment: Development
+[2025-10-28 06:21:50.204] [INFO] [Microsoft.Hosting.Lifetime] Content root path: C:\Users\frane\Desktop\EPAM - AZURE\game-store-v2-with-branches\Gamestore\Gamestore.WebApi

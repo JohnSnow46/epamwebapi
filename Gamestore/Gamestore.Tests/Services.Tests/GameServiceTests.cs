@@ -1,6 +1,7 @@
 ﻿using Gamestore.Data.Interfaces;
 using Gamestore.Entities.Business;
 using Gamestore.Services.Dto.GamesDto;
+using Gamestore.Services.Interfaces;
 using Gamestore.Services.Services.Business;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -15,12 +16,14 @@ public class GameServiceTests
     private readonly Mock<IUnitOfWork> _unitOfWorkMock;
     private readonly Mock<ILogger<GameService>> _loggerMock;
     private readonly GameService _gameService;
+    private readonly Mock<IBlobStorageService> _blobStorageServiceMock;
 
     public GameServiceTests()
     {
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _loggerMock = new Mock<ILogger<GameService>>();
-        _gameService = new GameService(_unitOfWorkMock.Object, _loggerMock.Object);
+        _blobStorageServiceMock = new Mock<IBlobStorageService>();
+        _gameService = new GameService(_unitOfWorkMock.Object, _loggerMock.Object, _blobStorageServiceMock.Object);
     }
 
     [Fact]

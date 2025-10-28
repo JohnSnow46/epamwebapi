@@ -1,2 +1,32 @@
 [2025-10-28 02:07:41.302] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET / | IP: ::1
 [2025-10-28 02:07:41.351] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ✅ ANONYMOUS ACCESS: GET /index.html | Status: 200
+[2025-10-28 05:36:34.617] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:36:34.705] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ℹ️ ANONYMOUS ACCESS: POST /api/users/login | Status: 400
+[2025-10-28 05:36:58.730] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:36:58.779] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 05:37:59.045] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:37:59.064] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 05:38:00.590] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:38:00.607] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 05:38:45.102] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:38:45.121] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 05:50:30.599] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:50:30.685] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ℹ️ ANONYMOUS ACCESS: POST /api/users/login | Status: 400
+[2025-10-28 05:50:42.216] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:50:42.223] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ℹ️ ANONYMOUS ACCESS: POST /api/users/login | Status: 400
+[2025-10-28 05:51:02.039] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:51:02.079] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 05:53:38.298] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:53:38.310] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 05:53:45.699] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:53:45.709] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ℹ️ ANONYMOUS ACCESS: POST /api/users/login | Status: 400
+[2025-10-28 05:54:29.391] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:54:29.403] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 05:56:09.893] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 05:56:09.922] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 06:18:46.069] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 06:18:46.149] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 06:18:54.458] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 06:18:54.471] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ℹ️ ANONYMOUS ACCESS: POST /api/users/login | Status: 400
+[2025-10-28 06:19:16.742] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 06:19:16.759] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
