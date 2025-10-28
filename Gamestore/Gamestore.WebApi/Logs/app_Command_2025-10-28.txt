@@ -1,0 +1,1228 @@
+[2025-10-28 02:07:38.494] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (14ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT 1
+[2025-10-28 02:07:38.538] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (35ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+
+IF EXISTS
+    (SELECT *
+     FROM [sys].[objects] o
+     WHERE [o].[type] = 'U'
+     AND [o].[is_ms_shipped] = 0
+     AND NOT EXISTS (SELECT *
+         FROM [sys].[extended_properties] AS [ep]
+         WHERE [ep].[major_id] = [o].[object_id]
+             AND [ep].[minor_id] = 0
+             AND [ep].[class] = 1
+             AND [ep].[name] = N'microsoft_database_tools_support'
+    )
+)
+SELECT 1 ELSE SELECT 0
+[2025-10-28 02:07:38.723] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (15ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.732] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.733] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.735] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.737] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.738] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.740] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.742] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.743] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.745] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.747] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.748] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.750] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.752] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.753] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.755] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.757] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.758] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.760] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.762] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.763] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.765] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.767] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.768] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.772] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (2ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.774] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.776] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.777] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.779] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.781] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.782] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.784] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.786] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.788] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.789] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Permissions] AS [p]
+        WHERE LOWER([p].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.802] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (2ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Roles] AS [r]
+        WHERE LOWER([r].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.805] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Roles] AS [r]
+        WHERE LOWER([r].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.808] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Roles] AS [r]
+        WHERE LOWER([r].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.811] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Roles] AS [r]
+        WHERE LOWER([r].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.814] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT CASE
+    WHEN EXISTS (
+        SELECT 1
+        FROM [Roles] AS [r]
+        WHERE LOWER([r].[Name]) = @__ToLower_0) THEN CAST(1 AS bit)
+    ELSE CAST(0 AS bit)
+END
+[2025-10-28 02:07:38.843] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (2ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.879] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+[2025-10-28 02:07:38.890] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.896] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.902] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.921] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.923] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.925] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.928] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.930] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.931] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.934] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.936] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.938] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.941] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.943] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.944] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.947] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.949] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.951] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.954] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.956] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.958] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.961] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.962] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.964] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.968] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.970] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.971] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.975] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.976] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.978] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.982] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.983] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.985] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.988] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.991] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.993] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:38.996] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:38.999] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.001] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.004] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.006] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.007] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.010] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.012] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.014] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.017] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.019] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.021] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.024] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.026] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.028] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.032] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.034] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.036] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.039] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.047] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (6ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.049] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.052] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.054] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.056] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.059] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.061] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.063] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.066] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.068] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.070] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.075] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.077] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.079] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.083] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.085] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.087] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.091] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.093] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.095] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.099] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.101] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.103] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.106] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.109] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.111] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.114] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.116] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.118] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.122] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.125] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.127] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.130] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.132] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.134] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.137] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.139] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.140] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.143] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.145] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.147] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.150] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.152] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.153] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.156] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.158] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.160] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.163] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.164] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.166] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.169] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.173] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.174] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.177] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.179] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.180] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.183] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.185] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.187] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.190] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.192] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.193] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.196] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.198] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.199] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.202] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.204] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.205] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.208] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.210] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.212] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.215] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.216] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.218] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.221] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.222] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.224] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.227] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.229] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.230] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.233] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.235] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.237] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.240] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.241] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.243] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.246] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.248] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.250] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.253] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.254] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.256] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.259] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.261] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.262] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.265] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.267] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.268] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.271] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.273] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.275] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.278] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.280] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.281] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.284] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.286] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.288] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.291] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.292] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.294] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.298] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.299] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.301] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.304] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.306] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.308] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.311] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.312] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.314] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.317] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.319] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.321] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.324] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.326] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.327] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.331] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.332] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.334] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.337] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.339] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.341] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.343] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.345] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.347] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.349] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.351] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.353] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.356] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.357] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.359] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.362] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.364] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.365] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.368] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.370] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.372] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.375] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.377] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.378] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.381] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.383] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.385] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.388] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.389] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.391] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.394] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.395] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.398] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.401] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.403] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.404] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.407] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.409] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.411] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.414] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.416] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.418] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.421] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.422] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.424] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.427] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.429] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.431] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.434] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.436] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.438] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.441] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.442] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.444] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.447] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (1ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.449] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.451] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:39.454] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 50)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[CreatedAt], [r].[Description], [r].[IsSystemRole], [r].[Level], [r].[Name]
+FROM [Roles] AS [r]
+WHERE LOWER([r].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.456] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[@__ToLower_0='?' (Size = 100)], CommandType='Text', CommandTimeout='30']
+SELECT TOP(1) [p].[Id], [p].[Category], [p].[Description], [p].[Name]
+FROM [Permissions] AS [p]
+WHERE LOWER([p].[Name]) = @__ToLower_0
+[2025-10-28 02:07:39.458] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (0ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT [r].[Id], [r].[GrantedAt], [r].[PermissionId], [r].[RoleId]
+FROM [RolePermissions] AS [r]
+[2025-10-28 02:07:41.226] [INFO] [Microsoft.EntityFrameworkCore.Database.Command] Executed DbCommand (2ms) [Parameters=[], CommandType='Text', CommandTimeout='30']
+SELECT COUNT(*)
+FROM [Games] AS [g]

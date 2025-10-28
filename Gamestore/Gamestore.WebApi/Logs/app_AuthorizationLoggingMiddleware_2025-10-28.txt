@@ -1,0 +1,2 @@
+[2025-10-28 02:07:41.302] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET / | IP: ::1
+[2025-10-28 02:07:41.351] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ✅ ANONYMOUS ACCESS: GET /index.html | Status: 200

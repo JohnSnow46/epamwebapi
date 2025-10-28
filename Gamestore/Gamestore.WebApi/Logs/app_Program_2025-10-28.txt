@@ -1,0 +1,8 @@
+[2025-10-28 02:07:37.206] [INFO] [Program] 🗄️ Initializing database...
+[2025-10-28 02:07:39.465] [INFO] [Program] ✅ Database initialization completed
+[2025-10-28 02:07:39.628] [INFO] [Program] 🚀 Game Store API starting...
+[2025-10-28 02:07:39.629] [INFO] [Program] 🔐 JWT Authentication enabled
+[2025-10-28 02:07:39.630] [INFO] [Program] 🛡️ Authorization policies configured
+[2025-10-28 02:07:39.631] [INFO] [Program] 🗄️ Database authentication enabled
+[2025-10-28 02:07:39.632] [INFO] [Program] 📚 Swagger available at: /swagger
+[2025-10-28 02:07:39.633] [INFO] [Program] 🌐 Environment: Development

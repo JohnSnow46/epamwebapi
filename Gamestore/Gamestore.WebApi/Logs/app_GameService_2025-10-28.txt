@@ -1,0 +1,2 @@
+[2025-10-28 02:07:41.203] [INFO] [Gamestore.Services.Services.Business.GameService] Starting get total games count operation
+[2025-10-28 02:07:41.229] [INFO] [Gamestore.Services.Services.Business.GameService] Total games count: 3

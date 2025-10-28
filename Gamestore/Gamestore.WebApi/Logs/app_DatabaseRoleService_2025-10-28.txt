@@ -1,0 +1,89 @@
+[2025-10-28 02:07:38.542] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Starting to seed default roles and permissions
+[2025-10-28 02:07:38.803] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Role already exists: Administrator
+[2025-10-28 02:07:38.806] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Role already exists: Manager
+[2025-10-28 02:07:38.809] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Role already exists: Moderator
+[2025-10-28 02:07:38.812] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Role already exists: User
+[2025-10-28 02:07:38.815] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Role already exists: Guest
+[2025-10-28 02:07:38.919] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewRoles already assigned to role Administrator
+[2025-10-28 02:07:38.926] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission UpdateRole already assigned to role Administrator
+[2025-10-28 02:07:38.933] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddGame already assigned to role Administrator
+[2025-10-28 02:07:38.939] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission UpdateGame already assigned to role Administrator
+[2025-10-28 02:07:38.946] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeletePlatform already assigned to role Administrator
+[2025-10-28 02:07:38.952] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission UpdatePlatform already assigned to role Administrator
+[2025-10-28 02:07:38.959] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeleteUser already assigned to role Administrator
+[2025-10-28 02:07:38.966] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewDeletedGames already assigned to role Administrator
+[2025-10-28 02:07:38.973] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission UpdateUser already assigned to role Administrator
+[2025-10-28 02:07:38.980] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewComments already assigned to role Administrator
+[2025-10-28 02:07:38.986] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewUsers already assigned to role Administrator
+[2025-10-28 02:07:38.994] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddPublisher already assigned to role Administrator
+[2025-10-28 02:07:39.002] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission EditOrders already assigned to role Administrator
+[2025-10-28 02:07:39.008] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeletePublisher already assigned to role Administrator
+[2025-10-28 02:07:39.015] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeleteGame already assigned to role Administrator
+[2025-10-28 02:07:39.022] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ShipOrders already assigned to role Administrator
+[2025-10-28 02:07:39.030] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewOrders already assigned to role Administrator
+[2025-10-28 02:07:39.037] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewGame already assigned to role Administrator
+[2025-10-28 02:07:39.050] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddComment already assigned to role Administrator
+[2025-10-28 02:07:39.057] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission EditDeletedGames already assigned to role Administrator
+[2025-10-28 02:07:39.064] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeleteComment already assigned to role Administrator
+[2025-10-28 02:07:39.072] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission UpdatePublisher already assigned to role Administrator
+[2025-10-28 02:07:39.081] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission BanUsers already assigned to role Administrator
+[2025-10-28 02:07:39.089] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewPlatform already assigned to role Administrator
+[2025-10-28 02:07:39.097] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ModerateComments already assigned to role Administrator
+[2025-10-28 02:07:39.104] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission UpdateGenre already assigned to role Administrator
+[2025-10-28 02:07:39.112] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddPlatform already assigned to role Administrator
+[2025-10-28 02:07:39.120] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeleteGenre already assigned to role Administrator
+[2025-10-28 02:07:39.128] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddUser already assigned to role Administrator
+[2025-10-28 02:07:39.135] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewOrderHistory already assigned to role Administrator
+[2025-10-28 02:07:39.141] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeleteRole already assigned to role Administrator
+[2025-10-28 02:07:39.148] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewGenre already assigned to role Administrator
+[2025-10-28 02:07:39.155] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddRole already assigned to role Administrator
+[2025-10-28 02:07:39.161] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddGenre already assigned to role Administrator
+[2025-10-28 02:07:39.167] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewPublisher already assigned to role Administrator
+[2025-10-28 02:07:39.175] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewGame already assigned to role Manager
+[2025-10-28 02:07:39.182] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddGame already assigned to role Manager
+[2025-10-28 02:07:39.188] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission UpdateGame already assigned to role Manager
+[2025-10-28 02:07:39.194] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeleteGame already assigned to role Manager
+[2025-10-28 02:07:39.201] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewGenre already assigned to role Manager
+[2025-10-28 02:07:39.207] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddGenre already assigned to role Manager
+[2025-10-28 02:07:39.213] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission UpdateGenre already assigned to role Manager
+[2025-10-28 02:07:39.219] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeleteGenre already assigned to role Manager
+[2025-10-28 02:07:39.225] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewPlatform already assigned to role Manager
+[2025-10-28 02:07:39.232] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddPlatform already assigned to role Manager
+[2025-10-28 02:07:39.238] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission UpdatePlatform already assigned to role Manager
+[2025-10-28 02:07:39.244] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeletePlatform already assigned to role Manager
+[2025-10-28 02:07:39.251] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewPublisher already assigned to role Manager
+[2025-10-28 02:07:39.257] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddPublisher already assigned to role Manager
+[2025-10-28 02:07:39.263] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission UpdatePublisher already assigned to role Manager
+[2025-10-28 02:07:39.270] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeletePublisher already assigned to role Manager
+[2025-10-28 02:07:39.276] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewComments already assigned to role Manager
+[2025-10-28 02:07:39.283] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddComment already assigned to role Manager
+[2025-10-28 02:07:39.289] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeleteComment already assigned to role Manager
+[2025-10-28 02:07:39.296] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ModerateComments already assigned to role Manager
+[2025-10-28 02:07:39.302] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission BanUsers already assigned to role Manager
+[2025-10-28 02:07:39.309] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewOrders already assigned to role Manager
+[2025-10-28 02:07:39.315] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission EditOrders already assigned to role Manager
+[2025-10-28 02:07:39.322] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewOrderHistory already assigned to role Manager
+[2025-10-28 02:07:39.329] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ShipOrders already assigned to role Manager
+[2025-10-28 02:07:39.335] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewGame already assigned to role Moderator
+[2025-10-28 02:07:39.342] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewGenre already assigned to role Moderator
+[2025-10-28 02:07:39.348] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewPlatform already assigned to role Moderator
+[2025-10-28 02:07:39.354] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewPublisher already assigned to role Moderator
+[2025-10-28 02:07:39.360] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewComments already assigned to role Moderator
+[2025-10-28 02:07:39.367] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddComment already assigned to role Moderator
+[2025-10-28 02:07:39.373] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission DeleteComment already assigned to role Moderator
+[2025-10-28 02:07:39.379] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ModerateComments already assigned to role Moderator
+[2025-10-28 02:07:39.386] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission BanUsers already assigned to role Moderator
+[2025-10-28 02:07:39.392] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewGame already assigned to role User
+[2025-10-28 02:07:39.399] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewGenre already assigned to role User
+[2025-10-28 02:07:39.406] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewPlatform already assigned to role User
+[2025-10-28 02:07:39.412] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewPublisher already assigned to role User
+[2025-10-28 02:07:39.419] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewComments already assigned to role User
+[2025-10-28 02:07:39.426] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission AddComment already assigned to role User
+[2025-10-28 02:07:39.432] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewGame already assigned to role Guest
+[2025-10-28 02:07:39.439] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewGenre already assigned to role Guest
+[2025-10-28 02:07:39.445] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewPlatform already assigned to role Guest
+[2025-10-28 02:07:39.452] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewPublisher already assigned to role Guest
+[2025-10-28 02:07:39.459] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Permission ViewComments already assigned to role Guest
+[2025-10-28 02:07:39.460] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Completed seeding default roles and permissions
+[2025-10-28 02:07:39.462] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Starting migration of hardcoded users
+[2025-10-28 02:07:39.464] [INFO] [Gamestore.Services.Services.Auth.DatabaseRoleService] Completed migration of hardcoded users
