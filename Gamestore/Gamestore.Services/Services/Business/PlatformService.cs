@@ -62,20 +62,31 @@ public class PlatformService(IUnitOfWork unitOfWork, ILogger<PlatformService> lo
     }
 
     /// <summary>
-    /// Deletes a platform by its ID.
+    /// Epic 10 US14: Deletes a platform by its ID.
     /// </summary>
     public async Task<Platform?> DeletePlatformById(Guid id)
     {
-        _logger.LogInformation("Starting delete platform operation for ID: {PlatformId}", id);
+        try
+        {
+            var platform = await _unitOfWork.Platforms.GetByIdAsync(id);
 
-        var platformEntity = await GetRequiredPlatformById(id);
-        await ValidatePlatformCanBeDeleted(id);
+            if (platform == null)
+            {
+                _logger.LogWarning("Platform not found for deletion: {PlatformId}", id);
+                return null;
+            }
 
-        await _unitOfWork.Platforms.DeleteAsync(id);
-        await _unitOfWork.CompleteAsync();
+            await _unitOfWork.Platforms.DeleteAsync(id);
+            await _unitOfWork.CompleteAsync();
 
-        _logger.LogInformation("Platform with ID: {PlatformId} deleted successfully", id);
-        return platformEntity;
+            _logger.LogInformation("Platform deleted successfully: {PlatformId}", id);
+            return platform;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error deleting platform: {PlatformId}", id);
+            throw;
+        }
     }
 
     /// <summary>
@@ -168,16 +179,6 @@ public class PlatformService(IUnitOfWork unitOfWork, ILogger<PlatformService> lo
         }
     }
 
-    private async Task<bool> IsPlatformUsedByGames(Guid platformId)
-    {
-        var gamePlatforms = await _unitOfWork.GamePlatforms.GetByPlatformIdAsync(platformId);
-        var isUsed = gamePlatforms != null && gamePlatforms.Any();
-
-        _logger.LogInformation("Platform with ID: {PlatformId} is used by games: {IsUsed}", platformId, isUsed);
-
-        return isUsed;
-    }
-
     private void ValidatePlatformId(Guid id)
     {
         if (id == Guid.Empty)
@@ -209,15 +210,6 @@ public class PlatformService(IUnitOfWork unitOfWork, ILogger<PlatformService> lo
         _logger.LogInformation("Game found with ID: {GameId} for key: {GameKey}", game.Id, key);
 
         return game;
-    }
-
-    private async Task ValidatePlatformCanBeDeleted(Guid platformId)
-    {
-        if (await IsPlatformUsedByGames(platformId))
-        {
-            _logger.LogWarning("Cannot delete platform with ID: {PlatformId} because it is used by games", platformId);
-            throw new InvalidOperationException("Cannot delete a platform that is used by games. Please remove the platform from games first");
-        }
     }
 
     private async Task<IEnumerable<Platform>> GetPlatformsByGameId(Guid gameId)

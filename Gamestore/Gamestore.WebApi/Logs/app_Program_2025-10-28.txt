@@ -62,3 +62,43 @@
 [2025-10-28 06:21:49.826] [INFO] [Program] 🗄️ Database authentication enabled
 [2025-10-28 06:21:49.828] [INFO] [Program] 📚 Swagger available at: /swagger
 [2025-10-28 06:21:49.829] [INFO] [Program] 🌐 Environment: Development
+[2025-10-28 19:11:49.508] [INFO] [Program] 🗄️ Initializing database...
+[2025-10-28 19:11:51.378] [INFO] [Program] ✅ Database initialization completed
+[2025-10-28 19:11:51.742] [INFO] [Program] 🚀 Game Store API starting...
+[2025-10-28 19:11:51.743] [INFO] [Program] 🔐 JWT Authentication enabled
+[2025-10-28 19:11:51.745] [INFO] [Program] 🛡️ Authorization policies configured
+[2025-10-28 19:11:51.746] [INFO] [Program] 🗄️ Database authentication enabled
+[2025-10-28 19:11:51.748] [INFO] [Program] 📚 Swagger available at: /swagger
+[2025-10-28 19:11:51.749] [INFO] [Program] 🌐 Environment: Development
+[2025-10-28 19:19:00.183] [INFO] [Program] 🗄️ Initializing database...
+[2025-10-28 19:19:02.666] [INFO] [Program] ✅ Database initialization completed
+[2025-10-28 19:19:02.768] [INFO] [Program] 🚀 Game Store API starting...
+[2025-10-28 19:19:02.770] [INFO] [Program] 🔐 JWT Authentication enabled
+[2025-10-28 19:19:02.771] [INFO] [Program] 🛡️ Authorization policies configured
+[2025-10-28 19:19:02.772] [INFO] [Program] 🗄️ Database authentication enabled
+[2025-10-28 19:19:02.774] [INFO] [Program] 📚 Swagger available at: /swagger
+[2025-10-28 19:19:02.776] [INFO] [Program] 🌐 Environment: Development
+[2025-10-28 19:31:53.453] [INFO] [Program] 🗄️ Initializing database...
+[2025-10-28 19:31:56.138] [INFO] [Program] ✅ Database initialization completed
+[2025-10-28 19:31:56.311] [INFO] [Program] 🚀 Game Store API starting...
+[2025-10-28 19:31:56.313] [INFO] [Program] 🔐 JWT Authentication enabled
+[2025-10-28 19:31:56.333] [INFO] [Program] 🛡️ Authorization policies configured
+[2025-10-28 19:31:56.368] [INFO] [Program] 🗄️ Database authentication enabled
+[2025-10-28 19:31:56.370] [INFO] [Program] 📚 Swagger available at: /swagger
+[2025-10-28 19:31:56.371] [INFO] [Program] 🌐 Environment: Development
+[2025-10-28 19:35:54.902] [INFO] [Program] 🗄️ Initializing database...
+[2025-10-28 19:35:56.951] [INFO] [Program] ✅ Database initialization completed
+[2025-10-28 19:35:57.080] [INFO] [Program] 🚀 Game Store API starting...
+[2025-10-28 19:35:57.082] [INFO] [Program] 🔐 JWT Authentication enabled
+[2025-10-28 19:35:57.083] [INFO] [Program] 🛡️ Authorization policies configured
+[2025-10-28 19:35:57.084] [INFO] [Program] 🗄️ Database authentication enabled
+[2025-10-28 19:35:57.086] [INFO] [Program] 📚 Swagger available at: /swagger
+[2025-10-28 19:35:57.088] [INFO] [Program] 🌐 Environment: Development
+[2025-10-28 19:38:15.329] [INFO] [Program] 🗄️ Initializing database...
+[2025-10-28 19:38:17.371] [INFO] [Program] ✅ Database initialization completed
+[2025-10-28 19:38:17.568] [INFO] [Program] 🚀 Game Store API starting...
+[2025-10-28 19:38:17.569] [INFO] [Program] 🔐 JWT Authentication enabled
+[2025-10-28 19:38:17.571] [INFO] [Program] 🛡️ Authorization policies configured
+[2025-10-28 19:38:17.572] [INFO] [Program] 🗄️ Database authentication enabled
+[2025-10-28 19:38:17.574] [INFO] [Program] 📚 Swagger available at: /swagger
+[2025-10-28 19:38:17.575] [INFO] [Program] 🌐 Environment: Development

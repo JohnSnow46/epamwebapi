@@ -30,3 +30,35 @@
 [2025-10-28 06:18:54.471] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ℹ️ ANONYMOUS ACCESS: POST /api/users/login | Status: 400
 [2025-10-28 06:19:16.742] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
 [2025-10-28 06:19:16.759] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 19:32:25.952] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 19:32:26.113] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 19:32:53.865] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /.well-known/appspecific/com.chrome.devtools.json | IP: ::1
+[2025-10-28 19:32:53.867] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /.well-known/appspecific/com.chrome.devtools.json | Status: 404
+[2025-10-28 19:32:54.038] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /vendor.js.map | IP: ::1
+[2025-10-28 19:32:54.040] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /polyfills.js.map | IP: ::1
+[2025-10-28 19:32:54.041] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /main.js.map | IP: ::1
+[2025-10-28 19:32:54.043] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /vendor.js.map | Status: 404
+[2025-10-28 19:32:54.044] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /main.js.map | Status: 404
+[2025-10-28 19:32:54.052] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /polyfills.js.map | Status: 404
+[2025-10-28 19:32:54.055] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /runtime.js.map | IP: ::1
+[2025-10-28 19:32:54.058] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /styles.css.map | IP: ::1
+[2025-10-28 19:32:54.060] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /runtime.js.map | Status: 404
+[2025-10-28 19:32:54.061] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /styles.css.map | Status: 404
+[2025-10-28 19:34:03.674] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /.well-known/appspecific/com.chrome.devtools.json | IP: ::1
+[2025-10-28 19:34:03.676] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /.well-known/appspecific/com.chrome.devtools.json | Status: 404
+[2025-10-28 19:34:21.861] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: POST /api/users/login | IP: ::1
+[2025-10-28 19:34:21.879] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🚫 ANONYMOUS DENIED: POST /api/users/login | Status: 401 (Authentication required)
+[2025-10-28 19:36:05.403] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /.well-known/appspecific/com.chrome.devtools.json | IP: ::1
+[2025-10-28 19:36:05.406] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /.well-known/appspecific/com.chrome.devtools.json | Status: 404
+[2025-10-28 19:38:47.945] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /.well-known/appspecific/com.chrome.devtools.json | IP: ::1
+[2025-10-28 19:38:47.947] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /.well-known/appspecific/com.chrome.devtools.json | Status: 404
+[2025-10-28 19:38:48.238] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /vendor.js.map | IP: ::1
+[2025-10-28 19:38:48.239] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /runtime.js.map | IP: ::1
+[2025-10-28 19:38:48.241] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /main.js.map | IP: ::1
+[2025-10-28 19:38:48.242] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /vendor.js.map | Status: 404
+[2025-10-28 19:38:48.244] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /runtime.js.map | Status: 404
+[2025-10-28 19:38:48.245] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /main.js.map | Status: 404
+[2025-10-28 19:38:48.256] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /styles.css.map | IP: ::1
+[2025-10-28 19:38:48.258] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] 🔓 ANONYMOUS REQUEST: GET /polyfills.js.map | IP: ::1
+[2025-10-28 19:38:48.259] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /styles.css.map | Status: 404
+[2025-10-28 19:38:48.261] [INFO] [Gamestore.WebApi.Middleware.AuthorizationLoggingMiddleware] ❓ ANONYMOUS ACCESS: GET /polyfills.js.map | Status: 404

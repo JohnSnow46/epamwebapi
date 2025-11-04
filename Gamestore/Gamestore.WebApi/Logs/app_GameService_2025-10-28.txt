@@ -18,3 +18,17 @@
 [2025-10-28 06:18:46.007] [INFO] [Gamestore.Services.Services.Business.GameService] Total games count: 3
 [2025-10-28 06:21:55.347] [INFO] [Gamestore.Services.Services.Business.GameService] Getting total games count
 [2025-10-28 06:21:55.369] [INFO] [Gamestore.Services.Services.Business.GameService] Total games count: 3
+[2025-10-28 19:19:44.868] [INFO] [Gamestore.Services.Services.Business.GameService] Getting total games count
+[2025-10-28 19:19:44.890] [INFO] [Gamestore.Services.Services.Business.GameService] Total games count: 3
+[2025-10-28 19:20:00.209] [INFO] [Gamestore.Services.Services.Business.GameService] Starting get all games operation
+[2025-10-28 19:20:00.342] [INFO] [Gamestore.Services.Services.Business.GameService] Retrieved 3 games from database
+[2025-10-28 19:22:45.409] [INFO] [Gamestore.Services.Services.Business.GameService] Getting total games count
+[2025-10-28 19:22:45.414] [INFO] [Gamestore.Services.Services.Business.GameService] Total games count: 3
+[2025-10-28 19:32:01.656] [INFO] [Gamestore.Services.Services.Business.GameService] Getting total games count
+[2025-10-28 19:32:01.681] [INFO] [Gamestore.Services.Services.Business.GameService] Total games count: 3
+[2025-10-28 19:34:03.630] [INFO] [Gamestore.Services.Services.Business.GameService] Getting total games count
+[2025-10-28 19:34:03.639] [INFO] [Gamestore.Services.Services.Business.GameService] Total games count: 3
+[2025-10-28 19:36:04.105] [INFO] [Gamestore.Services.Services.Business.GameService] Getting total games count
+[2025-10-28 19:36:04.126] [INFO] [Gamestore.Services.Services.Business.GameService] Total games count: 3
+[2025-10-28 19:38:21.891] [INFO] [Gamestore.Services.Services.Business.GameService] Getting total games count
+[2025-10-28 19:38:21.912] [INFO] [Gamestore.Services.Services.Business.GameService] Total games count: 3

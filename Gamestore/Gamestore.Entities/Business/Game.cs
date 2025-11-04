@@ -32,4 +32,7 @@ public class Game
     public int CommentCount { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+    // Image
+    public string? ImageUrl { get; set; }
 }

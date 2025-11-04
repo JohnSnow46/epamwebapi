@@ -222,10 +222,17 @@ static void ConfigureCors(WebApplicationBuilder builder)
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowAll", policy => policy
-            .AllowAnyOrigin()
+            .WithOrigins(
+                "http://localhost:4200",
+                "https://localhost:4200",
+                "http://localhost:3000",
+                "https://localhost:3000",
+                "https://localhost:54262")
+            .SetIsOriginAllowedToAllowWildcardSubdomains()
             .AllowAnyMethod()
             .AllowAnyHeader()
-            .WithExposedHeaders("x-total-numbers-of-games", "Authorization"));
+            .AllowCredentials()
+            .WithExposedHeaders("x-total-numbers-of-games", "Authorization", "Content-Type", "Content-Disposition"));
     });
 }
 
@@ -313,9 +320,9 @@ static async Task ConfigureMiddlewarePipeline(WebApplication app)
     app.UseResponseCaching();
 
     // Authentication & Authorization
-    // app.UseAuthentication();
-    // app.UseAuthorization();
-    // app.UseAuthorizationLogging();
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.UseAuthorizationLogging();
 
     // Endpoints
     app.MapControllerRoute(

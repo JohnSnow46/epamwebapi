@@ -74,14 +74,11 @@ public partial class GameService(
         return gameRequest;
     }
 
-    /// <summary>
-    /// Updates an existing game by its key.
-    /// Epic 10 US2: Now supports image update in base64 format.
-    /// </summary>
-    public async Task<GameUpdateRequestDto> UpdateGameAsync(string key, GameMetadataUpdateRequestDto gameRequest)
+    public async Task<GameUpdateRequestDto> UpdateGameAsync(
+     string key,
+     GameMetadataUpdateRequestDto gameRequest)
     {
         _logger.LogInformation("Starting update game operation for key: {GameKey}", key);
-
         ValidateString(key, "Game key");
 
         if (gameRequest?.Game == null)
@@ -98,24 +95,44 @@ public partial class GameService(
         UpdateGameFromDto(existingGame, gameRequest);
         await UpdateGameRelations(existingGame.Id, gameRequest);
 
-        // Epic 10 US2: Update image if provided
+        // Epic 10 US2: Handle image update
         if (!string.IsNullOrEmpty(gameRequest.Image))
         {
             try
             {
-                await _blobStorageService.UploadImageAsync(gameRequest.Image, key);
-                _logger.LogInformation("Successfully updated image for game: {GameKey}", key);
+                if (!string.IsNullOrWhiteSpace(existingGame.ImageUrl))
+                {
+                    var oldBlobName = _blobStorageService.GetBlobNameFromGameKey(key);
+                    await _blobStorageService.DeleteImageAsync(oldBlobName);
+                    _logger.LogInformation("Deleted old image for game: {GameKey}", key);
+                }
+
+                var newImageUrl = await _blobStorageService.UploadImageAsync(
+                    gameRequest.Image,
+                    key);
+                existingGame.ImageUrl = newImageUrl;
+                _logger.LogInformation("Updated image for game: {GameKey}", key);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to update image for game: {GameKey}", key);
+                _logger.LogError(ex, "Failed to update image for game: {GameKey}. Game will be updated without new image.", key);
             }
         }
 
         await _unitOfWork.CompleteAsync();
-
         _logger.LogInformation("Game updated successfully with ID: {GameId}", existingGame.Id);
-        return gameRequest.Game;
+
+        return new GameUpdateRequestDto
+        {
+            Id = existingGame.Id,
+            Name = existingGame.Name,
+            Key = existingGame.Key,
+            Description = existingGame.Description,
+            Price = existingGame.Price,
+            UnitInStock = existingGame.UnitInStock,
+            Discontinued = existingGame.Discontinued,
+            Image = existingGame.ImageUrl,
+        };
     }
 
     /// <summary>

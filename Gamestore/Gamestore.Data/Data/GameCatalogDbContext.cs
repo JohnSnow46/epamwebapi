@@ -67,6 +67,12 @@ public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options
             .Property(g => g.Discontinued)
             .IsRequired();
 
+        // Game Image
+        modelBuilder.Entity<Game>()
+            .Property(g => g.ImageUrl)
+            .IsRequired(false)
+            .HasMaxLength(2048);
+
         // Game-Publisher
         modelBuilder.Entity<Game>()
             .HasOne(g => g.Publisher)

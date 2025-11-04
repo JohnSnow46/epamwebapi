@@ -31,4 +31,7 @@ public class GameUpdateRequestDto
     [JsonPropertyName("discount")]
     [JsonRequired]
     public int Discontinued { get; set; }
+
+    [JsonPropertyName("image")]
+    public string? Image { get; set; }
 }
