@@ -57,7 +57,7 @@ public class PlatformControllerTests
             .ReturnsAsync(createdPlatform);
 
         // Act
-        var result = await _controller.CreateOrUpdatePlatform(platformRequest);
+        var result = await _controller.CreatePlatform(platformRequest);
 
         // Assert
         var okResult = Assert.IsType<OkObjectResult>(result);
@@ -107,7 +107,7 @@ public class PlatformControllerTests
         var result = await _controller.GetAllPlatforms();
 
         // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedPlatforms = Assert.IsAssignableFrom<IEnumerable<Platform>>(okResult.Value);
         Assert.Equal(3, returnedPlatforms.Count());
     }

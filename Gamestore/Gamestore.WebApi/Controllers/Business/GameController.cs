@@ -1,213 +1,42 @@
-﻿// WebApi/Controllers/GameController.cs - Enhanced Authorization
-using System.Text.Json;
-using Gamestore.Entities.ErrorModels;
+﻿using Gamestore.Entities.ErrorModels;
 using Gamestore.Services.Dto.GamesDto;
 using Gamestore.Services.Interfaces;
 using Gamestore.WebApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace Gamestore.WebApi.Controllers.Business;
 
 [ApiController]
-[Route("api")]
-public class GameController(IGameService gameService, IPublisherService publisherService, ILogger<GameController> logger) : ControllerBase
+[Route("api/games")]
+public class GameController(
+    IGameService gameService,
+    IGenreService genreService,
+    IPlatformService platformService,
+    IPublisherService publisherService,
+    ILogger<GameController> logger) : ControllerBase
 {
     private readonly IGameService _gameService = gameService;
+    private readonly IGenreService _genreService = genreService;
+    private readonly IPlatformService _platformService = platformService;
     private readonly IPublisherService _publisherService = publisherService;
     private readonly ILogger<GameController> _logger = logger;
 
     /// <summary>
-    /// Epic 9: Admin and Manager can create games.
+    /// Get all games with filters
+    /// GET /api/games.
     /// </summary>
-    [HttpPost("games/add-game")]
-    [Authorize(Policy = "CanManageGames")]
-    public async Task<IActionResult> CreateGame([FromBody] GameMetadataCreateRequestDto gameRequest)
-    {
-        try
-        {
-            _logger.LogInformation(
-                "Creating game with Name: {GameName} by user: {User} (Role: {Role})",
-                gameRequest.Game.Name,
-                User.GetUserEmail(),
-                User.GetUserRole());
-
-            var game = await _gameService.AddGameAsync(gameRequest);
-
-            return game == null ? InternalServerError("Failed to create the game.") : (IActionResult)Ok(game);
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, "Error creating game");
-        }
-    }
-
-    /// <summary>
-    /// Epic 9: Admin and Manager can update games. Admin can edit deleted games.
-    /// </summary>
-    [HttpPut("games/update-game")]
-    [Authorize(Policy = "CanManageGames")]
-    public async Task<IActionResult> UpdateGame([FromBody] JsonElement requestData)
-    {
-        try
-        {
-            _logger.LogInformation(
-                "Received game update request from user: {User} (Role: {Role})",
-                User.GetUserEmail(),
-                User.GetUserRole());
-
-            if (!requestData.TryGetProperty("game", out _))
-            {
-                return BadRequest(new ErrorResponseModel
-                {
-                    Message = "Invalid request format. Expected 'game' property.",
-                    StatusCode = StatusCodes.Status400BadRequest,
-                });
-            }
-
-            var gameUpdateDto = requestData.Deserialize<GameMetadataUpdateRequestDto>();
-            if (gameUpdateDto == null || string.IsNullOrEmpty(gameUpdateDto.Game.Key))
-            {
-                return BadRequest(new ErrorResponseModel
-                {
-                    Message = "Invalid game data or missing Key.",
-                    StatusCode = StatusCodes.Status400BadRequest,
-                });
-            }
-
-            var key = gameUpdateDto.Game.Key;
-            _logger.LogInformation("Updating game with Key: {GameKey} by user: {User}", key, User.GetUserEmail());
-
-            // Check if game exists first
-            var existingGame = await _gameService.GetGameByKey(key);
-            if (existingGame == null)
-            {
-                return ResourceNotFound($"Game with key: '{key}' not found.");
-            }
-
-            if (User.IsAdmin())
-            {
-                _logger.LogInformation("Admin {User} updating game - can edit deleted games", User.GetUserEmail());
-            }
-
-            var updatedGame = await _gameService.UpdateGameAsync(key, gameUpdateDto);
-
-            _logger.LogInformation(
-                "Successfully updated game with Key: {GameKey} by user: {User}",
-                updatedGame.Key,
-                User.GetUserEmail());
-            return Ok(new { game = updatedGame });
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, "Error updating game");
-        }
-    }
-
-    /// <summary>
-    /// Epic 9: Everyone can view games. Guests have read-only access.
-    /// </summary>
-    [HttpGet("games/{key}")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetGameByKey(string key)
-    {
-        try
-        {
-            var userInfo = User.Identity?.IsAuthenticated == true
-                ? $"{User.GetUserEmail()} (Role: {User.GetUserRole()})"
-                : "Anonymous Guest";
-
-            _logger.LogInformation("Getting game by key: {Key} for user: {UserInfo}", key, userInfo);
-
-            var game = await _gameService.GetGameByKey(key);
-
-            return game == null ? ResourceNotFound($"Game with key: '{key}' not found.") : Ok(game);
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, $"Error getting game by key: {key}");
-        }
-    }
-
-    /// <summary>
-    /// Epic 9: Everyone can view games.
-    /// </summary>
-    [HttpGet("games/find/{id}")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetGameById(Guid id)
-    {
-        try
-        {
-            _logger.LogInformation("Getting game by id: {Id}", id);
-            var game = await _gameService.GetGameById(id);
-
-            return game == null ? ResourceNotFound($"Game with id: '{id}' not found.") : Ok(game);
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, $"Error getting game by id: {id}");
-        }
-    }
-
-    /// <summary>
-    /// Epic 9: Admin and Manager can delete games.
-    /// </summary>
-    [HttpDelete("games/{key}")]
-    [Authorize(Policy = "CanManageGames")]
-    public async Task<IActionResult> DeleteGameByKey(string key)
-    {
-        try
-        {
-            _logger.LogInformation(
-                "Deleting game by key: {Key} by user: {User} (Role: {Role})",
-                key,
-                User.GetUserEmail(),
-                User.GetUserRole());
-
-            if (string.IsNullOrWhiteSpace(key) || key == "undefined")
-            {
-                return BadRequest(new ErrorResponseModel
-                {
-                    Message = "Invalid game key provided",
-                    Details = "Game key cannot be empty or 'undefined'",
-                    StatusCode = StatusCodes.Status400BadRequest,
-                });
-            }
-
-            var game = await _gameService.DeleteGameAsync(key);
-            _logger.LogInformation(
-                "Successfully deleted game with key: {Key} by user: {User}",
-                key,
-                User.GetUserEmail());
-            return Ok(game);
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, $"Error deleting game by key: {key}");
-        }
-    }
-
-    /// <summary>
-    /// Epic 9: Everyone can view games list.
-    /// </summary>
-    [HttpGet("games/")]
+    [HttpGet]
+    [OutputCache(Duration = 60)]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllGames()
     {
         try
         {
-            _logger.LogInformation(
-                "Getting all games for user: {User}",
-                User.Identity?.IsAuthenticated == true ? User.GetUserEmail() : "Anonymous");
-
+            _logger.LogInformation("Getting all games");
             var games = await _gameService.GetAllGames();
-
-            if (games == null || !games.Any())
-            {
-                return ResourceNotFound("No games found.");
-            }
-
-            _logger.LogInformation("Successfully retrieved {Count} games", games.Count());
+            _logger.LogInformation("Successfully retrieved all games");
             return Ok(games);
         }
         catch (Exception ex)
@@ -217,115 +46,238 @@ public class GameController(IGameService gameService, IPublisherService publishe
     }
 
     /// <summary>
-    /// Epic 9: Authenticated users can download game files.
+    /// Get game by key
+    /// GET /api/games/{key}.
     /// </summary>
-    [HttpGet("games/download-game-file/{key}")]
-    [Authorize]
-    public async Task<IActionResult> DownloadGameFile(string key)
+    [HttpGet("{key}")]
+    [OutputCache(Duration = 60)]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetGameByKey(string key)
     {
         try
         {
-            if (User.HasReadOnlyAccess())
+            _logger.LogInformation("Getting game by key: {GameKey}", key);
+            var game = await _gameService.GetGameByKey(key);
+
+            if (game == null)
             {
-                return Forbid("Guests cannot download game files");
+                return ResourceNotFound($"Game with key '{key}' not found.");
+            }
+
+            _logger.LogInformation("Successfully retrieved game with key: {GameKey}", key);
+            return Ok(game);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, $"Error retrieving game with key: {key}");
+        }
+    }
+
+    /// <summary>
+    /// Create new game
+    /// POST /api/games.
+    /// </summary>
+    [HttpPost]
+    [Authorize(Policy = "CanManageGames")]
+    public async Task<IActionResult> CreateGame([FromBody] GameMetadataCreateRequestDto gameRequest)
+    {
+        try
+        {
+            if (gameRequest?.Game == null)
+            {
+                return BadRequest(new ErrorResponseModel
+                {
+                    Message = "Game data is required.",
+                    StatusCode = StatusCodes.Status400BadRequest,
+                });
             }
 
             _logger.LogInformation(
-                "Creating game file for game with key: {Key} for user: {User} (Role: {Role})",
+                "Creating game with key: {GameKey} by user: {User} (Role: {Role})",
+                gameRequest.Game.Key,
+                User.GetUserEmail(),
+                User.GetUserRole());
+
+            var newGame = await _gameService.AddGameAsync(gameRequest);
+
+            if (newGame == null)
+            {
+                return InternalServerError("Failed to create the game.");
+            }
+
+            _logger.LogInformation(
+                "Successfully created game with key: {GameKey} by user: {User}",
+                newGame.Game.Key,
+                User.GetUserEmail());
+            return Ok(newGame);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, "Error creating game");
+        }
+    }
+
+    /// <summary>
+    /// Update game
+    /// PUT /api/games.
+    /// </summary>
+    [HttpPut]
+    [Authorize(Policy = "CanManageGames")]
+    public async Task<IActionResult> UpdateGame([FromBody] GameMetadataUpdateRequestDto gameUpdateDto)
+    {
+        try
+        {
+            if (gameUpdateDto?.Game == null || string.IsNullOrEmpty(gameUpdateDto.Game.Key))
+            {
+                return BadRequest(new ErrorResponseModel
+                {
+                    Message = "Invalid game data or missing Key.",
+                    StatusCode = StatusCodes.Status400BadRequest,
+                });
+            }
+
+            _logger.LogInformation(
+                "Received game update request for key: {GameKey} from user: {User} (Role: {Role})",
+                gameUpdateDto.Game.Key,
+                User.GetUserEmail(),
+                User.GetUserRole());
+
+            var updatedGame = await _gameService.UpdateGameAsync(gameUpdateDto.Game.Key, gameUpdateDto);
+
+            if (updatedGame == null)
+            {
+                return ResourceNotFound($"Game with key '{gameUpdateDto.Game.Key}' not found.");
+            }
+
+            _logger.LogInformation(
+                "Successfully updated game with key: {GameKey} by user: {User}",
+                gameUpdateDto.Game.Key,
+                User.GetUserEmail());
+            return Ok(updatedGame);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, "Error updating game");
+        }
+    }
+
+    /// <summary>
+    /// Delete game by key
+    /// DELETE /api/games/{key}.
+    /// </summary>
+    [HttpDelete("{key}")]
+    [Authorize(Policy = "CanManageGames")]
+    public async Task<IActionResult> DeleteGame(string key)
+    {
+        try
+        {
+            _logger.LogInformation(
+                "Deleting game with key: {GameKey} by user: {User} (Role: {Role})",
                 key,
                 User.GetUserEmail(),
                 User.GetUserRole());
 
-            var filePath = await _gameService.CreateGameFileAsync(key);
+            var deletedGame = await _gameService.DeleteGameAsync(key);
 
-            if (!System.IO.File.Exists(filePath))
+            if (deletedGame == null)
             {
-                return ResourceNotFound($"File for game '{key}' could not be found.");
+                return ResourceNotFound($"Game with key '{key}' not found.");
             }
-
-            var fileName = Path.GetFileName(filePath);
-            var fileContent = await System.IO.File.ReadAllBytesAsync(filePath);
 
             _logger.LogInformation(
-                "Successfully created and sending game file for game key: {Key} to user: {User}",
+                "Successfully deleted game with key: {GameKey} by user: {User}",
                 key,
                 User.GetUserEmail());
-            return File(fileContent, "application/json", fileName);
-        }
-        catch (KeyNotFoundException ex)
-        {
-            _logger.LogWarning(ex, "Game not found with key: {Key}", key);
-            return ResourceNotFound(ex.Message);
+            return Ok(deletedGame);
         }
         catch (Exception ex)
         {
-            return HandleException(ex, $"Error creating game file for game key: {key}");
+            return HandleException(ex, $"Error deleting game with key: {key}");
         }
     }
 
     /// <summary>
-    /// Epic 9: Everyone can view games by publisher.
+    /// Get genres for a game
+    /// GET /api/games/{key}/genres.
     /// </summary>
-    [HttpGet("{publisherName}/games")]
+    [HttpGet("{key}/genres")]
+    [OutputCache(Duration = 60)]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<GameMetadataUpdateRequestDto>>> GetGamesByPublisherName(string publisherName)
+    public async Task<IActionResult> GetGameGenres(string key)
     {
         try
         {
-            _logger.LogInformation("Getting games by publisher name: {PublisherName}", publisherName);
-            var games = await _publisherService.GetGamesByPublisherNameAsync(publisherName);
+            _logger.LogInformation("Getting genres for game with key: {GameKey}", key);
+            var genres = await _genreService.GetGenresByGameKeyAsync(key);
 
-            if (games == null)
+            if (!genres.Any())
             {
-                return ResourceNotFound($"Games with publisher name: '{publisherName}' not found.");
+                return ResourceNotFound($"No genres found for game '{key}'.");
             }
 
-            _logger.LogInformation("Successfully found games with publisher name: {PublisherName}", publisherName);
-            return Ok(games);
+            _logger.LogInformation("Successfully retrieved genres for game with key: {GameKey}", key);
+            return Ok(genres);
         }
         catch (Exception ex)
         {
-            return HandleException(ex, $"Error getting games by publisher name: {publisherName}");
+            return HandleException(ex, $"Error retrieving genres for game with key: {key}");
         }
     }
 
     /// <summary>
-    /// Epic 9: Admin can view deleted games.
+    /// Get platforms for a game
+    /// GET /api/games/{key}/platforms.
     /// </summary>
-    [HttpGet("games/deleted")]
-    [Authorize(Policy = "CanViewDeletedGames")]
-    public Task<IActionResult> GetDeletedGames()
+    [HttpGet("{key}/platforms")]
+    [OutputCache(Duration = 60)]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetGamePlatforms(string key)
     {
         try
         {
-            _logger.LogInformation("Getting deleted games for admin: {User}", User.GetUserEmail());
+            _logger.LogInformation("Getting platforms for game with key: {GameKey}", key);
+            var platforms = await _platformService.GetPlatformsByGameKeyAsync(key);
 
-            // Mock implementation - in real app, you'd filter by IsDeleted = true
-            // TODO: Implement actual deleted games retrieval when IsDeleted property is added
-            var deletedGames = new[]
+            if (!platforms.Any())
             {
-                new { Id = Guid.NewGuid(), Name = "Deleted Game 1", DeletedAt = DateTime.UtcNow.AddDays(-5) },
-                new { Id = Guid.NewGuid(), Name = "Deleted Game 2", DeletedAt = DateTime.UtcNow.AddDays(-10) },
-            };
+                return ResourceNotFound($"No platforms found for game '{key}'.");
+            }
 
-            return Task.FromResult<IActionResult>(Ok(deletedGames));
+            _logger.LogInformation("Successfully retrieved platforms for game with key: {GameKey}", key);
+            return Ok(platforms);
         }
         catch (Exception ex)
         {
-            return Task.FromResult<IActionResult>(HandleException(ex, "Error retrieving deleted games"));
+            return HandleException(ex, $"Error retrieving platforms for game with key: {key}");
         }
     }
 
-    private ObjectResult InternalServerError(string message, string details = null)
+    /// <summary>
+    /// Get publisher for a game
+    /// GET /api/games/{key}/publisher.
+    /// </summary>
+    [HttpGet("{key}/publisher")]
+    [OutputCache(Duration = 60)]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetGamePublisher(string key)
     {
-        _logger.LogWarning(message);
-
-        return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponseModel
+        try
         {
-            Message = message,
-            Details = details,
-            StatusCode = StatusCodes.Status500InternalServerError,
-        });
+            _logger.LogInformation("Getting publisher for game with key: {GameKey}", key);
+            var publisher = await _publisherService.GetPublisherByGameKey(key);
+
+            if (publisher == null)
+            {
+                return ResourceNotFound($"Publisher for game with key '{key}' not found.");
+            }
+
+            _logger.LogInformation("Successfully retrieved publisher for game with key: {GameKey}", key);
+            return Ok(publisher);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, $"Error retrieving publisher for game with key: {key}");
+        }
     }
 
     private NotFoundObjectResult ResourceNotFound(string message)
@@ -336,6 +288,17 @@ public class GameController(IGameService gameService, IPublisherService publishe
         {
             Message = message,
             StatusCode = StatusCodes.Status404NotFound,
+        });
+    }
+
+    private ObjectResult InternalServerError(string message)
+    {
+        _logger.LogError(message);
+
+        return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponseModel
+        {
+            Message = message,
+            StatusCode = StatusCodes.Status500InternalServerError,
         });
     }
 

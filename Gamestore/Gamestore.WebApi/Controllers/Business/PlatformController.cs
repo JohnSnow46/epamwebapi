@@ -1,6 +1,4 @@
-﻿using System.Text.Json;
-using Gamestore.Entities.Business;
-using Gamestore.Entities.ErrorModels;
+﻿using Gamestore.Entities.ErrorModels;
 using Gamestore.Services.Dto.PlatformsDto;
 using Gamestore.Services.Interfaces;
 using Gamestore.WebApi.Extensions;
@@ -20,14 +18,23 @@ public class PlatformController(IGameService gameService, IPlatformService platf
     /// <summary>
     /// Epic 9: Admin and Manager can create platforms.
     /// </summary>
-    [HttpPost("add-platform")]
+    [HttpPost]
     [Authorize(Policy = "CanManageBusinessEntities")]
-    public async Task<IActionResult> CreateOrUpdatePlatform([FromBody] PlatformMetadataCreateRequestDto platformRequest)
+    public async Task<IActionResult> CreatePlatform([FromBody] PlatformMetadataCreateRequestDto platformRequest)
     {
         try
         {
+            if (platformRequest?.Platform == null)
+            {
+                return BadRequest(new ErrorResponseModel
+                {
+                    Message = "Platform data is required.",
+                    StatusCode = StatusCodes.Status400BadRequest,
+                });
+            }
+
             _logger.LogInformation(
-                "Creating or updating platform with Type: {PlatformType} by user: {User}",
+                "Creating platform with Type: {PlatformType} by user: {User}",
                 platformRequest.Platform.Type,
                 User.GetUserEmail());
 
@@ -35,39 +42,31 @@ public class PlatformController(IGameService gameService, IPlatformService platf
 
             if (updatedPlatform == null)
             {
-                return ResourceNotFound($"Platform with ID '{platformRequest.Platform.Id}' not found.");
+                return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponseModel
+                {
+                    Message = "Failed to create the platform.",
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                });
             }
 
-            _logger.LogInformation("Successfully processed platform with ID: {PlatformId}", updatedPlatform.Id);
+            _logger.LogInformation("Successfully created platform with ID: {PlatformId}", updatedPlatform.Id);
             return Ok(updatedPlatform);
         }
         catch (Exception ex)
         {
-            return HandleException(ex, "Error creating or updating platform");
+            return HandleException(ex, "Error creating platform");
         }
     }
 
     /// <summary>
     /// Epic 9: Admin and Manager can update platforms.
     /// </summary>
-    [HttpPut("update-platform")]
+    [HttpPut]
     [Authorize(Policy = "CanManageBusinessEntities")]
-    public async Task<IActionResult> UpdatePlatform([FromBody] JsonElement requestData)
+    public async Task<IActionResult> UpdatePlatform([FromBody] PlatformMetadataUpdateRequestDto platformUpdateDto)
     {
         try
         {
-            _logger.LogInformation("Received platform update request from user: {User}", User.GetUserEmail());
-
-            if (!requestData.TryGetProperty("platform", out var platformElement))
-            {
-                return BadRequest(new ErrorResponseModel
-                {
-                    Message = "Invalid request format. Expected 'platform' property.",
-                    StatusCode = StatusCodes.Status400BadRequest,
-                });
-            }
-
-            var platformUpdateDto = platformElement.Deserialize<PlatformMetadataUpdateRequestDto>();
             if (platformUpdateDto == null || platformUpdateDto.Id == Guid.Empty)
             {
                 return BadRequest(new ErrorResponseModel
@@ -77,13 +76,23 @@ public class PlatformController(IGameService gameService, IPlatformService platf
                 });
             }
 
-            var id = platformUpdateDto.Id;
-            _logger.LogInformation("Updating platform with ID: {PlatformId}, Type: {PlatformType}", id, platformUpdateDto.Type);
+            _logger.LogInformation(
+                "Received platform update request for ID: {PlatformId} from user: {User}",
+                platformUpdateDto.Id,
+                User.GetUserEmail());
 
-            var updatedPlatform = await _platformService.UpdatePlatform(id, platformUpdateDto);
+            var updatedPlatform = await _platformService.UpdatePlatform(platformUpdateDto.Id, platformUpdateDto);
 
-            _logger.LogInformation("Successfully updated platform with ID: {PlatformId}", updatedPlatform.Id);
-            return Ok(new { platform = updatedPlatform });
+            if (updatedPlatform == null)
+            {
+                return ResourceNotFound($"Platform with ID '{platformUpdateDto.Id}' not found.");
+            }
+
+            _logger.LogInformation(
+                "Successfully updated platform with ID: {PlatformId} by user: {User}",
+                platformUpdateDto.Id,
+                User.GetUserEmail());
+            return Ok(updatedPlatform);
         }
         catch (Exception ex)
         {
@@ -122,12 +131,17 @@ public class PlatformController(IGameService gameService, IPlatformService platf
     /// </summary>
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<Platform>>> GetAllPlatforms()
+    public async Task<IActionResult> GetAllPlatforms()
     {
         try
         {
             _logger.LogInformation("Getting all platforms");
             var platforms = await _platformService.GetAllPlatformsAsync();
+
+            if (platforms == null || !platforms.Any())
+            {
+                return ResourceNotFound("No platforms found.");
+            }
 
             _logger.LogInformation("Successfully retrieved {Count} platforms", platforms.Count());
             return Ok(platforms);
@@ -167,7 +181,7 @@ public class PlatformController(IGameService gameService, IPlatformService platf
     /// <summary>
     /// Epic 9: Everyone can view platforms by game key.
     /// </summary>
-    [HttpGet("{key}/platforms")]
+    [HttpGet("game/{key}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetPlatformsByGameKey(string key)
     {

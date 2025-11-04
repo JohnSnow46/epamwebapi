@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using Gamestore.Entities.Business;
 using Gamestore.Services.Dto.GamesDto;
 using Gamestore.Services.Interfaces;
 using Gamestore.WebApi.Controllers.Business;
@@ -16,6 +15,8 @@ namespace Gamestore.Tests.Controllers.Tests;
 public class GameControllerTests
 {
     private readonly Mock<IGameService> _gameServiceMock;
+    private readonly Mock<IGenreService> _genreServiceMock;
+    private readonly Mock<IPlatformService> _platformServiceMock;
     private readonly Mock<IPublisherService> _publisherServiceMock;
     private readonly Mock<ILogger<GameController>> _loggerMock;
     private readonly GameController _controller;
@@ -23,11 +24,15 @@ public class GameControllerTests
     public GameControllerTests()
     {
         _gameServiceMock = new Mock<IGameService>();
+        _genreServiceMock = new Mock<IGenreService>();
+        _platformServiceMock = new Mock<IPlatformService>();
         _publisherServiceMock = new Mock<IPublisherService>();
         _loggerMock = new Mock<ILogger<GameController>>();
 
         _controller = new GameController(
             _gameServiceMock.Object,
+            _genreServiceMock.Object,
+            _platformServiceMock.Object,
             _publisherServiceMock.Object,
             _loggerMock.Object);
 
@@ -94,33 +99,6 @@ public class GameControllerTests
     }
 
     [Fact]
-    public async Task GetGameByIdShouldReturnGameWhenExists()
-    {
-        // Arrange
-        var gameId = Guid.NewGuid();
-        var gameDto = new GameCreateRequestDto
-        {
-            Name = "Test Game",
-            Key = "test-game",
-            Description = "Test Description",
-            Price = 59.99,
-            UnitInStock = 100,
-            Discount = 0,
-        };
-
-        _gameServiceMock
-            .Setup(s => s.GetGameById(gameId))
-            .ReturnsAsync(gameDto);
-
-        // Act
-        var result = await _controller.GetGameById(gameId);
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.NotNull(okResult.Value);
-    }
-
-    [Fact]
     public async Task GetAllGamesShouldReturnGamesList()
     {
         // Arrange
@@ -157,46 +135,6 @@ public class GameControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var returnedGames = Assert.IsAssignableFrom<IEnumerable<GameCreateRequestDto>>(okResult.Value);
         Assert.Equal(2, returnedGames.Count());
-    }
-
-    [Fact]
-    public async Task DeleteGameShouldReturnSuccessWhenGameIsDeleted()
-    {
-        // Arrange
-        var key = "game-to-delete";
-        var deletedGame = new Game
-        {
-            Id = Guid.NewGuid(),
-            Key = key,
-            Name = "Deleted Game",
-        };
-
-        _gameServiceMock
-            .Setup(s => s.DeleteGameAsync(key))
-            .ReturnsAsync(deletedGame);
-
-        // Act
-        var result = await _controller.DeleteGameByKey(key);
-
-        // Assert
-        var okResult = Assert.IsType<OkObjectResult>(result);
-        Assert.NotNull(okResult.Value);
-        _gameServiceMock.Verify(s => s.DeleteGameAsync(key), Times.Once);
-    }
-
-    [Fact]
-    public async Task DeleteGameShouldReturnBadRequestWhenKeyIsUndefined()
-    {
-        // Arrange
-        var invalidKey = "undefined";
-
-        // Act
-        var result = await _controller.DeleteGameByKey(invalidKey);
-
-        // Assert
-        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
-        Assert.NotNull(badRequestResult.Value);
-        _gameServiceMock.Verify(s => s.DeleteGameAsync(It.IsAny<string>()), Times.Never);
     }
 
     private void SetupControllerContext()

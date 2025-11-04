@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Gamestore.Entities.Business;
+﻿using Gamestore.Entities.Business;
 using Gamestore.Entities.ErrorModels;
 using Gamestore.Services.Dto.PublishersDto;
 using Gamestore.Services.Interfaces;
@@ -17,33 +16,8 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     private readonly ILogger<PublishersController> _logger = logger;
 
     /// <summary>
-    /// Epic 9: Everyone can view publisher by name.
-    /// </summary>
-    [HttpGet("name/{companyName}")]
-    [AllowAnonymous]
-    public async Task<ActionResult<Publisher>> GetPublisherByName(string companyName)
-    {
-        try
-        {
-            _logger.LogInformation("Getting publisher by Name: {PublisherName}", companyName);
-            var publisher = await _publisherService.GetPublisherByCompanyNameAsync(companyName);
-
-            if (publisher == null)
-            {
-                return ResourceNotFound($"Publisher with name '{companyName}' not found.");
-            }
-
-            _logger.LogInformation("Successfully found Publisher with name: {PublisherName}", companyName);
-            return Ok(publisher);
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, $"Error getting publisher by name: {companyName}");
-        }
-    }
-
-    /// <summary>
-    /// Epic 9: Everyone can view all publishers.
+    /// Get all publishers
+    /// GET /api/publishers.
     /// </summary>
     [HttpGet]
     [AllowAnonymous]
@@ -69,7 +43,35 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     }
 
     /// <summary>
-    /// Epic 9: Everyone can view publisher by game key.
+    /// Get publisher by company name
+    /// GET /api/publishers/name/{companyName}.
+    /// </summary>
+    [HttpGet("name/{companyName}")]
+    [AllowAnonymous]
+    public async Task<ActionResult<Publisher>> GetPublisherByName(string companyName)
+    {
+        try
+        {
+            _logger.LogInformation("Getting publisher by Name: {PublisherName}", companyName);
+            var publisher = await _publisherService.GetPublisherByCompanyNameAsync(companyName);
+
+            if (publisher == null)
+            {
+                return ResourceNotFound($"Publisher with name '{companyName}' not found.");
+            }
+
+            _logger.LogInformation("Successfully found Publisher with name: {PublisherName}", companyName);
+            return Ok(publisher);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, $"Error getting publisher by name: {companyName}");
+        }
+    }
+
+    /// <summary>
+    /// Get publisher by game key
+    /// GET /api/publishers/game/{key}.
     /// </summary>
     [HttpGet("game/{key}")]
     [AllowAnonymous]
@@ -95,20 +97,16 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     }
 
     /// <summary>
-    /// Epic 9: Admin and Manager can create publishers.
+    /// Create new publisher
+    /// POST /api/publishers.
     /// </summary>
-    [HttpPost("add-publisher")]
+    [HttpPost]
     [Authorize(Policy = "CanManageBusinessEntities")]
     public async Task<IActionResult> CreatePublisher([FromBody] PublisherCreateRequestDto publisherRequest)
     {
         try
         {
-            _logger.LogInformation(
-                "Creating publisher with Name: {PublisherName} by user: {User}",
-                publisherRequest.Publisher.CompanyName,
-                User.GetUserEmail());
-
-            if (publisherRequest == null)
+            if (publisherRequest == null || publisherRequest.Publisher == null)
             {
                 return BadRequest(new ErrorResponseModel
                 {
@@ -116,6 +114,11 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
                     StatusCode = StatusCodes.Status400BadRequest,
                 });
             }
+
+            _logger.LogInformation(
+                "Creating publisher with Name: {PublisherName} by user: {User}",
+                publisherRequest.Publisher.CompanyName,
+                User.GetUserEmail());
 
             var publisher = await _publisherService.AddPublisherAsync(publisherRequest);
 
@@ -129,27 +132,16 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     }
 
     /// <summary>
-    /// Epic 9: Admin and Manager can update publishers.
+    /// Update publisher
+    /// PUT /api/publishers.
     /// </summary>
-    [HttpPut("update-publisher")]
+    [HttpPut]
     [Authorize(Policy = "CanManageBusinessEntities")]
-    public async Task<IActionResult> UpdatePublisher([FromBody] JsonElement requestData)
+    public async Task<IActionResult> UpdatePublisher([FromBody] PublisherUpdateRequestDto publisherUpdateDto)
     {
         try
         {
-            _logger.LogInformation("Received publisher update request from user: {User}", User.GetUserEmail());
-
-            if (!requestData.TryGetProperty("publisher", out var publisherElement))
-            {
-                return BadRequest(new ErrorResponseModel
-                {
-                    Message = "Invalid request format. Expected 'publisher' property.",
-                    StatusCode = StatusCodes.Status400BadRequest,
-                });
-            }
-
-            var publisherUpdate = publisherElement.Deserialize<PublisherUpdateRequestDto>();
-            if (publisherUpdate == null || publisherUpdate.Id == Guid.Empty)
+            if (publisherUpdateDto == null || publisherUpdateDto.Id == Guid.Empty)
             {
                 return BadRequest(new ErrorResponseModel
                 {
@@ -158,13 +150,18 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
                 });
             }
 
-            var id = publisherUpdate.Id;
+            _logger.LogInformation(
+                "Received publisher update request for ID: {PublisherId} from user: {User}",
+                publisherUpdateDto.Id,
+                User.GetUserEmail());
+
+            var id = publisherUpdateDto.Id;
             _logger.LogInformation("Updating publisher with ID: {PublisherId}", id);
 
-            var updatedPublisher = await _publisherService.UpdatePublisherAsync(id, publisherUpdate);
+            var updatedPublisher = await _publisherService.UpdatePublisherAsync(id, publisherUpdateDto);
 
             _logger.LogInformation("Successfully updated publisher with ID: {PublisherId}", updatedPublisher.Id);
-            return Ok(new { publisher = updatedPublisher });
+            return Ok(updatedPublisher);
         }
         catch (Exception ex)
         {
@@ -173,7 +170,8 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     }
 
     /// <summary>
-    /// Epic 9: Admin and Manager can delete publishers.
+    /// Delete publisher
+    /// DELETE /api/publishers/{id}.
     /// </summary>
     [HttpDelete("{id}")]
     [Authorize(Policy = "CanManageBusinessEntities")]
@@ -181,7 +179,11 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     {
         try
         {
-            _logger.LogInformation("Deleting publisher with ID: {Id} by user: {User}", id, User.GetUserEmail());
+            _logger.LogInformation(
+                "Deleting publisher with ID: {Id} by user: {User}",
+                id,
+                User.GetUserEmail());
+
             var deletedPublisher = await _publisherService.DeletePublisherAsync(id);
 
             if (deletedPublisher == null)

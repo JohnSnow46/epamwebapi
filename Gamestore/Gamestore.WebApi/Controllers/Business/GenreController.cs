@@ -1,5 +1,4 @@
-﻿using System.Text.Json;
-using Gamestore.Entities.ErrorModels;
+﻿using Gamestore.Entities.ErrorModels;
 using Gamestore.Services.Dto.GenresDto;
 using Gamestore.Services.Interfaces;
 using Gamestore.WebApi.Extensions;
@@ -10,7 +9,7 @@ using Microsoft.AspNetCore.OutputCaching;
 namespace Gamestore.WebApi.Controllers.Business;
 
 [ApiController]
-[Route("api")]
+[Route("api/genres")]
 public class GenreController(IGameService gameService, IGenreService genreService, ILogger<GenreController> logger) : ControllerBase
 {
     private readonly IGameService _gameService = gameService;
@@ -19,13 +18,23 @@ public class GenreController(IGameService gameService, IGenreService genreServic
 
     /// <summary>
     /// Epic 9: Admin and Manager can create genres (business entities).
+    /// POST /api/genres.
     /// </summary>
-    [HttpPost("genres/add-genre")]
+    [HttpPost]
     [Authorize(Policy = "CanManageBusinessEntities")]
     public async Task<IActionResult> CreateGenre([FromBody] GenreMetadataCreateRequestDto genreRequest)
     {
         try
         {
+            if (genreRequest?.Genre == null)
+            {
+                return BadRequest(new ErrorResponseModel
+                {
+                    Message = "Genre data is required.",
+                    StatusCode = StatusCodes.Status400BadRequest,
+                });
+            }
+
             _logger.LogInformation(
                 "Creating new genre with Name: {GenreName} by user: {User} (Role: {Role})",
                 genreRequest.Genre.Name,
@@ -47,28 +56,14 @@ public class GenreController(IGameService gameService, IGenreService genreServic
 
     /// <summary>
     /// Epic 9: Admin and Manager can update genres (business entities).
+    /// PUT /api/genres.
     /// </summary>
-    [HttpPut("genres/update-genre")]
+    [HttpPut]
     [Authorize(Policy = "CanManageBusinessEntities")]
-    public async Task<IActionResult> UpdateGenre([FromBody] JsonElement requestData)
+    public async Task<IActionResult> UpdateGenre([FromBody] GenreMetadataUpdateRequestDto genreUpdateDto)
     {
         try
         {
-            _logger.LogInformation(
-                "Received genre update request from user: {User} (Role: {Role})",
-                User.GetUserEmail(),
-                User.GetUserRole());
-
-            if (!requestData.TryGetProperty("genre", out var genreElement))
-            {
-                return BadRequest(new ErrorResponseModel
-                {
-                    Message = "Invalid request format. Expected 'genre' property.",
-                    StatusCode = StatusCodes.Status400BadRequest,
-                });
-            }
-
-            var genreUpdateDto = genreElement.Deserialize<GenreMetadataUpdateRequestDto>();
             if (genreUpdateDto == null || genreUpdateDto.Id == Guid.Empty)
             {
                 return BadRequest(new ErrorResponseModel
@@ -77,6 +72,12 @@ public class GenreController(IGameService gameService, IGenreService genreServic
                     StatusCode = StatusCodes.Status400BadRequest,
                 });
             }
+
+            _logger.LogInformation(
+                "Received genre update request for ID: {GenreId} from user: {User} (Role: {Role})",
+                genreUpdateDto.Id,
+                User.GetUserEmail(),
+                User.GetUserRole());
 
             var id = genreUpdateDto.Id;
             _logger.LogInformation(
@@ -91,7 +92,7 @@ public class GenreController(IGameService gameService, IGenreService genreServic
                 "Successfully updated genre with ID: {GenreId} by user: {User}",
                 updatedGenre.Id,
                 User.GetUserEmail());
-            return Ok(new { genre = updatedGenre });
+            return Ok(updatedGenre);
         }
         catch (Exception ex)
         {
@@ -100,19 +101,16 @@ public class GenreController(IGameService gameService, IGenreService genreServic
     }
 
     /// <summary>
-    /// Epic 9: Everyone can view genres (read-only for guests).
+    /// Epic 9: Everyone can view a genre by ID.
+    /// GET /api/genres/{id}.
     /// </summary>
-    [HttpGet("genres/{id}")]
+    [HttpGet("{id}")]
     [AllowAnonymous]
     public async Task<IActionResult> GetGenreById(Guid id)
     {
         try
         {
-            var userInfo = User.Identity?.IsAuthenticated == true
-                ? $"{User.GetUserEmail()} (Role: {User.GetUserRole()})"
-                : "Anonymous Guest";
-
-            _logger.LogInformation("Getting genre by ID: {GenreId} for user: {UserInfo}", id, userInfo);
+            _logger.LogInformation("Getting genre by ID: {GenreId}", id);
             var genre = await _genreService.GetGenreById(id);
 
             if (genre == null)
@@ -125,14 +123,15 @@ public class GenreController(IGameService gameService, IGenreService genreServic
         }
         catch (Exception ex)
         {
-            return HandleException(ex, $"Error getting genre by ID: {id}");
+            return HandleException(ex, $"Error retrieving genre with ID: {id}");
         }
     }
 
     /// <summary>
     /// Epic 9: Everyone can view all genres.
+    /// GET /api/genres.
     /// </summary>
-    [HttpGet("genres/")]
+    [HttpGet]
     [AllowAnonymous]
     public async Task<IActionResult> GetAllGenres()
     {
@@ -150,9 +149,10 @@ public class GenreController(IGameService gameService, IGenreService genreServic
     }
 
     /// <summary>
-    /// Epic 9: Everyone can view subgenres.
+    /// Epic 9: Everyone can view subgenres for a parent genre.
+    /// GET /api/genres/{id}/genres.
     /// </summary>
-    [HttpGet("genres/{id}/subgenres")]
+    [HttpGet("{id}/genres")]
     [AllowAnonymous]
     public async Task<IActionResult> GetGenresByParentId(Guid id)
     {
@@ -174,8 +174,9 @@ public class GenreController(IGameService gameService, IGenreService genreServic
 
     /// <summary>
     /// Epic 9: Admin and Manager can delete genres (business entities).
+    /// DELETE /api/genres/{id}.
     /// </summary>
-    [HttpDelete("genres/{id}")]
+    [HttpDelete("{id}")]
     [Authorize(Policy = "CanManageBusinessEntities")]
     public async Task<IActionResult> DeleteGenreById(Guid id)
     {
@@ -208,8 +209,9 @@ public class GenreController(IGameService gameService, IGenreService genreServic
 
     /// <summary>
     /// Epic 9: Everyone can view genres by game key (cached for performance).
+    /// GET /api/genres/game/{key}.
     /// </summary>
-    [HttpGet("genres/{key}/genres")]
+    [HttpGet("game/{key}")]
     [OutputCache(Duration = 60)]
     [AllowAnonymous]
     public async Task<IActionResult> GetGenresByGameKey(string key)
@@ -238,8 +240,9 @@ public class GenreController(IGameService gameService, IGenreService genreServic
 
     /// <summary>
     /// Epic 9: Everyone can view games by genre.
+    /// GET /api/genres/{id}/games.
     /// </summary>
-    [HttpGet("genres/{id}/games")]
+    [HttpGet("{id}/games")]
     [AllowAnonymous]
     public async Task<IActionResult> GetGamesByGenreId(Guid id)
     {
