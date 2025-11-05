@@ -100,7 +100,7 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     /// Create new publisher
     /// POST /api/publishers.
     /// </summary>
-    [HttpPost]
+    [HttpPost("add-publisher")]
     [Authorize(Policy = "CanManageBusinessEntities")]
     public async Task<IActionResult> CreatePublisher([FromBody] PublisherMetadataCreateRequestDto publisherRequest)
     {
@@ -141,7 +141,7 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     /// Update publisher
     /// PUT /api/publishers.
     /// </summary>
-    [HttpPut]
+    [HttpPut("update-publisher")]
     [Authorize(Policy = "CanManageBusinessEntities")]
     public async Task<IActionResult> UpdatePublisher([FromBody] PublisherMetadataUpdateRequestDto publisherUpdateDto)
     {

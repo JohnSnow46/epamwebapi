@@ -1,4 +1,5 @@
-﻿using System.Text.Json.Serialization;
+﻿using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Gamestore.Entities.Business;
 
@@ -6,11 +7,12 @@ public class Publisher
 {
     public Guid Id { get; set; }
 
+    [Required]
     public string CompanyName { get; set; } = string.Empty;
 
-    public string Description { get; set; } = string.Empty;
+    public string? Description { get; set; } = string.Empty;
 
-    public string HomePage { get; set; } = string.Empty;
+    public string? HomePage { get; set; } = string.Empty;
 
     [JsonIgnore]
     public ICollection<Game>? Games { get; set; }
