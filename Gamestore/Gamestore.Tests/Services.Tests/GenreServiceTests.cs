@@ -200,9 +200,12 @@ public class GenreServiceTests
 
         var updateRequest = new GenreMetadataUpdateRequestDto
         {
-            Id = genreId,
-            Name = "Updated Name",
-            ParentGenreId = null,
+            Genre = new GenreUpdateRequestDto
+            {
+                Id = genreId,
+                Name = "Updated Name",
+                ParentGenreId = null,
+            },
         };
 
         _unitOfWorkMock
@@ -218,7 +221,7 @@ public class GenreServiceTests
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _genreService.UpdateGenre(genreId, updateRequest);
+        var result = await _genreService.UpdateGenre(genreId, updateRequest.Genre);
 
         // Assert
         Assert.NotNull(result);

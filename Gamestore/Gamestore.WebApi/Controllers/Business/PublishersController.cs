@@ -102,11 +102,11 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     /// </summary>
     [HttpPost]
     [Authorize(Policy = "CanManageBusinessEntities")]
-    public async Task<IActionResult> CreatePublisher([FromBody] PublisherCreateRequestDto publisherRequest)
+    public async Task<IActionResult> CreatePublisher([FromBody] PublisherMetadataCreateRequestDto publisherRequest)
     {
         try
         {
-            if (publisherRequest == null || publisherRequest.Publisher == null)
+            if (publisherRequest == null)
             {
                 return BadRequest(new ErrorResponseModel
                 {
@@ -117,12 +117,18 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
 
             _logger.LogInformation(
                 "Creating publisher with Name: {PublisherName} by user: {User}",
-                publisherRequest.Publisher.CompanyName,
+                publisherRequest.CompanyName,
                 User.GetUserEmail());
 
-            var publisher = await _publisherService.AddPublisherAsync(publisherRequest);
+            var createDto = new PublisherCreateRequestDto
+            {
+                Publisher = publisherRequest,
+            };
+            var publisher = await _publisherService.AddPublisherAsync(createDto);
 
-            _logger.LogInformation("Successfully created publisher with Name: {PublisherName}", publisher.Publisher.CompanyName);
+            _logger.LogInformation(
+                "Successfully created publisher with Name: {PublisherName}",
+                publisherRequest.CompanyName);
             return Ok(publisher);
         }
         catch (Exception ex)
@@ -137,11 +143,11 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     /// </summary>
     [HttpPut]
     [Authorize(Policy = "CanManageBusinessEntities")]
-    public async Task<IActionResult> UpdatePublisher([FromBody] PublisherUpdateRequestDto publisherUpdateDto)
+    public async Task<IActionResult> UpdatePublisher([FromBody] PublisherMetadataUpdateRequestDto publisherUpdateDto)
     {
         try
         {
-            if (publisherUpdateDto == null || publisherUpdateDto.Id == Guid.Empty)
+            if (publisherUpdateDto?.Publisher == null || publisherUpdateDto.Publisher.Id == Guid.Empty)
             {
                 return BadRequest(new ErrorResponseModel
                 {
@@ -152,13 +158,11 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
 
             _logger.LogInformation(
                 "Received publisher update request for ID: {PublisherId} from user: {User}",
-                publisherUpdateDto.Id,
+                publisherUpdateDto.Publisher.Id,
                 User.GetUserEmail());
 
-            var id = publisherUpdateDto.Id;
-            _logger.LogInformation("Updating publisher with ID: {PublisherId}", id);
-
-            var updatedPublisher = await _publisherService.UpdatePublisherAsync(id, publisherUpdateDto);
+            var id = publisherUpdateDto.Publisher.Id;
+            var updatedPublisher = await _publisherService.UpdatePublisherAsync(id, publisherUpdateDto.Publisher);
 
             _logger.LogInformation("Successfully updated publisher with ID: {PublisherId}", updatedPublisher.Id);
             return Ok(updatedPublisher);

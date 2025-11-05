@@ -10,6 +10,5 @@ public class GenreUpdateRequestDto
     [Required]
     public string? Name { get; set; }
 
-    [Required]
     public Guid? ParentGenreId { get; set; }
 }

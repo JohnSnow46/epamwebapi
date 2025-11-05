@@ -1,4 +1,5 @@
-﻿using Gamestore.Entities.ErrorModels;
+﻿using Gamestore.Entities.Business;
+using Gamestore.Entities.ErrorModels;
 using Gamestore.Services.Dto.PlatformsDto;
 using Gamestore.Services.Interfaces;
 using Gamestore.WebApi.Extensions;
@@ -67,7 +68,16 @@ public class PlatformController(IGameService gameService, IPlatformService platf
     {
         try
         {
-            if (platformUpdateDto == null || platformUpdateDto.Id == Guid.Empty)
+            if (platformUpdateDto?.Platform == null)
+            {
+                return BadRequest(new ErrorResponseModel
+                {
+                    Message = "Platform data is required.",
+                    StatusCode = StatusCodes.Status400BadRequest,
+                });
+            }
+
+            if (platformUpdateDto.Platform.Id == Guid.Empty)
             {
                 return BadRequest(new ErrorResponseModel
                 {
@@ -78,19 +88,19 @@ public class PlatformController(IGameService gameService, IPlatformService platf
 
             _logger.LogInformation(
                 "Received platform update request for ID: {PlatformId} from user: {User}",
-                platformUpdateDto.Id,
+                platformUpdateDto.Platform.Id,
                 User.GetUserEmail());
 
-            var updatedPlatform = await _platformService.UpdatePlatform(platformUpdateDto.Id, platformUpdateDto);
+            var updatedPlatform = await _platformService.UpdatePlatform(platformUpdateDto.Platform.Id, platformUpdateDto.Platform);
 
             if (updatedPlatform == null)
             {
-                return ResourceNotFound($"Platform with ID '{platformUpdateDto.Id}' not found.");
+                return ResourceNotFound($"Platform with ID '{platformUpdateDto.Platform.Id}' not found.");
             }
 
             _logger.LogInformation(
                 "Successfully updated platform with ID: {PlatformId} by user: {User}",
-                platformUpdateDto.Id,
+                updatedPlatform.Platform.Id,
                 User.GetUserEmail());
             return Ok(updatedPlatform);
         }
@@ -138,13 +148,8 @@ public class PlatformController(IGameService gameService, IPlatformService platf
             _logger.LogInformation("Getting all platforms");
             var platforms = await _platformService.GetAllPlatformsAsync();
 
-            if (platforms == null || !platforms.Any())
-            {
-                return ResourceNotFound("No platforms found.");
-            }
-
             _logger.LogInformation("Successfully retrieved {Count} platforms", platforms.Count());
-            return Ok(platforms);
+            return Ok(platforms ?? Enumerable.Empty<Platform>());
         }
         catch (Exception ex)
         {

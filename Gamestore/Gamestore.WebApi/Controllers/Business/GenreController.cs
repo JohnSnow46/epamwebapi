@@ -64,7 +64,16 @@ public class GenreController(IGameService gameService, IGenreService genreServic
     {
         try
         {
-            if (genreUpdateDto == null || genreUpdateDto.Id == Guid.Empty)
+            if (genreUpdateDto?.Genre == null)
+            {
+                return BadRequest(new ErrorResponseModel
+                {
+                    Message = "Genre data is required.",
+                    StatusCode = StatusCodes.Status400BadRequest,
+                });
+            }
+
+            if (genreUpdateDto.Genre.Id == Guid.Empty)
             {
                 return BadRequest(new ErrorResponseModel
                 {
@@ -75,23 +84,26 @@ public class GenreController(IGameService gameService, IGenreService genreServic
 
             _logger.LogInformation(
                 "Received genre update request for ID: {GenreId} from user: {User} (Role: {Role})",
-                genreUpdateDto.Id,
+                genreUpdateDto.Genre.Id,
                 User.GetUserEmail(),
                 User.GetUserRole());
 
-            var id = genreUpdateDto.Id;
+            var id = genreUpdateDto.Genre.Id;
             _logger.LogInformation(
                 "Updating genre with ID: {GenreId}, Name: {GenreName}, ParentId: {ParentId} by user: {User}",
                 id,
-                genreUpdateDto.Name,
-                genreUpdateDto.ParentGenreId,
+                genreUpdateDto.Genre.Name,
+                genreUpdateDto.Genre.ParentGenreId,
                 User.GetUserEmail());
 
-            var updatedGenre = await _genreService.UpdateGenre(id, genreUpdateDto);
+            // KEY: pass genreUpdateDto.Genre (unwrapped) to service
+            var updatedGenre = await _genreService.UpdateGenre(id, genreUpdateDto.Genre);
+
             _logger.LogInformation(
                 "Successfully updated genre with ID: {GenreId} by user: {User}",
                 updatedGenre.Id,
                 User.GetUserEmail());
+
             return Ok(updatedGenre);
         }
         catch (Exception ex)

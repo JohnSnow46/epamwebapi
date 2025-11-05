@@ -81,8 +81,11 @@ public class PlatformServiceTests
 
         var updateRequest = new PlatformMetadataUpdateRequestDto
         {
-            Id = platformId,
-            Type = "Updated Type",
+            Platform = new PlatformUpdateRequestDto
+            {
+                Id = platformId,
+                Type = "Updated Type",
+            },
         };
 
         _unitOfWorkMock
@@ -98,12 +101,12 @@ public class PlatformServiceTests
             .Returns(Task.CompletedTask);
 
         // Act
-        var result = await _platformService.UpdatePlatform(platformId, updateRequest);
+        var result = await _platformService.UpdatePlatform(platformId, updateRequest.Platform);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal(platformId, result.Id);
-        Assert.Equal("Updated Type", result.Type);
+        Assert.Equal(platformId, result.Platform.Id);
+        Assert.Equal("Updated Type", result.Platform.Type);
         Assert.Equal("Updated Type", existingPlatform.Type);
         _unitOfWorkMock.Verify(u => u.CompleteAsync(), Times.Once);
     }

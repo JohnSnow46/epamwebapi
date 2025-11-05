@@ -13,7 +13,7 @@ public interface IPublisherService
 
     Task<PublisherCreateRequestDto> AddPublisherAsync(PublisherCreateRequestDto publisher);
 
-    Task<PublisherMetadataCreateRequestDto> DeletePublisherAsync(Guid id);
+    Task<PublisherUpdateRequestDto> DeletePublisherAsync(Guid id);
 
     Task<IEnumerable<Game>> GetGamesByPublisherNameAsync(string publisherName);
 
@@ -21,5 +21,5 @@ public interface IPublisherService
 
     Task<Publisher> CreatePublisherAsync(Publisher publisher);
 
-    Task<Publisher> UpdatePublisherAsync(Guid id, PublisherUpdateRequestDto publisherUpdateDto);
+    Task<PublisherUpdateRequestDto> UpdatePublisherAsync(Guid id, PublisherUpdateRequestDto publisherUpdateDto);
 }

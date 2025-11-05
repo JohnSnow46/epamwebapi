@@ -5,7 +5,7 @@ namespace Gamestore.Services.Interfaces;
 
 public interface IPlatformService
 {
-    Task<PlatformMetadataUpdateRequestDto> UpdatePlatform(Guid id, PlatformMetadataUpdateRequestDto platformRequest);
+    Task<PlatformMetadataUpdateRequestDto> UpdatePlatform(Guid id, PlatformUpdateRequestDto platformRequest);
 
     Task<PlatformCreateRequestDto?> CreatePlatform(PlatformMetadataCreateRequestDto platformRequest);
 

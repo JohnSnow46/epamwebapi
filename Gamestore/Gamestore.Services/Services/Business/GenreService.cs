@@ -47,7 +47,7 @@ public class GenreService(IUnitOfWork unitOfWork, ILogger<GenreService> logger) 
     /// <summary>
     /// Updates an existing genre.
     /// </summary>
-    public async Task<GenreUpdateRequestDto> UpdateGenre(Guid id, GenreMetadataUpdateRequestDto genreRequest)
+    public async Task<GenreUpdateRequestDto> UpdateGenre(Guid id, GenreUpdateRequestDto genreRequest)
     {
         _logger.LogInformation("Starting update genre operation for ID: {GenreId}", id);
 
@@ -66,7 +66,6 @@ public class GenreService(IUnitOfWork unitOfWork, ILogger<GenreService> logger) 
         await _unitOfWork.CompleteAsync();
 
         _logger.LogInformation("Successfully updated genre with ID: {GenreId}", genreEntity.Id);
-
         return MapToGenreDto(genreEntity);
     }
 
@@ -370,7 +369,7 @@ public class GenreService(IUnitOfWork unitOfWork, ILogger<GenreService> logger) 
             };
     }
 
-    private static void UpdateGenreFromDto(Genre genreEntity, GenreMetadataUpdateRequestDto genreDto)
+    private static void UpdateGenreFromDto(Genre genreEntity, GenreUpdateRequestDto genreDto)
     {
         ArgumentNullException.ThrowIfNull(genreEntity);
         ArgumentNullException.ThrowIfNull(genreDto);

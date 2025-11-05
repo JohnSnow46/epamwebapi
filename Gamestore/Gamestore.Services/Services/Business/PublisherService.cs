@@ -84,9 +84,9 @@ public class PublisherService(IUnitOfWork unitOfWork, ILogger<PublisherService> 
     }
 
     /// <summary>
-    /// Updates an existing publisher.
+    /// Updates an existing publisher and returns DTO.
     /// </summary>
-    public async Task<Publisher> UpdatePublisherAsync(Guid id, PublisherUpdateRequestDto publisherUpdateDto)
+    public async Task<PublisherUpdateRequestDto> UpdatePublisherAsync(Guid id, PublisherUpdateRequestDto publisherUpdateDto)
     {
         _logger.LogInformation("Starting update publisher operation for publisher {PublisherId}", id);
 
@@ -94,31 +94,41 @@ public class PublisherService(IUnitOfWork unitOfWork, ILogger<PublisherService> 
 
         var existingPublisher = await _unitOfWork.Publishers.GetByIdAsync(id);
 
+        if (existingPublisher == null)
+        {
+            _logger.LogWarning("Publisher not found for update: {PublisherId}", id);
+            throw new ArgumentException($"Publisher with ID '{id}' not found", nameof(id));
+        }
+
         existingPublisher.CompanyName = publisherUpdateDto.CompanyName;
         existingPublisher.HomePage = publisherUpdateDto.HomePage ?? existingPublisher.HomePage;
         existingPublisher.Description = publisherUpdateDto.Description ?? existingPublisher.Description;
 
         ValidatePublisherEntity(existingPublisher);
 
-        return await UpdateExistingPublisher(existingPublisher);
+        await _unitOfWork.Publishers.UpdateAsync(existingPublisher);
+        await _unitOfWork.CompleteAsync();
+
+        _logger.LogInformation("Publisher updated successfully with ID: {PublisherId}", id);
+
+        return MapToPublisherUpdateDto(existingPublisher);
     }
 
     /// <summary>
-    /// Deletes a publisher by its ID.
+    /// Deletes a publisher by its ID and returns DTO.
     /// </summary>
-    public async Task<PublisherMetadataCreateRequestDto> DeletePublisherAsync(Guid id)
+    public async Task<PublisherUpdateRequestDto> DeletePublisherAsync(Guid id)
     {
         _logger.LogInformation("Starting delete publisher operation for ID: {PublisherId}", id);
         ValidateGuid(id, "Publisher ID");
 
         var publisher = await GetRequiredPublisherById(id);
-        var publisherDto = MapToPublisherDto(publisher);
 
         await _unitOfWork.Publishers.DeleteAsync(id);
         await _unitOfWork.CompleteAsync();
 
         _logger.LogInformation("Publisher with ID: {PublisherId} deleted successfully", id);
-        return publisherDto;
+        return MapToPublisherUpdateDto(publisher);
     }
 
     /// <summary>
@@ -154,8 +164,17 @@ public class PublisherService(IUnitOfWork unitOfWork, ILogger<PublisherService> 
     {
         if (obj == null)
         {
-            _logger.LogWarning("{ParamName} is null", paramName);
-            throw new ArgumentNullException(paramName.ToLower(System.Globalization.CultureInfo.CurrentCulture).Replace(" ", string.Empty), $"{paramName} cannot be null");
+            _logger.LogWarning("Validation failed: {ParamName} is null", paramName);
+            throw new ArgumentNullException(paramName);
+        }
+    }
+
+    private void ValidateId(Guid id)
+    {
+        if (id == Guid.Empty)
+        {
+            _logger.LogWarning("Validation failed: Publisher ID is empty");
+            throw new ArgumentException("Publisher ID cannot be empty", nameof(id));
         }
     }
 
@@ -164,154 +183,80 @@ public class PublisherService(IUnitOfWork unitOfWork, ILogger<PublisherService> 
         if (id == Guid.Empty)
         {
             _logger.LogWarning("Provided {ParamName} is empty", paramName);
-            throw new ArgumentException($"{paramName} cannot be empty", paramName.ToLower(System.Globalization.CultureInfo.CurrentCulture).Replace(" ", string.Empty));
+            throw new ArgumentException($"{paramName} cannot be empty", paramName.ToLowerInvariant());
         }
     }
 
-    private void ValidateString(string? value, string paramName)
+    private void ValidateString(string value, string paramName)
     {
         if (string.IsNullOrWhiteSpace(value))
         {
-            _logger.LogWarning("Provided {ParamName} is null or empty", paramName);
-            throw new ArgumentException($"{paramName} cannot be null or empty", paramName.ToLower(System.Globalization.CultureInfo.CurrentCulture).Replace(" ", string.Empty));
+            _logger.LogWarning("Validation failed: {ParamName} is null or empty", paramName);
+            throw new ArgumentException($"{paramName} cannot be null or empty", paramName.ToLowerInvariant());
         }
     }
 
-    private static void ValidateId(Guid id)
+    private void ValidatePublisherEntity(Publisher publisher)
     {
-        if (id == Guid.Empty)
+        if (string.IsNullOrWhiteSpace(publisher.CompanyName))
         {
-            throw new ArgumentException("Publisher ID cannot be empty", nameof(id));
-        }
-    }
-
-    private void ValidatePublisherEntity(Publisher? publisher)
-    {
-        ValidateObject(publisher, "Publisher");
-
-        if (string.IsNullOrWhiteSpace(publisher!.CompanyName))
-        {
-            _logger.LogWarning("Publisher company name is empty");
+            _logger.LogWarning("Validation failed: CompanyName is null or empty");
             throw new ValidationException("Publisher company name cannot be empty");
-        }
-    }
-
-    private void LogPublisherRetrievalResult(Publisher? publisher, Guid id)
-    {
-        if (publisher != null)
-        {
-            _logger.LogInformation("Publisher found with ID: {PublisherId}", id);
-        }
-        else
-        {
-            _logger.LogWarning("Publisher not found with ID: {PublisherId}", id);
-        }
-    }
-
-    private void LogPublisherNameRetrievalResult(Publisher? publisher, string companyName)
-    {
-        if (publisher != null)
-        {
-            _logger.LogInformation("Publisher found with company name: {CompanyName}", companyName);
-        }
-        else
-        {
-            _logger.LogWarning("Publisher not found with company name: {CompanyName}", companyName);
         }
     }
 
     private async Task<Publisher> GetRequiredPublisherById(Guid id)
     {
         var publisher = await _unitOfWork.Publishers.GetByIdAsync(id);
-
         if (publisher == null)
         {
-            _logger.LogWarning("Publisher with ID: {PublisherId} not found", id);
-            throw new KeyNotFoundException($"Publisher with ID '{id}' not found");
+            _logger.LogWarning("Publisher not found: {PublisherId}", id);
+            throw new ArgumentException($"Publisher with ID '{id}' not found");
         }
 
         return publisher;
     }
 
-    private async Task<Publisher> GetPublisherByNameOrThrow(string publisherName)
+    private async Task<Publisher> GetPublisherByNameOrThrow(string name)
     {
-        var publisher = await _unitOfWork.Publishers.GetByCompanyNameAsync(publisherName);
-
+        var publisher = await _unitOfWork.Publishers.GetByCompanyNameAsync(name);
         if (publisher == null)
         {
-            _logger.LogWarning("Publisher with name {PublisherName} not found", publisherName);
-            throw new KeyNotFoundException($"Publisher with name '{publisherName}' not found");
+            _logger.LogWarning("Publisher not found by name: {PublisherName}", name);
+            throw new ArgumentException($"Publisher with name '{name}' not found");
         }
 
         return publisher;
     }
 
-    private async Task<IEnumerable<Game>> GetGamesForPublisher(Guid publisherId)
+    private async Task<Game> GetGameByKeyOrThrow(string key)
     {
-        var games = await _unitOfWork.Publishers.GetGamesByPublisherIdAsync(publisherId);
-
-        return games.Select(game => new Game
-        {
-            Id = game.Id,
-            Name = game.Name,
-            Key = game.Key,
-        });
-    }
-
-    private async Task<Game> GetGameByKeyOrThrow(string gameKey)
-    {
-        var game = await _unitOfWork.Games.GetKeyAsync(gameKey);
-
+        var game = await _unitOfWork.Games.GetKeyAsync(key);
         if (game == null)
         {
-            _logger.LogWarning("Game with key: {GameKey} not found", gameKey);
-            throw new KeyNotFoundException($"Game with key '{gameKey}' not found");
+            _logger.LogWarning("Game not found by key: {GameKey}", key);
+            throw new ArgumentException($"Game with key '{key}' not found");
         }
 
         return game;
     }
 
-    private void EnsureGameHasPublisher(Game game)
+    private static void EnsureGameHasPublisher(Game game)
     {
-        if (game.PublisherId == null)
+        if (!game.PublisherId.HasValue)
         {
-            _logger.LogWarning("Game with key: {GameKey} has no publisher assigned", game.Key);
-            throw new KeyNotFoundException($"Game with key '{game.Key}' has no publisher assigned");
+            throw new ArgumentException("Game does not have an associated publisher");
         }
     }
 
     private async Task<Publisher> CreateNewPublisher(Publisher publisher)
     {
-        publisher = EnsurePublisherHasId(publisher);
-
         _logger.LogInformation("Creating new publisher with ID: {PublisherId}", publisher.Id);
 
         await _unitOfWork.Publishers.AddAsync(publisher);
         await _unitOfWork.CompleteAsync();
 
         _logger.LogInformation("Publisher created successfully with ID: {PublisherId}", publisher.Id);
-
-        return publisher;
-    }
-
-    private async Task<Publisher> UpdateExistingPublisher(Publisher publisher)
-    {
-        _logger.LogInformation("Updating existing publisher with ID: {PublisherId}", publisher.Id);
-
-        await _unitOfWork.Publishers.UpdateAsync(publisher);
-        await _unitOfWork.CompleteAsync();
-
-        _logger.LogInformation("Publisher updated successfully with ID: {PublisherId}", publisher.Id);
-
-        return publisher;
-    }
-
-    private static Publisher EnsurePublisherHasId(Publisher publisher)
-    {
-        if (publisher.Id == Guid.Empty)
-        {
-            publisher.Id = Guid.NewGuid();
-        }
 
         return publisher;
     }
@@ -327,14 +272,44 @@ public class PublisherService(IUnitOfWork unitOfWork, ILogger<PublisherService> 
         };
     }
 
-    private static PublisherMetadataCreateRequestDto MapToPublisherDto(Publisher publisher)
+    private static PublisherUpdateRequestDto MapToPublisherUpdateDto(Publisher publisher)
     {
-        return new PublisherMetadataCreateRequestDto
+        return new PublisherUpdateRequestDto
         {
             Id = publisher.Id,
             CompanyName = publisher.CompanyName,
             HomePage = publisher.HomePage,
             Description = publisher.Description,
         };
+    }
+
+    private async Task<IEnumerable<Game>> GetGamesForPublisher(Guid publisherId)
+    {
+        var games = await _unitOfWork.Games.GetAllAsync();
+        return games.Where(g => g.PublisherId == publisherId);
+    }
+
+    private void LogPublisherRetrievalResult(Publisher? publisher, Guid id)
+    {
+        if (publisher == null)
+        {
+            _logger.LogWarning("Publisher not found by ID: {PublisherId}", id);
+        }
+        else
+        {
+            _logger.LogInformation("Successfully retrieved publisher with ID: {PublisherId}", id);
+        }
+    }
+
+    private void LogPublisherNameRetrievalResult(Publisher? publisher, string name)
+    {
+        if (publisher == null)
+        {
+            _logger.LogWarning("Publisher not found by name: {PublisherName}", name);
+        }
+        else
+        {
+            _logger.LogInformation("Successfully retrieved publisher with name: {PublisherName}", name);
+        }
     }
 }

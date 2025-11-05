@@ -18,7 +18,7 @@ public class PlatformService(IUnitOfWork unitOfWork, ILogger<PlatformService> lo
     /// <summary>
     /// Updates an existing platform.
     /// </summary>
-    public async Task<PlatformMetadataUpdateRequestDto> UpdatePlatform(Guid id, PlatformMetadataUpdateRequestDto platformRequest)
+    public async Task<PlatformMetadataUpdateRequestDto> UpdatePlatform(Guid id, PlatformUpdateRequestDto platformRequest)
     {
         _logger.LogInformation("Starting update platform operation for ID: {PlatformId}", id);
 
@@ -33,8 +33,11 @@ public class PlatformService(IUnitOfWork unitOfWork, ILogger<PlatformService> lo
 
         return new PlatformMetadataUpdateRequestDto
         {
-            Id = platformEntity.Id,
-            Type = platformEntity.Type,
+            Platform = new PlatformUpdateRequestDto
+            {
+                Id = platformEntity.Id,
+                Type = platformEntity.Type,
+            },
         };
     }
 
