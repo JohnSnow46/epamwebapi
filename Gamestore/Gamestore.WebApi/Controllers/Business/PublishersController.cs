@@ -44,55 +44,55 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
 
     /// <summary>
     /// Get publisher by company name
-    /// GET /api/publishers/name/{companyName}.
+    /// GET /api/publishers/{companyname}.
     /// </summary>
-    [HttpGet("name/{companyName}")]
+    [HttpGet("{companyname}")]
     [AllowAnonymous]
-    public async Task<ActionResult<Publisher>> GetPublisherByName(string companyName)
+    public async Task<ActionResult<Publisher>> GetPublisherByName(string companyname)
     {
         try
         {
-            _logger.LogInformation("Getting publisher by Name: {PublisherName}", companyName);
-            var publisher = await _publisherService.GetPublisherByCompanyNameAsync(companyName);
+            _logger.LogInformation("Getting publisher by Name: {PublisherName}", companyname);
+            var publisher = await _publisherService.GetPublisherByCompanyNameAsync(companyname);
 
             if (publisher == null)
             {
-                return ResourceNotFound($"Publisher with name '{companyName}' not found.");
+                return ResourceNotFound($"Publisher with name '{companyname}' not found.");
             }
 
-            _logger.LogInformation("Successfully found Publisher with name: {PublisherName}", companyName);
+            _logger.LogInformation("Successfully found Publisher with name: {PublisherName}", companyname);
             return Ok(publisher);
         }
         catch (Exception ex)
         {
-            return HandleException(ex, $"Error getting publisher by name: {companyName}");
+            return HandleException(ex, $"Error getting publisher by name: {companyname}");
         }
     }
 
     /// <summary>
-    /// Get publisher by game key
-    /// GET /api/publishers/game/{key}.
+    /// Get games by publisher company name
+    /// GET /api/publishers/{companyname}/games.
     /// </summary>
-    [HttpGet("game/{key}")]
+    [HttpGet("{companyname}/games")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetGamePublisherByGameKey(string key)
+    public async Task<ActionResult<IEnumerable<Game>>> GetGamesByPublisher(string companyname)
     {
         try
         {
-            _logger.LogInformation("Getting publisher for game with key: {Key}", key);
-            var publisher = await _publisherService.GetPublisherByGameKey(key);
+            _logger.LogInformation("Getting games for publisher: {PublisherName}", companyname);
+            var games = await _publisherService.GetGamesByPublisherNameAsync(companyname);
 
-            if (publisher == null)
+            if (games == null || !games.Any())
             {
-                return ResourceNotFound($"Publisher for game with key: '{key}' not found.");
+                return ResourceNotFound($"No games found for publisher '{companyname}'.");
             }
 
-            _logger.LogInformation("Successfully found publisher for game with key: {Key}", key);
-            return Ok(publisher);
+            _logger.LogInformation("Successfully retrieved {Count} games for publisher: {PublisherName}", games.Count(), companyname);
+            return Ok(games);
         }
         catch (Exception ex)
         {
-            return HandleException(ex, $"Error getting publisher for game with key: {key}");
+            return HandleException(ex, $"Error getting games for publisher: {companyname}");
         }
     }
 
@@ -100,9 +100,9 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     /// Create new publisher
     /// POST /api/publishers.
     /// </summary>
-    [HttpPost("add-publisher")]
+    [HttpPost]
     [Authorize(Policy = "CanManageBusinessEntities")]
-    public async Task<IActionResult> CreatePublisher([FromBody] PublisherMetadataCreateRequestDto publisherRequest)
+    public async Task<IActionResult> CreatePublisher([FromBody] PublisherCreateRequestDto publisherRequest)
     {
         try
         {
@@ -120,16 +120,13 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
                 publisherRequest.CompanyName,
                 User.GetUserEmail());
 
-            var createDto = new PublisherCreateRequestDto
-            {
-                Publisher = publisherRequest,
-            };
-            var publisher = await _publisherService.AddPublisherAsync(createDto);
+            var createdPublisher = await _publisherService.AddPublisherAsync(publisherRequest);
 
             _logger.LogInformation(
                 "Successfully created publisher with Name: {PublisherName}",
                 publisherRequest.CompanyName);
-            return Ok(publisher);
+
+            return Ok(createdPublisher);
         }
         catch (Exception ex)
         {
@@ -141,7 +138,7 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     /// Update publisher
     /// PUT /api/publishers.
     /// </summary>
-    [HttpPut("update-publisher")]
+    [HttpPut]
     [Authorize(Policy = "CanManageBusinessEntities")]
     public async Task<IActionResult> UpdatePublisher([FromBody] PublisherMetadataUpdateRequestDto publisherUpdateDto)
     {

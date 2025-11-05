@@ -5,5 +5,5 @@ namespace Gamestore.Services.Dto.PublishersDto;
 public class PublisherMetadataUpdateRequestDto
 {
     [JsonPropertyName("publisher")]
-    public PublisherUpdateRequestDto Publisher { get; set; } = new();
+    public PublisherUpdateRequestDto Publisher { get; set; }
 }

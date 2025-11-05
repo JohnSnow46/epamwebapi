@@ -325,9 +325,7 @@ static async Task ConfigureMiddlewarePipeline(WebApplication app)
     app.UseAuthorizationLogging();
 
     // Endpoints
-    app.MapControllerRoute(
-        name: "default",
-        pattern: "{controller=Home}/{action=Index}/{id?}");
+    app.MapControllers();
 
     app.MapFallbackToFile("index.html");
 

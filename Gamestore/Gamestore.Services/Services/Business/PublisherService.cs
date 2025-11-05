@@ -61,9 +61,16 @@ public class PublisherService(IUnitOfWork unitOfWork, ILogger<PublisherService> 
         _logger.LogInformation("Starting add publisher operation");
 
         ValidateObject(publisher, "Publisher DTO");
-        ValidateObject(publisher.Publisher, "Publisher data");
+        ValidateObject(publisher, "Publisher data");
 
-        var publisherEntity = CreatePublisherEntityFromDto(publisher.Publisher);
+        // var publisherEntity = CreatePublisherEntityFromDto(publisher);
+        var publisherEntity = new Publisher
+        {
+            Id = Guid.NewGuid(),
+            CompanyName = publisher.CompanyName,
+            HomePage = publisher.HomePage,
+            Description = publisher.Description,
+        };
 
         await _unitOfWork.Publishers.AddAsync(publisherEntity);
         await _unitOfWork.CompleteAsync();
@@ -204,17 +211,19 @@ public class PublisherService(IUnitOfWork unitOfWork, ILogger<PublisherService> 
         }
     }
 
-    private static Publisher CreatePublisherEntityFromDto(PublisherMetadataCreateRequestDto dto)
-    {
-        return new Publisher
-        {
-            Id = Guid.NewGuid(),
-            CompanyName = dto.CompanyName,
-            HomePage = dto.HomePage,
-            Description = dto.Description,
-        };
-    }
-
+#pragma warning disable SA1005
+    // Single line comments should begin with single space
+    //private static Publisher CreatePublisherEntityFromDto(PublisherMetadataCreateRequestDto dto)
+    //{
+    //    return new Publisher
+    //    {
+    //        Id = Guid.NewGuid(),
+    //        CompanyName = dto.CompanyName,
+    //        HomePage = dto.HomePage,
+    //        Description = dto.Description,
+    //    };
+    //}
+#pragma warning restore SA1005 // Single line comments should begin with single space
     private async Task<Publisher> CreateNewPublisher(Publisher publisher)
     {
         await _unitOfWork.Publishers.AddAsync(publisher);
