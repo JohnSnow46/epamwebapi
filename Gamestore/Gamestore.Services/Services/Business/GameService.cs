@@ -4,7 +4,6 @@ using Gamestore.Data.Interfaces;
 using Gamestore.Entities.Business;
 using Gamestore.Services.Dto.GamesDto;
 using Gamestore.Services.Interfaces;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 
@@ -13,13 +12,11 @@ namespace Gamestore.Services.Services.Business;
 public partial class GameService(
     IUnitOfWork unitOfWork,
     ILogger<GameService> logger,
-    IBlobStorageService blobStorageService,
-    IMemoryCache memoryCache) : IGameService
+    IBlobStorageService blobStorageService) : IGameService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ILogger<GameService> _logger = logger;
     private readonly IBlobStorageService _blobStorageService = blobStorageService;
-    private readonly IMemoryCache _memoryCache = memoryCache;
 
     /// <summary>
     /// Adds a new game with associated genres and platforms.
@@ -115,9 +112,6 @@ public partial class GameService(
                     key);
                 existingGame.ImageUrl = newImageUrl;
                 _logger.LogInformation("Uploaded new image for game: {GameKey}", key);
-
-                _blobStorageService.ClearImageCache(key, _memoryCache);
-                _logger.LogInformation("Cleared cache for game image: {GameKey}", key);
             }
             catch (Exception ex)
             {
@@ -193,9 +187,6 @@ public partial class GameService(
             {
                 await _blobStorageService.DeleteImageAsync(blobName);
                 _logger.LogInformation("Successfully deleted image for game: {GameKey}", key);
-
-                _blobStorageService.ClearImageCache(key, _memoryCache);
-                _logger.LogInformation("Cleared cache for deleted game image: {GameKey}", key);
             }
             else
             {
