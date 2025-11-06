@@ -102,11 +102,11 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
     /// </summary>
     [HttpPost]
     [Authorize(Policy = "CanManageBusinessEntities")]
-    public async Task<IActionResult> CreatePublisher([FromBody] PublisherCreateRequestDto publisherRequest)
+    public async Task<IActionResult> CreatePublisher([FromBody] PublisherMetadataCreateRequestDto publisherRequest)
     {
         try
         {
-            if (publisherRequest == null)
+            if (publisherRequest?.Publisher == null)
             {
                 return BadRequest(new ErrorResponseModel
                 {
@@ -117,14 +117,14 @@ public class PublishersController(IPublisherService publisherService, ILogger<Pu
 
             _logger.LogInformation(
                 "Creating publisher with Name: {PublisherName} by user: {User}",
-                publisherRequest.CompanyName,
+                publisherRequest.Publisher.CompanyName,
                 User.GetUserEmail());
 
-            var createdPublisher = await _publisherService.AddPublisherAsync(publisherRequest);
+            var createdPublisher = await _publisherService.AddPublisherAsync(publisherRequest.Publisher);
 
             _logger.LogInformation(
                 "Successfully created publisher with Name: {PublisherName}",
-                publisherRequest.CompanyName);
+                publisherRequest.Publisher.CompanyName);
 
             return Ok(createdPublisher);
         }

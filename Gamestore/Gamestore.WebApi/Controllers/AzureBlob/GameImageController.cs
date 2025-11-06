@@ -17,30 +17,27 @@ public class GameImageController(
     private readonly IMemoryCache _memoryCache = memoryCache;
     private readonly ILogger<GameImageController> _logger = logger;
 
-    /// <summary>
-    /// US4 - Get game image endpoint
-    /// Epic 10: Everyone can view game images
-    /// NFR2: Implements caching for image retrieval.
-    /// </summary>
     [HttpGet("games/{key}/image")]
     [AllowAnonymous]
-    [ResponseCache(Duration = 3600, Location = ResponseCacheLocation.Any)]
     public async Task<IActionResult> GetGameImage(string key)
     {
         try
         {
             var cacheKey = $"game-image-{key}";
 
-            // Try to get from cache
 #nullable enable
             if (_memoryCache.TryGetValue(cacheKey, out byte[]? cachedImage) && cachedImage != null)
             {
                 _logger.LogInformation("Returning cached image for game: {GameKey}", key);
+
+                var etag = $"\"{key}-{DateTime.UtcNow:yyyy-MM-dd-HH}\"";
+                Response.Headers.ETag = etag;
+                Response.Headers.CacheControl = "public, max-age=300";
+
                 return File(cachedImage, "image/jpeg");
             }
 #nullable disable
 
-            // Get from blob storage
             var blobName = _blobStorageService.GetBlobNameFromGameKey(key);
             var imageBytes = await _blobStorageService.GetImageAsync(blobName);
 
@@ -54,14 +51,18 @@ public class GameImageController(
                 });
             }
 
-            // Cache the image
             var cacheOptions = new MemoryCacheEntryOptions()
-                .SetAbsoluteExpiration(TimeSpan.FromMinutes(60))
+                .SetAbsoluteExpiration(TimeSpan.FromMinutes(5))
                 .SetPriority(CacheItemPriority.Normal);
 
             _memoryCache.Set(cacheKey, imageBytes, cacheOptions);
 
             _logger.LogInformation("Successfully retrieved and cached image for game: {GameKey}", key);
+
+            var etagNew = $"\"{key}-{DateTime.UtcNow:yyyy-MM-dd-HH}\"";
+            Response.Headers.ETag = etagNew;
+            Response.Headers.CacheControl = "public, max-age=300";
+
             return File(imageBytes, "image/jpeg");
         }
         catch (Exception ex)

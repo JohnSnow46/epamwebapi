@@ -2,6 +2,7 @@
 using Azure.Storage.Blobs.Models;
 using Gamestore.Services.Configuration;
 using Gamestore.Services.Interfaces;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp;
@@ -25,7 +26,6 @@ public class BlobStorageService : IBlobStorageService
         var blobServiceClient = new BlobServiceClient(_settings.ConnectionString);
         _containerClient = blobServiceClient.GetBlobContainerClient(_settings.ContainerName);
 
-        // Ensure container exists
         _containerClient.CreateIfNotExists(PublicAccessType.Blob);
     }
 
@@ -33,21 +33,17 @@ public class BlobStorageService : IBlobStorageService
     {
         try
         {
-            // Remove data:image/...;base64, prefix if present
             var base64Data = base64Image.Contains(',')
                 ? base64Image.Split(',')[1]
                 : base64Image;
 
             var imageBytes = Convert.FromBase64String(base64Data);
 
-            // Validate and optimize image
             var optimizedImage = await OptimizeImageAsync(imageBytes);
 
-            // Generate blob name
             var blobName = GetBlobNameFromGameKey(gameKey);
             var blobClient = _containerClient.GetBlobClient(blobName);
 
-            // Upload to Azure Blob Storage
             using var stream = new MemoryStream(optimizedImage);
 
             await blobClient.UploadAsync(
@@ -120,15 +116,26 @@ public class BlobStorageService : IBlobStorageService
 
     public string GetBlobNameFromGameKey(string gameKey)
     {
-        // Create a unique blob name based on game key
         return $"{gameKey.ToLower()}.jpg";
+    }
+
+    public void ClearImageCache(string gameKey, IMemoryCache memoryCache)
+    {
+        try
+        {
+            var cacheKey = $"game-image-{gameKey}";
+            memoryCache.Remove(cacheKey);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error clearing cache for game: {GameKey}", gameKey);
+        }
     }
 
     private static async Task<byte[]> OptimizeImageAsync(byte[] imageBytes)
     {
         using var image = await Image.LoadAsync(new MemoryStream(imageBytes));
 
-        // Resize if too large (max 1920x1080)
         if (image.Width > 1920 || image.Height > 1080)
         {
             image.Mutate(x => x.Resize(new ResizeOptions
@@ -138,7 +145,6 @@ public class BlobStorageService : IBlobStorageService
             }));
         }
 
-        // Convert to JPEG with quality optimization
         using var outputStream = new MemoryStream();
         await image.SaveAsJpegAsync(outputStream, new SixLabors.ImageSharp.Formats.Jpeg.JpegEncoder
         {

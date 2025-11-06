@@ -11,4 +11,6 @@ public interface IBlobStorageService
     Task<bool> ImageExistsAsync(string blobName);
 
     string GetBlobNameFromGameKey(string gameKey);
+
+    void ClearImageCache(string gameKey, Microsoft.Extensions.Caching.Memory.IMemoryCache memoryCache);
 }

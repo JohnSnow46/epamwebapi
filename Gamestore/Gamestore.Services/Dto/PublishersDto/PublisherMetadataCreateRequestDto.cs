@@ -1,6 +1,9 @@
-﻿namespace Gamestore.Services.Dto.PublishersDto;
+﻿using System.Text.Json.Serialization;
+
+namespace Gamestore.Services.Dto.PublishersDto;
 
 public class PublisherMetadataCreateRequestDto
 {
-    public PublisherMetadataCreateRequestDto Publisher { get; set; }
+    [JsonPropertyName("publisher")]
+    public PublisherCreateRequestDto Publisher { get; set; } = new();
 }
