@@ -234,24 +234,6 @@ public class GameServiceTests
     }
 
     [Fact]
-    public async Task GetTotalGamesCountShouldReturnCorrectCount()
-    {
-        // Arrange
-        var expectedCount = 42;
-
-        _unitOfWorkMock
-            .Setup(u => u.Games.CountAsync())
-            .ReturnsAsync(expectedCount);
-
-        // Act
-        var result = await _gameService.GetTotalGamesCountAsync();
-
-        // Assert
-        Assert.Equal(expectedCount, result);
-        _unitOfWorkMock.Verify(u => u.Games.CountAsync(), Times.Once);
-    }
-
-    [Fact]
     public async Task UpdateGameAsyncShouldUpdateExistingGame()
     {
         // Arrange

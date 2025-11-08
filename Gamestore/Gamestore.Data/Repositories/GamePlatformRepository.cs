@@ -41,4 +41,9 @@ public class GamePlatformRepository(GameCatalogDbContext context) : Repository<P
             .Where(gp => gp.PlatformId == platformId)
             .ToListAsync();
     }
+
+    public async Task AddAsync(GamePlatform gamePlatform)
+    {
+        await _context.GamePlatforms.AddAsync(gamePlatform);
+    }
 }

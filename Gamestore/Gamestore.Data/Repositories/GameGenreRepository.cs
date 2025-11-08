@@ -41,4 +41,9 @@ public class GameGenreRepository(GameCatalogDbContext context) : Repository<Genr
             .Where(gg => gg.GenreId == genreId)
             .ToListAsync();
     }
+
+    public async Task AddAsync(GameGenre gameGenre)
+    {
+        await _context.GameGenres.AddAsync(gameGenre);
+    }
 }

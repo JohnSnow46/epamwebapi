@@ -11,6 +11,7 @@ using Gamestore.Services.Services.AzureBlob;
 using Gamestore.Services.Services.Business;
 using Gamestore.Services.Services.Community;
 using Gamestore.Services.Services.Filters;
+using Gamestore.Services.Services.SeedTest;
 using Gamestore.WebApi.Logging;
 using Gamestore.WebApi.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -37,6 +38,12 @@ var app = builder.Build();
 // Configure middleware pipeline
 await ConfigureMiddlewarePipeline(app);
 
+// SeedService
+// using (var scope = app.Services.CreateScope())
+// {
+//    var seedService = scope.ServiceProvider.GetRequiredService<SeedService>();
+//    await seedService.SeedGamesAsync(100000);
+// }
 app.Run();
 
 // Configuration Methods
@@ -269,6 +276,9 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
 
     // Add Response Caching
     builder.Services.AddResponseCaching();
+
+    // SeedService
+    builder.Services.AddScoped<SeedService>();
 }
 
 static void ConfigureExternalAuthService(WebApplicationBuilder builder)
