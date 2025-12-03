@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using Gamestore.Data.Interfaces;
 using Gamestore.Entities.Business;
+using Gamestore.Services.Caching;
 using Gamestore.Services.Dto.GamesDto;
 using Gamestore.Services.Interfaces;
 using Microsoft.Extensions.Logging;
@@ -12,11 +13,13 @@ namespace Gamestore.Services.Services.Business;
 public partial class GameService(
     IUnitOfWork unitOfWork,
     ILogger<GameService> logger,
+    ICacheService cacheService,
     IBlobStorageService blobStorageService) : IGameService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly ILogger<GameService> _logger = logger;
     private readonly IBlobStorageService _blobStorageService = blobStorageService;
+    private readonly ICacheService _cacheService = cacheService;
 
     /// <summary>
     /// Adds a new game with associated genres and platforms.
@@ -66,6 +69,13 @@ public partial class GameService(
         }
 
         await _unitOfWork.CompleteAsync();
+
+        // INVALIDATE CACHE
+        _logger.LogInformation("Invalidating cache after creating game");
+        _cacheService.RemoveMultiple(
+            CacheKeys.AllGames,
+            CacheKeys.AllGamesCount);
+
         return gameRequest;
     }
 
@@ -122,6 +132,25 @@ public partial class GameService(
         await _unitOfWork.CompleteAsync();
         _logger.LogInformation("Game updated successfully with ID: {GameId}", existingGame.Id);
 
+        // INVALIDATE CACHE
+        _logger.LogInformation("Invalidating cache after updating game '{GameKey}'", key);
+        _cacheService.RemoveMultiple(
+            CacheKeys.AllGames,
+            CacheKeys.GameByKey(key),
+            CacheKeys.GameById(existingGame.Id));
+
+        // Invalidate genre cache
+        foreach (var genre in existingGame.GameGenres ?? Enumerable.Empty<GameGenre>())
+        {
+            _cacheService.Remove(CacheKeys.GamesByGenre(genre.GenreId));
+        }
+
+        // Invalidate platform cache
+        foreach (var platform in existingGame.GamePlatforms ?? Enumerable.Empty<GamePlatform>())
+        {
+            _cacheService.Remove(CacheKeys.GamesByPlatform(platform.PlatformId));
+        }
+
         return new GameUpdateRequestDto
         {
             Id = existingGame.Id,
@@ -143,6 +172,15 @@ public partial class GameService(
         _logger.LogInformation("Starting get game operation by key: {GameKey}", key);
 
         ValidateString(key, "Game key");
+
+        // CHECK CACHE
+        string cacheKey = CacheKeys.GameByKey(key);
+        if (_cacheService.TryGetValue(cacheKey, out GameUpdateRequestDto cachedGame))
+        {
+            _logger.LogInformation("Retrieved game '{GameKey}' from cache", key);
+            return cachedGame;
+        }
+
         var existingGame = await GetGameByKeyOrNull(key);
 
         if (existingGame == null)
@@ -152,6 +190,12 @@ public partial class GameService(
 
         var gameDetails = MapToGameDtoUpdate(existingGame);
         _logger.LogInformation("Successfully retrieved game with ID: {GameId}", existingGame.Id);
+
+        // CACHE RESULT
+        _cacheService.Set(
+            cacheKey,
+            gameDetails,
+            CacheKeys.SingleGameCacheDuration);
 
         return gameDetails;
     }
@@ -202,6 +246,32 @@ public partial class GameService(
         await _unitOfWork.Games.DeleteGameByKey(game);
         await _unitOfWork.CompleteAsync();
 
+        // INVALIDATE CACHE
+        _logger.LogInformation("Invalidating cache after deleting game '{GameKey}'", key);
+        _cacheService.RemoveMultiple(
+            CacheKeys.AllGames,
+            CacheKeys.AllGamesCount,
+            CacheKeys.GameByKey(key),
+            CacheKeys.GameById(game.Id));
+
+        // Invalidate genre cache
+        foreach (var genre in game.GameGenres ?? Enumerable.Empty<GameGenre>())
+        {
+            _cacheService.Remove(CacheKeys.GamesByGenre(genre.GenreId));
+        }
+
+        // Invalidate platform cache
+        foreach (var platform in game.GamePlatforms ?? Enumerable.Empty<GamePlatform>())
+        {
+            _cacheService.Remove(CacheKeys.GamesByPlatform(platform.PlatformId));
+        }
+
+        // Invalidate publisher cache
+        if (game.PublisherId.HasValue)
+        {
+            _cacheService.Remove(CacheKeys.GamesByPublisher(game.PublisherId.Value));
+        }
+
         _logger.LogInformation("Successfully deleted game with key: {Key}, ID: {Id}", key, game.Id);
         return game;
     }
@@ -213,11 +283,65 @@ public partial class GameService(
     {
         _logger.LogInformation("Starting get all games operation");
 
+        // CHECK CACHE
+        if (_cacheService.TryGetValue(CacheKeys.AllGames, out IEnumerable<GameCreateRequestDto> cachedGames))
+        {
+            _logger.LogInformation("Retrieved all games from cache");
+            return cachedGames;
+        }
+
+        // FETCH FROM DATABASE
         var games = await _unitOfWork.Games.GetAllAsync();
         var gameList = games.ToList();
 
         _logger.LogInformation("Retrieved {Count} games from database", gameList.Count);
-        return gameList.Select(MapToGameDto);
+        var gameDtos = gameList.Select(MapToGameDto).ToList();
+
+        // CACHE RESULT
+        _cacheService.Set(
+            CacheKeys.AllGames,
+            gameDtos,
+            CacheKeys.GamesCacheDuration);
+
+        return gameDtos;
+    }
+
+    /// <summary>
+    /// Gets image for game (NO cache - always fresh from Azure!).
+    /// </summary>
+    public async Task<byte[]?> GetGameImageAsync(string gameKey)
+    {
+        try
+        {
+            ValidateString(gameKey, "Game key");
+
+            _logger.LogInformation("Retrieving image for game: {GameKey}", gameKey);
+
+            var blobName = _blobStorageService.GetBlobNameFromGameKey(gameKey);
+            var imageExists = await _blobStorageService.ImageExistsAsync(blobName);
+            if (!imageExists)
+            {
+                _logger.LogWarning("Image not found for game: {GameKey}", gameKey);
+                return null;
+            }
+
+            var imageBytes = await _blobStorageService.GetImageAsync(blobName);
+
+            if (imageBytes != null && imageBytes.Length > 0)
+            {
+                _logger.LogInformation(
+                    "Successfully retrieved image for game: {GameKey} ({SizeKB}KB)",
+                    gameKey,
+                    imageBytes.Length / 1024);
+            }
+
+            return imageBytes;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving image for game: {GameKey}", gameKey);
+            throw;
+        }
     }
 
     /// <summary>

@@ -9,6 +9,7 @@ using Gamestore.Services.Services.Auth;
 using Gamestore.Services.Services.Auth.Management;
 using Gamestore.Services.Services.AzureBlob;
 using Gamestore.Services.Services.Business;
+using Gamestore.Services.Services.Caching;
 using Gamestore.Services.Services.Community;
 using Gamestore.Services.Services.Filters;
 using Gamestore.Services.Services.SeedTest;
@@ -270,6 +271,9 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
 
     // Register Blob Storage Service
     builder.Services.AddSingleton<IBlobStorageService, BlobStorageService>();
+
+    // Cache Service
+    builder.Services.AddScoped<ICacheService, MemoryCacheService>();
 
     // Add Memory Cache for image caching
     builder.Services.AddMemoryCache();

@@ -1,5 +1,6 @@
 ﻿using Gamestore.Data.Interfaces;
 using Gamestore.Entities.Business;
+using Gamestore.Services.Caching;
 using Gamestore.Services.Dto.GamesDto;
 using Gamestore.Services.Interfaces;
 using Gamestore.Services.Services.Business;
@@ -17,13 +18,15 @@ public class GameServiceTests
     private readonly Mock<ILogger<GameService>> _loggerMock;
     private readonly GameService _gameService;
     private readonly Mock<IBlobStorageService> _blobStorageServiceMock;
+    private readonly Mock<ICacheService> _cacheServiceMock;
 
     public GameServiceTests()
     {
         _unitOfWorkMock = new Mock<IUnitOfWork>();
         _loggerMock = new Mock<ILogger<GameService>>();
         _blobStorageServiceMock = new Mock<IBlobStorageService>();
-        _gameService = new GameService(_unitOfWorkMock.Object, _loggerMock.Object, _blobStorageServiceMock.Object);
+        _cacheServiceMock = new Mock<ICacheService>();
+        _gameService = new GameService(_unitOfWorkMock.Object, _loggerMock.Object, _cacheServiceMock.Object, _blobStorageServiceMock.Object);
     }
 
     [Fact]
@@ -53,6 +56,14 @@ public class GameServiceTests
                 Discontinued = 10,
             },
         };
+
+        // Cache miss - returns false
+        IEnumerable<GameCreateRequestDto> outGames = null;
+        _cacheServiceMock
+            .Setup(c => c.TryGetValue(
+                CacheKeys.AllGames,
+                out outGames))
+            .Returns(false);
 
         _unitOfWorkMock
             .Setup(u => u.Games.GetAllAsync())
@@ -84,6 +95,14 @@ public class GameServiceTests
             Discontinued = 5,
         };
 
+        // Cache miss
+        GameUpdateRequestDto outGame = null;
+        _cacheServiceMock
+            .Setup(c => c.TryGetValue(
+                It.IsAny<string>(),
+                out outGame))
+            .Returns(false);
+
         _unitOfWorkMock
             .Setup(u => u.Games.GetKeyAsync(gameKey))
             .ReturnsAsync(game);
@@ -103,6 +122,14 @@ public class GameServiceTests
     {
         // Arrange
         var gameKey = "nonexistent-game";
+
+        // Cache miss
+        GameUpdateRequestDto outGame = null;
+        _cacheServiceMock
+            .Setup(c => c.TryGetValue(
+                It.IsAny<string>(),
+                out outGame))
+            .Returns(false);
 
         _unitOfWorkMock
             .Setup(u => u.Games.GetKeyAsync(gameKey))
@@ -223,6 +250,14 @@ public class GameServiceTests
             .Setup(u => u.CompleteAsync())
             .Returns(Task.CompletedTask);
 
+        _blobStorageServiceMock
+            .Setup(b => b.GetBlobNameFromGameKey(gameKey))
+            .Returns($"games/{gameKey}.jpg");
+
+        _blobStorageServiceMock
+            .Setup(b => b.ImageExistsAsync(It.IsAny<string>()))
+            .ReturnsAsync(false);
+
         // Act
         var result = await _gameService.DeleteGameAsync(gameKey);
 
@@ -288,6 +323,14 @@ public class GameServiceTests
         _unitOfWorkMock
             .Setup(u => u.CompleteAsync())
             .Returns(Task.CompletedTask);
+
+        _blobStorageServiceMock
+            .Setup(b => b.GetBlobNameFromGameKey(gameKey))
+            .Returns($"games/{gameKey}.jpg");
+
+        _blobStorageServiceMock
+            .Setup(b => b.ImageExistsAsync(It.IsAny<string>()))
+            .ReturnsAsync(false);
 
         // Act
         var result = await _gameService.UpdateGameAsync(gameKey, updateRequest);

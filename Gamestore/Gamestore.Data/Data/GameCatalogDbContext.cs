@@ -67,6 +67,28 @@ public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options
             .Property(g => g.Discontinued)
             .IsRequired();
 
+        // Epic 11: Performance Indexes
+
+        // Index 1
+        modelBuilder.Entity<Game>()
+            .HasIndex(g => g.PublisherId)
+            .HasDatabaseName("IX_Games_PublisherId");
+
+        // Index 2
+        modelBuilder.Entity<Game>()
+            .HasIndex(g => g.Discontinued)
+            .HasDatabaseName("IX_Games_Discontinued");
+
+        // Index 3
+        modelBuilder.Entity<GameGenre>()
+            .HasIndex(gg => gg.GenreId)
+            .HasDatabaseName("IX_GameGenres_GenreId");
+
+        // Index 4
+        modelBuilder.Entity<GamePlatform>()
+            .HasIndex(gp => gp.PlatformId)
+            .HasDatabaseName("IX_GamePlatforms_PlatformId");
+
         // Game Image
         modelBuilder.Entity<Game>()
             .Property(g => g.ImageUrl)

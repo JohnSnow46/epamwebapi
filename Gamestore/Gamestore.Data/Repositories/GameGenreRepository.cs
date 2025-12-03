@@ -12,6 +12,7 @@ public class GameGenreRepository(GameCatalogDbContext context) : Repository<Genr
     public async Task<List<Genre>> GetByIdsAsync(List<Guid> ids)
     {
         return await _context.Genres
+            .AsNoTracking()
             .Where(p => ids.Contains(p.Id))
             .ToListAsync();
     }
@@ -25,6 +26,7 @@ public class GameGenreRepository(GameCatalogDbContext context) : Repository<Genr
     public async Task<List<GameGenre>> GetByGameIdAsync(Guid gameId)
     {
         return await _context.GameGenres
+            .AsNoTracking()
             .Where(g => g.GameId == gameId)
             .ToListAsync();
     }
@@ -38,6 +40,7 @@ public class GameGenreRepository(GameCatalogDbContext context) : Repository<Genr
     public async Task<IEnumerable<GameGenre>> GetByGenreIdAsync(Guid genreId)
     {
         return await _context.GameGenres
+            .AsNoTracking()
             .Where(gg => gg.GenreId == genreId)
             .ToListAsync();
     }

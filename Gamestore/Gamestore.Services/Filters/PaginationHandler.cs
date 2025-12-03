@@ -21,7 +21,7 @@ public class PaginationHandler(ILogger<PaginationHandler> logger) : GameQueryHan
     /// <param name="games">The list of games to paginate.</param>
     /// <param name="parameters">The filter parameters.</param>
     /// <returns>The paginated game filter result.</returns>
-    public override Task<GameFilterResult> HandleAsync(IEnumerable<Game> games, GameFilterParameters parameters)
+    public override Task<GameFilterResult> HandleAsync(IQueryable<Game> games, GameFilterParameters parameters)
     {
         _logger.LogInformation(
             "Applying pagination with page size: {PageSize}, page: {Page}",

@@ -7,26 +7,29 @@ using Microsoft.Extensions.Logging;
 namespace Gamestore.Services.Services.Filters;
 
 /// <summary>
-/// Service for filtering and managing game queries.
+/// Service for filtering and managing game queries with caching support.
 /// </summary>
 public class GameFilterService : IGameFilterService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ILogger<GameFilterService> _logger;
+    private readonly ICacheService _cacheService;
 
-    // Only keep the first handler in the chain as a field
     private readonly GenreFilterHandler _firstHandler;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="GameFilterService"/> class.
     /// </summary>
     /// <param name="unitOfWork">The unit of work.</param>
+    /// <param name="cacheService">The cache service.</param>
     /// <param name="loggerFactory">The logger factory.</param>
     public GameFilterService(
         IUnitOfWork unitOfWork,
+        ICacheService cacheService,
         ILoggerFactory loggerFactory)
     {
         _unitOfWork = unitOfWork;
+        _cacheService = cacheService;
         _logger = loggerFactory.CreateLogger<GameFilterService>();
 
         // Initialize handlers as local variables
@@ -81,16 +84,34 @@ public class GameFilterService : IGameFilterService
     }
 
     /// <summary>
-    /// Gets filtered games based on the specified parameters.
+    /// Gets filtered games based on the specified parameters with cache support.
     /// </summary>
     /// <param name="parameters">The filter parameters.</param>
     /// <returns>The filtered game result.</returns>
     public async Task<GameFilterResult> GetFilteredGamesAsync(GameFilterParameters parameters)
     {
         _logger.LogInformation("Getting filtered games with parameters: {@Parameters}", parameters);
-        var games = await _unitOfWork.Games.GetAllAsync();
 
-        return await _firstHandler.HandleAsync(games, parameters);
+        // CREATE SIMPLE CACHE KEY
+        string cacheKey = $"filtered_games_{parameters.GetHashCode()}";
+
+        // CHECK CACHE
+        if (_cacheService.TryGetValue(cacheKey, out GameFilterResult cachedResult))
+        {
+            _logger.LogInformation("Retrieved filtered games from cache");
+            return cachedResult;
+        }
+
+        // FETCH AND FILTER GAMES
+        var games = await _unitOfWork.Games.GetAllAsync();
+        var result = await _firstHandler.HandleAsync(games.AsQueryable(), parameters);
+
+        // CACHE RESULT
+        _cacheService.Set(cacheKey, result, TimeSpan.FromMinutes(15));
+
+        _logger.LogInformation("Cached filtered games result");
+
+        return result;
     }
 
     /// <summary>
@@ -111,6 +132,10 @@ public class GameFilterService : IGameFilterService
 
         await _unitOfWork.Games.IncrementViewCountAsync(game.Key);
         await _unitOfWork.CompleteAsync();
+
+        // INVALIDATE FILTER CACHE
+        _logger.LogInformation("Invalidating filter cache");
+        _cacheService.RemoveByPattern("filtered_games_");
 
         _logger.LogInformation("View count incremented successfully for game with key: {GameKey}", gameKey);
     }

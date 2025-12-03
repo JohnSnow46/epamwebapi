@@ -24,4 +24,6 @@ public interface IGameService
     Task<IEnumerable<GameCreateRequestDto>> GetGamesByGenreAsync(Guid genreId);
 
     Task<int> GetTotalGamesCountAsync();
+
+    Task<byte[]?> GetGameImageAsync(string gameKey);
 }
