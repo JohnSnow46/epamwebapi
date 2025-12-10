@@ -29,6 +29,9 @@ public class UnitOfWork : IUnitOfWork
         UserRoles = new UserRoleRepository(_context);
         Permissions = new PermissionRepository(_context);
         RolePermissions = new Repository<RolePermission>(_context);
+
+        // User notficication
+        UserNotifications = new UserNotificationRepository(_context);
     }
 
     // Existing repositories
@@ -58,6 +61,9 @@ public class UnitOfWork : IUnitOfWork
     public IPermissionRepository Permissions { get; }
 
     public IRepository<RolePermission> RolePermissions { get; }
+
+    // User notification
+    public IUserNotificationRepository UserNotifications { get; }
 
     public async Task CompleteAsync()
     {

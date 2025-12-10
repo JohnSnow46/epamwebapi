@@ -12,6 +12,7 @@ using Gamestore.Services.Services.Business;
 using Gamestore.Services.Services.Caching;
 using Gamestore.Services.Services.Community;
 using Gamestore.Services.Services.Filters;
+using Gamestore.Services.Services.Notification;
 using Gamestore.Services.Services.SeedTest;
 using Gamestore.WebApi.Logging;
 using Gamestore.WebApi.Middleware;
@@ -274,6 +275,9 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
 
     // Cache Service
     builder.Services.AddScoped<ICacheService, MemoryCacheService>();
+
+    // Notification services
+    builder.Services.AddScoped<INotificationService, NotificationService>();
 
     // Add Memory Cache for image caching
     builder.Services.AddMemoryCache();

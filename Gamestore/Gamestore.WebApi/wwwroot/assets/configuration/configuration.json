@@ -1,5 +1,5 @@
 {
-  "baseApiUrl": "https://localhost:7091/",
+  "baseApiUrl": "https://localhost:7091/api/",
 
   "getGameImageApiUrl": "games/{key}/image",
   "gamesAllApiUrl": "games/all",
@@ -54,7 +54,7 @@
   "rolePermissionsApiUrl": "roles/{id}/permissions",
   "permissionsApiUrl": "roles/permissions",
 
-  "notificationsApiUrl": "users/notifications",
+  "notificationsApiUrl": "notifications",
   "userNotificationsApiUrl": "users/my/notifications",
   "updateUserNotificationsApiUrl": "users/notifications",
 
