@@ -26,13 +26,6 @@ public class NotificationService(
         var methods = await _unitOfWork.UserNotifications
             .GetUserEnabledNotificationMethodsAsync(userId);
 
-        if (methods.Count == 0)
-        {
-            _logger.LogWarning("User {UserId} has no notification preferences, initializing defaults", userId);
-            await _unitOfWork.UserNotifications.InitializeDefaultPreferencesAsync(userId);
-            return await _unitOfWork.UserNotifications.GetUserEnabledNotificationMethodsAsync(userId);
-        }
-
         return methods;
     }
 
@@ -51,12 +44,6 @@ public class NotificationService(
             .Select(m => m.ToLowerInvariant())
             .Distinct()
             .ToList();
-
-        if (validMethods.Count == 0)
-        {
-            _logger.LogWarning("No valid notification methods provided for user {UserId}", userId);
-            validMethods = NotificationConstants.AvailableMethods;
-        }
 
         // Update preferences
         await _unitOfWork.UserNotifications.UpdateUserNotificationPreferencesAsync(userId, validMethods);

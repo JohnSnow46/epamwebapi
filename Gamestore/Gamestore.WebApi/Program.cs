@@ -287,6 +287,11 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
 
     // SeedService
     builder.Services.AddScoped<SeedService>();
+
+    // Epic 12 US4 - Email Infrastructure
+    builder.Services.AddScoped<IEmailService, EmailService>();
+    builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
+    builder.Services.AddScoped<IOrderNotificationService, OrderNotificationService>();
 }
 
 static void ConfigureExternalAuthService(WebApplicationBuilder builder)

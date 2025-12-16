@@ -18,11 +18,13 @@ namespace Gamestore.WebApi.Controllers.Auth;
 public class UsersController(
     IUserManagementService userManagementService,
     INotificationService notificationService,
+    IEmailService emailService,
     ILogger<UsersController> logger) : ControllerBase
 {
     private readonly IUserManagementService _userManagementService = userManagementService;
     private readonly INotificationService _notificationService = notificationService;
     private readonly ILogger<UsersController> _logger = logger;
+    private readonly IEmailService _emailService = emailService;
 
     /// <summary>
     /// US3 - Get all users endpoint
@@ -344,17 +346,12 @@ public class UsersController(
                 selectedMethods.Count,
                 userEmail);
 
-            return Ok(new UserNotificationMethodsDto
-            {
-                UserId = userId,
-                SelectedMethods = selectedMethods,
-                AvailableMethods = availableMethods,
-                UpdatedAt = DateTime.UtcNow,
-            });
+            return Ok(selectedMethods);
         }
         catch (Exception ex)
         {
-            return HandleException(ex, "Error retrieving user notification preferences");
+            _logger.LogError(ex, "Error retrieving user notification preferences");
+            return Ok(new List<string>());
         }
     }
 
@@ -376,18 +373,6 @@ public class UsersController(
     {
         try
         {
-            // Validate request
-            if (request?.Notifications == null || request.Notifications.Count == 0)
-            {
-                _logger.LogWarning("Empty notification methods list provided");
-                return BadRequest(new ErrorResponseModel
-                {
-                    Message = "At least one notification method must be selected",
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    ErrorId = Guid.NewGuid().ToString(),
-                });
-            }
-
             var userEmail = User.GetUserEmail();
             _logger.LogInformation(
                 "Updating notification preferences for user: {Email}, Methods: {Methods}",
@@ -437,6 +422,22 @@ public class UsersController(
         {
             return HandleException(ex, "Error updating notification preferences");
         }
+    }
+
+    /// <summary>
+    /// Test email sender.
+    /// </summary>
+    [HttpPost("test-email")]
+    [AllowAnonymous]
+    public async Task<IActionResult> TestEmail(string email = "test@example.com")
+    {
+        var sent = await _emailService.SendEmailAsync(
+            email,
+            "Test Email from Game Store",
+            "<h1>Test</h1><p>If you see this, email works! ✅</p>",
+            isHtmlBody: true);
+
+        return Ok(new { success = sent, message = sent ? "Email sent!" : "Failed to send email" });
     }
 
     /// <summary>
