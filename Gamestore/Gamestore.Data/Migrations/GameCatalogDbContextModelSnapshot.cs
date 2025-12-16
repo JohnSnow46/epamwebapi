@@ -250,10 +250,14 @@ namespace Gamestore.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("Discontinued")
+                        .HasDatabaseName("IX_Games_Discontinued");
+
                     b.HasIndex("Key")
                         .IsUnique();
 
-                    b.HasIndex("PublisherId");
+                    b.HasIndex("PublisherId")
+                        .HasDatabaseName("IX_Games_PublisherId");
 
                     b.ToTable("Games");
                 });
@@ -295,7 +299,8 @@ namespace Gamestore.Data.Migrations
 
                     b.HasKey("GameId", "GenreId");
 
-                    b.HasIndex("GenreId");
+                    b.HasIndex("GenreId")
+                        .HasDatabaseName("IX_GameGenres_GenreId");
 
                     b.ToTable("GameGenres");
                 });
@@ -316,7 +321,8 @@ namespace Gamestore.Data.Migrations
 
                     b.HasKey("GameId", "PlatformId");
 
-                    b.HasIndex("PlatformId");
+                    b.HasIndex("PlatformId")
+                        .HasDatabaseName("IX_GamePlatforms_PlatformId");
 
                     b.ToTable("GamePlatforms");
                 });
@@ -367,11 +373,9 @@ namespace Gamestore.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Description")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("HomePage")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -441,6 +445,45 @@ namespace Gamestore.Data.Migrations
                     b.HasIndex("ParentCommentId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("Gamestore.Entities.Notifications.UserNotificationPreference", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<bool>("IsEnabled")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(true);
+
+                    b.Property<string>("NotificationMethod")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETUTCDATE()");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserId", "NotificationMethod")
+                        .IsUnique();
+
+                    b.ToTable("UserNotificationPreferences");
                 });
 
             modelBuilder.Entity("Gamestore.Entities.Auth.RolePermission", b =>

@@ -1,15 +1,15 @@
 {
-  "baseApiUrl": "https://localhost:54262/api/",
+  "baseApiUrl": "https://localhost:7091/api/",
 
   "getGameImageApiUrl": "games/{key}/image",
   "gamesAllApiUrl": "games/all",
   "getGameFileApiUrl": "games/{key}/file",
-  "getPublishedDateOptionsApiUrl": "games-filter/publish-date-options",
-  "getSortingOptionsApiUrl": "games-filter/sorting-options",
-  "getPaggingOptionsApiUrl": "games-filter/pagination-options",
+  "getPublishedDateOptionsApiUrl": "games/publish-date-options",
+  "getSortingOptionsApiUrl": "games/sorting-options",
+  "getPaggingOptionsApiUrl": "games/pagination-options",
   "gameApiUrl": "games/{key}",
   "gameByIdApiUrl": "games/find/{id}",
-  "gamesApiUrl": "games-filter",
+  "gamesApiUrl": "games",
   "gamesByGenreApiUrl": "genres/{id}/games",
   "gamesByPublisherApiUrl": "publishers/{companyname}/games",
   "gamesByPlatformApiUrl": "platforms/{id}/games",
@@ -54,6 +54,10 @@
   "rolePermissionsApiUrl": "roles/{id}/permissions",
   "permissionsApiUrl": "roles/permissions",
 
+  "notificationsApiUrl": "notifications",
+  "userNotificationsApiUrl": "users/my/notifications",
+  "updateUserNotificationsApiUrl": "users/notifications",
+
   "publisherApiUrl": "publishers/{companyname}",
   "publishersApiUrl": "publishers",
   "publisherByGameApiUrl": "games/{key}/publisher",
@@ -61,7 +65,7 @@
   "deletePublisherApiUrl": "publishers/{id}",
   "updatePublisherApiUrl": "publishers",
 
-  "historyApiUrl": "orders/history",
+  "historyApiUrl": "orders/history",  
   "orderApiUrl": "orders/{id}",
   "ordersApiUrl": "orders",
   "orderDetailsApiUrl": "orders/{id}/details",

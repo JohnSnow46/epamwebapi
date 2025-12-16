@@ -36,6 +36,7 @@
   "DeleteUser": "/delete-user",
   "AddUser": "/add-user",
   "Login": "/login",
+  "Notifications": "/Notifications",
 
   "Roles": "/roles",
   "Role": "/role",

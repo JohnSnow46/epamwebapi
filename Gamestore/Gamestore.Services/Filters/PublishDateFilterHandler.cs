@@ -21,7 +21,7 @@ public class PublishDateFilterHandler(ILogger<PublishDateFilterHandler> logger) 
     /// <param name="games">The list of games to filter.</param>
     /// <param name="parameters">The filter parameters.</param>
     /// <returns>The filtered game filter result.</returns>
-    public override async Task<GameFilterResult> HandleAsync(IEnumerable<Game> games, GameFilterParameters parameters)
+    public override async Task<GameFilterResult> HandleAsync(IQueryable<Game> games, GameFilterParameters parameters)
     {
         _logger.LogInformation("Filtering games by publish date");
 

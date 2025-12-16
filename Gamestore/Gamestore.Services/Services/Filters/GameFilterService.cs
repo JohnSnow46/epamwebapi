@@ -104,7 +104,7 @@ public class GameFilterService : IGameFilterService
 
         // FETCH AND FILTER GAMES
         var games = await _unitOfWork.Games.GetAllAsync();
-        var result = await _firstHandler.HandleAsync(games, parameters);
+        var result = await _firstHandler.HandleAsync(games.AsQueryable(), parameters);
 
         // CACHE RESULT
         _cacheService.Set(cacheKey, result, TimeSpan.FromMinutes(15));

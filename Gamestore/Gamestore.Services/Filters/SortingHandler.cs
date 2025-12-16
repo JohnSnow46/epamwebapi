@@ -21,7 +21,7 @@ public class SortingHandler(ILogger<SortingHandler> logger) : GameQueryHandlerBa
     /// <param name="games">The list of games to sort.</param>
     /// <param name="parameters">The filter parameters.</param>
     /// <returns>The sorted game filter result.</returns>
-    public override async Task<GameFilterResult> HandleAsync(IEnumerable<Game> games, GameFilterParameters parameters)
+    public override async Task<GameFilterResult> HandleAsync(IQueryable<Game> games, GameFilterParameters parameters)
     {
         _logger.LogInformation("Sorting games by {SortBy}", parameters.SortBy);
 
