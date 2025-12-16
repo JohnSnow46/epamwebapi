@@ -2,6 +2,7 @@
 using Gamestore.Services.Dto.FiltersDto;
 using Gamestore.Services.Dto.GamesDto;
 using Gamestore.Services.Filters.IFilters;
+using Microsoft.EntityFrameworkCore;
 
 namespace Gamestore.Services.Filters;
 
@@ -29,7 +30,7 @@ public abstract class GameQueryHandlerBase : IGameQueryHandler
     /// <param name="games">The list of games to process.</param>
     /// <param name="parameters">The filter parameters.</param>
     /// <returns>The processed game filter result.</returns>
-    public abstract Task<GameFilterResult> HandleAsync(IEnumerable<Game> games, GameFilterParameters parameters);
+    public abstract Task<GameFilterResult> HandleAsync(IQueryable<Game> games, GameFilterParameters parameters);
 
     /// <summary>
     /// Passes the processing to the next handler if one exists.
@@ -37,13 +38,13 @@ public abstract class GameQueryHandlerBase : IGameQueryHandler
     /// <param name="games">The list of games to process.</param>
     /// <param name="parameters">The filter parameters.</param>
     /// <returns>The processed game filter result.</returns>
-    protected async Task<GameFilterResult> PassToNextAsync(IEnumerable<Game> games, GameFilterParameters parameters)
+    protected async Task<GameFilterResult> PassToNextAsync(IQueryable<Game> games, GameFilterParameters parameters)
     {
         return _nextHandler != null
             ? await _nextHandler.HandleAsync(games, parameters)
             : new GameFilterResult
             {
-                Games = games.Select(MapToGameDto).ToList(),
+                Games = (await games.ToListAsync()).Select(MapToGameDto).ToList(),
                 CurrentPage = parameters.Page,
                 TotalPages = 1,
             };

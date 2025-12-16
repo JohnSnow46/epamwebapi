@@ -21,5 +21,5 @@ public interface IGameQueryHandler
     /// <param name="games">The list of games to process.</param>
     /// <param name="parameters">The filter parameters.</param>
     /// <returns>The processed game filter result.</returns>
-    Task<GameFilterResult> HandleAsync(IEnumerable<Game> games, GameFilterParameters parameters);
+    Task<GameFilterResult> HandleAsync(IQueryable<Game> games, GameFilterParameters parameters);
 }

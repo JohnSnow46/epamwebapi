@@ -14,38 +14,39 @@ public class GameImageController(
     private readonly IBlobStorageService _blobStorageService = blobStorageService;
     private readonly ILogger<GameImageController> _logger = logger;
 
-    [HttpGet("games/{key}/image")]
+    [HttpGet("{gameKey}/url")]
     [AllowAnonymous]
-    public async Task<IActionResult> GetGameImage(string key)
+    public async Task<ActionResult<ImageUrlResponse>> GetImageUrl(string gameKey)
     {
         try
         {
-            _logger.LogInformation("Getting image for game: {GameKey}", key);
+            _logger.LogDebug("Requesting image URL for game: {GameKey}", gameKey);
 
-            var blobName = _blobStorageService.GetBlobNameFromGameKey(key);
-            var imageBytes = await _blobStorageService.GetImageAsync(blobName);
+            var url = await _blobStorageService.GetImageUrlAsync(gameKey);
 
-            if (imageBytes == null)
+            if (url == null)
             {
-                _logger.LogWarning("Image not found for game: {GameKey}", key);
-                return NotFound(new ErrorResponseModel
-                {
-                    Message = $"Image not found for game '{key}'",
-                    StatusCode = StatusCodes.Status404NotFound,
-                });
+                _logger.LogWarning("Image not found for game: {GameKey}", gameKey);
+                return NotFound(new { message = "Image not found for this game" });
             }
 
-            _logger.LogInformation("Successfully retrieved image for game: {GameKey}", key);
-            return File(imageBytes, "image/jpeg");
+            // Client-side cache for 10 minutes
+            Response.Headers.CacheControl = "public, max-age=600";
+
+            return Ok(new ImageUrlResponse { Url = url });
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error retrieving image for game: {GameKey}", key);
-            return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponseModel
-            {
-                Message = "An error occurred while retrieving the game image",
-                StatusCode = StatusCodes.Status500InternalServerError,
-            });
+            _logger.LogError(ex, "Error retrieving image URL for game: {GameKey}", gameKey);
+            return StatusCode(500, new { message = "Error retrieving image URL" });
         }
+    }
+
+    public class ImageUrlResponse
+    {
+        /// <summary>
+        /// Public URL to the game image in Azure Blob Storage.
+        /// </summary>
+        public string Url { get; set; } = string.Empty;
     }
 }

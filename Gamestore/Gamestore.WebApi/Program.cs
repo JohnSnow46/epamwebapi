@@ -12,6 +12,8 @@ using Gamestore.Services.Services.Business;
 using Gamestore.Services.Services.Caching;
 using Gamestore.Services.Services.Community;
 using Gamestore.Services.Services.Filters;
+using Gamestore.Services.Services.Notification;
+using Gamestore.Services.Services.SeedTest;
 using Gamestore.WebApi.Logging;
 using Gamestore.WebApi.Middleware;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -38,6 +40,12 @@ var app = builder.Build();
 // Configure middleware pipeline
 await ConfigureMiddlewarePipeline(app);
 
+// SeedService
+// using (var scope = app.Services.CreateScope())
+// {
+//    var seedService = scope.ServiceProvider.GetRequiredService<SeedService>();
+//    await seedService.SeedGamesAsync(100000);
+// }
 app.Run();
 
 // Configuration Methods
@@ -268,11 +276,22 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
     // Cache Service
     builder.Services.AddScoped<ICacheService, MemoryCacheService>();
 
+    // Notification services
+    builder.Services.AddScoped<INotificationService, NotificationService>();
+
     // Add Memory Cache for image caching
     builder.Services.AddMemoryCache();
 
     // Add Response Caching
     builder.Services.AddResponseCaching();
+
+    // SeedService
+    builder.Services.AddScoped<SeedService>();
+
+    // Epic 12 US4 - Email Infrastructure
+    builder.Services.AddScoped<IEmailService, EmailService>();
+    builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
+    builder.Services.AddScoped<IOrderNotificationService, OrderNotificationService>();
 }
 
 static void ConfigureExternalAuthService(WebApplicationBuilder builder)

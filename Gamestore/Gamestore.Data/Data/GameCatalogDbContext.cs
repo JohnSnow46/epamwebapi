@@ -1,6 +1,7 @@
 ﻿using Gamestore.Entities.Auth;
 using Gamestore.Entities.Business;
 using Gamestore.Entities.Community;
+using Gamestore.Entities.Notifications;
 using Microsoft.EntityFrameworkCore;
 
 namespace Gamestore.Data.Data;
@@ -35,6 +36,9 @@ public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options
 
     public DbSet<RolePermission> RolePermissions { get; set; }
 
+    // DbSet for User Notification Preferences (Epic 12)
+    public DbSet<UserNotificationPreference> UserNotificationPreferences { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // ========== EXISTING CONFIGURATIONS (unchanged) ==========
@@ -66,6 +70,28 @@ public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options
         modelBuilder.Entity<Game>()
             .Property(g => g.Discontinued)
             .IsRequired();
+
+        // Epic 11: Performance Indexes
+
+        // Index 1
+        modelBuilder.Entity<Game>()
+            .HasIndex(g => g.PublisherId)
+            .HasDatabaseName("IX_Games_PublisherId");
+
+        // Index 2
+        modelBuilder.Entity<Game>()
+            .HasIndex(g => g.Discontinued)
+            .HasDatabaseName("IX_Games_Discontinued");
+
+        // Index 3
+        modelBuilder.Entity<GameGenre>()
+            .HasIndex(gg => gg.GenreId)
+            .HasDatabaseName("IX_GameGenres_GenreId");
+
+        // Index 4
+        modelBuilder.Entity<GamePlatform>()
+            .HasIndex(gp => gp.PlatformId)
+            .HasDatabaseName("IX_GamePlatforms_PlatformId");
 
         // Game Image
         modelBuilder.Entity<Game>()
@@ -315,6 +341,38 @@ public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options
         modelBuilder.Entity<RolePermission>()
             .Property(rp => rp.GrantedAt)
             .HasDefaultValueSql("GETUTCDATE()");
+
+        modelBuilder.Entity<UserNotificationPreference>()
+    .HasKey(unp => unp.Id);
+
+        modelBuilder.Entity<UserNotificationPreference>()
+            .Property(unp => unp.UserId)
+            .IsRequired();
+
+        modelBuilder.Entity<UserNotificationPreference>()
+            .Property(unp => unp.NotificationMethod)
+            .IsRequired()
+            .HasMaxLength(50);
+
+        modelBuilder.Entity<UserNotificationPreference>()
+            .Property(unp => unp.IsEnabled)
+            .HasDefaultValue(true);
+
+        modelBuilder.Entity<UserNotificationPreference>()
+            .Property(unp => unp.CreatedAt)
+            .HasDefaultValueSql("GETUTCDATE()");
+
+        modelBuilder.Entity<UserNotificationPreference>()
+            .Property(unp => unp.UpdatedAt)
+            .HasDefaultValueSql("GETUTCDATE()");
+
+        // Unique constraint: one preference per user per method
+        modelBuilder.Entity<UserNotificationPreference>()
+            .HasIndex(unp => new { unp.UserId, unp.NotificationMethod })
+            .IsUnique();
+
+        modelBuilder.Entity<UserNotificationPreference>()
+            .HasIndex(unp => unp.UserId);
 
         base.OnModelCreating(modelBuilder);
     }

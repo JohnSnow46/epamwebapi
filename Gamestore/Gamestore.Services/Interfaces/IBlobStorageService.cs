@@ -4,7 +4,7 @@ public interface IBlobStorageService
 {
     Task<string> UploadImageAsync(string base64Image, string gameKey);
 
-    Task<byte[]?> GetImageAsync(string blobName);
+    Task<string?> GetImageUrlAsync(string gameKey);
 
     Task DeleteImageAsync(string blobName);
 

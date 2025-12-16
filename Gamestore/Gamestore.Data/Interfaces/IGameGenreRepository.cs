@@ -13,4 +13,6 @@ public interface IGameGenreRepository
     Task<List<GameGenre>> GetByGameIdAsync(Guid gameId);
 
     Task<IEnumerable<GameGenre>> GetByGenreIdAsync(Guid genreId);
+
+    Task AddAsync(GameGenre gameGenre);
 }
