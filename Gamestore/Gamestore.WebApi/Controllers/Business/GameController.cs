@@ -24,6 +24,28 @@ public class GameController(
     private readonly ILogger<GameController> _logger = logger;
 
     /// <summary>
+    /// Get all games with filters
+    /// GET /api/games.
+    /// </summary>
+    [HttpGet]
+    [OutputCache(Duration = 60)]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllGames()
+    {
+        try
+        {
+            _logger.LogInformation("Getting all games");
+            var games = await _gameService.GetAllGames();
+            _logger.LogInformation("Successfully retrieved all games");
+            return Ok(games);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, "Error retrieving all games");
+        }
+    }
+
+    /// <summary>
     /// Get game by key
     /// GET /api/games/{key}.
     /// </summary>

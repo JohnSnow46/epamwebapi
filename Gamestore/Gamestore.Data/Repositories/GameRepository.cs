@@ -12,7 +12,6 @@ public class GameRepository(GameCatalogDbContext context) : Repository<Game>(con
     public async Task<Game?> GetKeyAsync(string key)
     {
         return await _context.Games
-            .AsNoTracking()
             .Include(g => g.GameGenres)
                 .ThenInclude(gg => gg.Genre)
             .Include(g => g.GamePlatforms)
@@ -32,7 +31,6 @@ public class GameRepository(GameCatalogDbContext context) : Repository<Game>(con
     public async Task<IEnumerable<Game>> GetByPlatformAsync(Guid platformId)
     {
         return await _context.GamePlatforms
-                             .AsNoTracking()
                              .Where(gp => gp.PlatformId == platformId)
                              .Select(gp => gp.Game)
                              .ToListAsync();
@@ -41,7 +39,6 @@ public class GameRepository(GameCatalogDbContext context) : Repository<Game>(con
     public async Task<IEnumerable<Game>> GetByGenreAsync(Guid genreId)
     {
         return await _context.GameGenres
-                             .AsNoTracking()
                              .Where(gg => gg.GenreId == genreId)
                              .Select(gg => gg.Game)
                              .ToListAsync();
@@ -50,7 +47,6 @@ public class GameRepository(GameCatalogDbContext context) : Repository<Game>(con
     public async Task<IEnumerable<Game>> GetByIdsAsync(List<Guid> gameIds)
     {
         return await _context.Games
-            .AsNoTracking()
             .Where(g => gameIds.Contains(g.Id))
             .ToListAsync();
     }
@@ -74,7 +70,6 @@ public class GameRepository(GameCatalogDbContext context) : Repository<Game>(con
     public override async Task<IEnumerable<Game>> GetAllAsync()
     {
         var games = await _context.Games
-            .AsNoTracking()
             .Include(g => g.GameGenres)
                 .ThenInclude(gg => gg.Genre)
             .Include(g => g.GamePlatforms)
@@ -83,16 +78,5 @@ public class GameRepository(GameCatalogDbContext context) : Repository<Game>(con
             .ToListAsync();
 
         return games;
-    }
-
-    public IQueryable<Game> GetAll()
-    {
-        return _context.Games
-            .AsNoTracking()
-            .Include(g => g.GameGenres)
-                .ThenInclude(gg => gg.Genre)
-            .Include(g => g.GamePlatforms)
-                .ThenInclude(gp => gp.Platform)
-            .Include(g => g.Publisher);
     }
 }

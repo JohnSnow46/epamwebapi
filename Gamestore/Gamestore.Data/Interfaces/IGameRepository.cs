@@ -20,7 +20,4 @@ public interface IGameRepository : IRepository<Game>
 
     // ViewCount
     Task IncrementViewCountAsync(string key);
-
-    // Epic 11 - big data.
-    IQueryable<Game> GetAll();
 }

@@ -13,6 +13,4 @@ public interface IGamePlatformRepository
     Task AddRangeAsync(IEnumerable<GamePlatform> gamePlatforms);
 
     Task<IEnumerable<GamePlatform>> GetByPlatformIdAsync(Guid platformId);
-
-    Task AddAsync(GamePlatform gamePlatform);
 }
