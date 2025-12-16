@@ -12,7 +12,6 @@ public class PublisherRepository(GameCatalogDbContext context) : Repository<Publ
     public async Task<Publisher?> GetByCompanyNameAsync(string companyName)
     {
         return await _context.Publishers
-            .AsNoTracking()
             .Include(p => p.Games)
             .FirstOrDefaultAsync(p => p.CompanyName == companyName);
     }
@@ -20,7 +19,6 @@ public class PublisherRepository(GameCatalogDbContext context) : Repository<Publ
     public async Task<IEnumerable<Game>> GetGamesByPublisherIdAsync(Guid publisherId)
     {
         return await _context.Games
-            .AsNoTracking()
             .Where(g => g.PublisherId == publisherId)
             .ToListAsync();
     }

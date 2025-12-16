@@ -33,8 +33,5 @@ public interface IUnitOfWork
 
     IRepository<RolePermission> RolePermissions { get; }
 
-    // User notification
-    IUserNotificationRepository UserNotifications { get; }
-
     Task CompleteAsync();
 }

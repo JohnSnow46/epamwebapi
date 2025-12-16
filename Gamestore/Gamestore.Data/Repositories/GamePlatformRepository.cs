@@ -12,7 +12,6 @@ public class GamePlatformRepository(GameCatalogDbContext context) : Repository<P
     public async Task<List<Platform>> GetByIdsAsync(List<Guid> ids)
     {
         return await _context.Platforms
-            .AsNoTracking()
             .Where(p => ids.Contains(p.Id))
             .ToListAsync();
     }
@@ -26,7 +25,6 @@ public class GamePlatformRepository(GameCatalogDbContext context) : Repository<P
     public async Task<List<GamePlatform>> GetByGameIdAsync(Guid gameId)
     {
         return await _context.GamePlatforms
-            .AsNoTracking()
             .Where(gp => gp.GameId == gameId)
             .ToListAsync();
     }
@@ -40,13 +38,7 @@ public class GamePlatformRepository(GameCatalogDbContext context) : Repository<P
     public async Task<IEnumerable<GamePlatform>> GetByPlatformIdAsync(Guid platformId)
     {
         return await _context.GamePlatforms
-            .AsNoTracking()
             .Where(gp => gp.PlatformId == platformId)
             .ToListAsync();
-    }
-
-    public async Task AddAsync(GamePlatform gamePlatform)
-    {
-        await _context.GamePlatforms.AddAsync(gamePlatform);
     }
 }

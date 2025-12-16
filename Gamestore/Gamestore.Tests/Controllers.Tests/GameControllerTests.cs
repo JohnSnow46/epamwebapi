@@ -98,6 +98,45 @@ public class GameControllerTests
         Assert.NotNull(okResult.Value);
     }
 
+    [Fact]
+    public async Task GetAllGamesShouldReturnGamesList()
+    {
+        // Arrange
+        var games = new List<GameCreateRequestDto>
+        {
+            new()
+            {
+                Name = "Game 1",
+                Key = "game-1",
+                Description = "Description 1",
+                Price = 29.99,
+                UnitInStock = 50,
+                Discount = 0,
+            },
+            new()
+            {
+                Name = "Game 2",
+                Key = "game-2",
+                Description = "Description 2",
+                Price = 39.99,
+                UnitInStock = 75,
+                Discount = 10,
+            },
+        };
+
+        _gameServiceMock
+            .Setup(s => s.GetAllGames())
+            .ReturnsAsync(games);
+
+        // Act
+        var result = await _controller.GetAllGames();
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var returnedGames = Assert.IsAssignableFrom<IEnumerable<GameCreateRequestDto>>(okResult.Value);
+        Assert.Equal(2, returnedGames.Count());
+    }
+
     private void SetupControllerContext()
     {
         var claims = new List<Claim>

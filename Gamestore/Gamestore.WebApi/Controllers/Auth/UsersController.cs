@@ -1,6 +1,5 @@
 ﻿using Gamestore.Entities.ErrorModels;
 using Gamestore.Services.Dto.AuthDto;
-using Gamestore.Services.Dto.NotificationsDto;
 using Gamestore.Services.Interfaces;
 using Gamestore.WebApi.Extensions;
 using Microsoft.AspNetCore.Authorization;
@@ -15,16 +14,10 @@ namespace Gamestore.WebApi.Controllers.Auth;
 /// </summary>
 [ApiController]
 [Route("api")]
-public class UsersController(
-    IUserManagementService userManagementService,
-    INotificationService notificationService,
-    IEmailService emailService,
-    ILogger<UsersController> logger) : ControllerBase
+public class UsersController(IUserManagementService userManagementService, ILogger<UsersController> logger) : ControllerBase
 {
     private readonly IUserManagementService _userManagementService = userManagementService;
-    private readonly INotificationService _notificationService = notificationService;
     private readonly ILogger<UsersController> _logger = logger;
-    private readonly IEmailService _emailService = emailService;
 
     /// <summary>
     /// US3 - Get all users endpoint
@@ -262,182 +255,6 @@ public class UsersController(
         {
             return HandleException(ex, $"Error checking permission: {permission}");
         }
-    }
-
-    /// <summary>
-    /// E12 US1 - Get all available notification methods
-    /// Returns a list of supported notification methods for the system.
-    /// Public endpoint - no authentication required.
-    /// </summary>
-    /// <returns>List of available notification methods: ["sms", "push", "email"]. </returns>
-    /// <response code="200">Successfully retrieved available notification methods. </response>
-    [HttpGet("notifications")]
-    [AllowAnonymous]
-    public async Task<IActionResult> GetNotificationMethods()
-    {
-        try
-        {
-            _logger.LogInformation("Retrieving available notification methods");
-
-            var methods = await _notificationService.GetAvailableNotificationMethodsAsync();
-
-            _logger.LogInformation("Retrieved {Count} available notification methods", methods.Count);
-
-            // Return as array for simplicity (matches Epic 12 specification)
-            return Ok(methods);
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, "Error retrieving available notification methods");
-        }
-    }
-
-    /// <summary>
-    /// E12 US2 - Get current user's notification method preferences
-    /// Returns the notification methods that the authenticated user has enabled.
-    /// Requires JWT authentication.
-    /// </summary>
-    /// <returns>User's notification preference data including selected and available methods. </returns>
-    /// <response code="200">Successfully retrieved user notification preferences. </response>
-    /// <response code="401">Unauthorized - JWT token missing or invalid. </response>
-    /// <response code="404">User not found. </response>
-    [HttpGet("users/my/notifications")]
-    [Authorize]
-    public async Task<IActionResult> GetMyNotificationMethods()
-    {
-        try
-        {
-            var userEmail = User.GetUserEmail();
-            _logger.LogInformation("Retrieving notification preferences for user: {Email}", userEmail);
-
-            // Get all users and find current user by email
-            var users = await _userManagementService.GetAllUsersForManagementAsync();
-            var currentUser = users.FirstOrDefault(u => u.Name == userEmail);
-
-            if (currentUser == null)
-            {
-                _logger.LogWarning("User not found for email: {Email}", userEmail);
-                return NotFound(new ErrorResponseModel
-                {
-                    Message = $"User with email {userEmail} not found",
-                    StatusCode = StatusCodes.Status404NotFound,
-                    ErrorId = Guid.NewGuid().ToString(),
-                });
-            }
-
-            // Extract userId from UserDto.Id
-            if (!Guid.TryParse(currentUser.Id, out var userId))
-            {
-                _logger.LogError("Invalid user ID format: {UserId}", currentUser.Id);
-                return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponseModel
-                {
-                    Message = "Invalid user ID format",
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    ErrorId = Guid.NewGuid().ToString(),
-                });
-            }
-
-            // Retrieve user's selected notification methods
-            var selectedMethods = await _notificationService.GetUserNotificationMethodsAsync(userId);
-            var availableMethods = await _notificationService.GetAvailableNotificationMethodsAsync();
-
-            _logger.LogInformation(
-                "Retrieved {Count} notification preferences for user: {Email}",
-                selectedMethods.Count,
-                userEmail);
-
-            return Ok(selectedMethods);
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error retrieving user notification preferences");
-            return Ok(new List<string>());
-        }
-    }
-
-    /// <summary>
-    /// E12 US3 - Update current user's notification method preferences
-    /// Allows authenticated user to select which notification methods to receive.
-    /// Requires JWT authentication.
-    /// </summary>
-    /// <param name="request">Request containing list of notification methods to enable. </param>
-    /// <returns>Updated user notification preference data. </returns>
-    /// <response code="200">Successfully updated notification preferences. </response>
-    /// <response code="400">Bad request - invalid notification methods or empty list. </response>
-    /// <response code="401">Unauthorized - JWT token missing or invalid. </response>
-    /// <response code="404">User not found. </response>
-    [HttpPut("users/notifications")]
-    [Authorize]
-    public async Task<IActionResult> UpdateNotificationMethods(
-        [FromBody] UpdateUserNotificationMethodsRequestDto request)
-    {
-        try
-        {
-            var userEmail = User.GetUserEmail();
-            _logger.LogInformation(
-                "Updating notification preferences for user: {Email}, Methods: {Methods}",
-                userEmail,
-                string.Join(", ", request.Notifications));
-
-            // Get all users and find current user by email
-            var users = await _userManagementService.GetAllUsersForManagementAsync();
-            var currentUser = users.FirstOrDefault(u => u.Name == userEmail);
-
-            if (currentUser == null)
-            {
-                _logger.LogWarning("User not found for email: {Email}", userEmail);
-                return NotFound(new ErrorResponseModel
-                {
-                    Message = $"User with email {userEmail} not found",
-                    StatusCode = StatusCodes.Status404NotFound,
-                    ErrorId = Guid.NewGuid().ToString(),
-                });
-            }
-
-            // Extract userId from UserDto.Id
-            if (!Guid.TryParse(currentUser.Id, out var userId))
-            {
-                _logger.LogError("Invalid user ID format: {UserId}", currentUser.Id);
-                return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponseModel
-                {
-                    Message = "Invalid user ID format",
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    ErrorId = Guid.NewGuid().ToString(),
-                });
-            }
-
-            // Update notification preferences
-            var result = await _notificationService.UpdateUserNotificationMethodsAsync(
-                userId,
-                request.Notifications);
-
-            _logger.LogInformation(
-                "Successfully updated notification preferences for user: {Email}. New methods: {Methods}",
-                userEmail,
-                string.Join(", ", result.SelectedMethods));
-
-            return Ok(result);
-        }
-        catch (Exception ex)
-        {
-            return HandleException(ex, "Error updating notification preferences");
-        }
-    }
-
-    /// <summary>
-    /// Test email sender.
-    /// </summary>
-    [HttpPost("test-email")]
-    [AllowAnonymous]
-    public async Task<IActionResult> TestEmail(string email = "test@example.com")
-    {
-        var sent = await _emailService.SendEmailAsync(
-            email,
-            "Test Email from Game Store",
-            "<h1>Test</h1><p>If you see this, email works! ✅</p>",
-            isHtmlBody: true);
-
-        return Ok(new { success = sent, message = sent ? "Email sent!" : "Failed to send email" });
     }
 
     /// <summary>

@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Gamestore.WebApi.Controllers.Filters;
 
 [ApiController]
-[Route("api/games")]
+[Route("api/games-filter")]
 public class GameFilterController(IGameFilterService gameFilterService, ILogger<GameFilterController> logger) : ControllerBase
 {
     private readonly IGameFilterService _gameFilterService = gameFilterService;

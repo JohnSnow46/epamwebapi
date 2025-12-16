@@ -12,7 +12,6 @@ public class CommentRepository(GameCatalogDbContext context) : Repository<Commen
     public async Task<IEnumerable<Comment>> GetCommentsByGameKeyAsync(string gameKey)
     {
         var game = await _context.Games
-            .AsNoTracking()
             .FirstOrDefaultAsync(g => g.Key == gameKey);
 
         return game == null ? Enumerable.Empty<Comment>() : await GetRootCommentsByGameIdAsync(game.Id);
@@ -21,7 +20,6 @@ public class CommentRepository(GameCatalogDbContext context) : Repository<Commen
     public async Task<Comment?> GetCommentByIdAsync(Guid id)
     {
         return await _context.Comments
-            .AsNoTracking()
             .Include(c => c.ChildComments)
             .FirstOrDefaultAsync(c => c.Id == id);
     }
@@ -29,7 +27,6 @@ public class CommentRepository(GameCatalogDbContext context) : Repository<Commen
     public async Task<IEnumerable<Comment>> GetRootCommentsByGameIdAsync(Guid gameId)
     {
         return await _context.Comments
-            .AsNoTracking()
             .Where(c => c.GameId == gameId && c.ParentCommentId == null)
             .Include(c => c.ChildComments)
             .ToListAsync();
