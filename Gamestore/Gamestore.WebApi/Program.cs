@@ -3,6 +3,7 @@ using System.Text.Json;
 using Gamestore.Data.Data;
 using Gamestore.Data.Interfaces;
 using Gamestore.Data.Repositories;
+using Gamestore.Entities.Notifications;
 using Gamestore.Services.Configuration;
 using Gamestore.Services.Interfaces;
 using Gamestore.Services.Services.Auth;
@@ -292,6 +293,10 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<IEmailService, EmailService>();
     builder.Services.AddScoped<INotificationDispatcher, NotificationDispatcher>();
     builder.Services.AddScoped<IOrderNotificationService, OrderNotificationService>();
+    builder.Services.AddScoped(typeof(IRepository<OrderNotification>), typeof(Repository<OrderNotification>));
+
+    // Basekt
+    builder.Services.AddScoped<IShoppingService, ShoppingService>();
 }
 
 static void ConfigureExternalAuthService(WebApplicationBuilder builder)

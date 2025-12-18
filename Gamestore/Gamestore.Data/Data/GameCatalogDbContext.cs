@@ -39,6 +39,12 @@ public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options
     // DbSet for User Notification Preferences (Epic 12)
     public DbSet<UserNotificationPreference> UserNotificationPreferences { get; set; }
 
+    public DbSet<Order> Orders { get; set; }
+
+    public DbSet<OrderDetail> OrderDetails { get; set; }
+
+    public DbSet<OrderNotification> OrderNotifications { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         // ========== EXISTING CONFIGURATIONS (unchanged) ==========
@@ -373,6 +379,50 @@ public class GameCatalogDbContext(DbContextOptions<GameCatalogDbContext> options
 
         modelBuilder.Entity<UserNotificationPreference>()
             .HasIndex(unp => unp.UserId);
+
+        // Order configuration
+        modelBuilder.Entity<Order>()
+            .HasKey(o => o.Id);
+
+        modelBuilder.Entity<Order>()
+            .Property(o => o.CustomerId)
+            .IsRequired();
+
+        modelBuilder.Entity<Order>()
+            .Property(o => o.Date)
+            .IsRequired();
+
+        modelBuilder.Entity<Order>()
+            .HasMany(o => o.OrderDetails)
+            .WithOne(od => od.Order)
+            .HasForeignKey(od => od.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        // OrderDetail configuration
+        modelBuilder.Entity<OrderDetail>()
+            .HasKey(od => od.Id);
+
+        modelBuilder.Entity<OrderDetail>()
+            .HasOne(od => od.Order)
+            .WithMany(o => o.OrderDetails)
+            .HasForeignKey(od => od.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        modelBuilder.Entity<OrderDetail>()
+            .HasOne(od => od.Game)
+            .WithMany()
+            .HasForeignKey(od => od.ProductId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // OrderNotification (Epic 12)
+        modelBuilder.Entity<OrderNotification>()
+            .HasKey(on => on.Id);
+
+        modelBuilder.Entity<OrderNotification>()
+            .HasOne(on => on.Order)
+            .WithMany(o => o.OrderNotifications)
+            .HasForeignKey(on => on.OrderId)
+            .OnDelete(DeleteBehavior.Cascade);
 
         base.OnModelCreating(modelBuilder);
     }

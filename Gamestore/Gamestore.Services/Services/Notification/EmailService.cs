@@ -1,117 +1,123 @@
 ﻿using System.Net;
 using System.Net.Mail;
+using System.Text;
 using Gamestore.Services.Interfaces;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace Gamestore.Services.Services.Notification;
 
-/// <summary>
-/// Service for sending emails via SMTP.
-/// Epic 12 US4 - Email notification infrastructure.
-/// </summary>
-public class EmailService(IConfiguration configuration, ILogger<EmailService> logger) : IEmailService
+public class EmailService(
+    IConfiguration configuration,
+    ILogger<EmailService> logger) : IEmailService
 {
     private readonly IConfiguration _configuration = configuration;
     private readonly ILogger<EmailService> _logger = logger;
 
-    /// <summary>
-    /// Send email to recipient.
-    /// </summary>
-    public async Task<bool> SendEmailAsync(string toEmail, string subject, string body, bool isHtmlBody = true)
+    public async Task<bool> SendEmailAsync(string toEmail, string subject, string body, bool isHtmlBody = true, bool isHtml = false)
     {
         try
         {
-            if (string.IsNullOrWhiteSpace(toEmail))
+            var smtpSettings = _configuration.GetSection("EmailSettings");
+            var smtpHost = smtpSettings["SmtpHost"];
+            var smtpPort = int.Parse(smtpSettings["SmtpPort"] ?? "587");
+            var smtpUser = smtpSettings["SmtpUser"];
+            var smtpPassword = smtpSettings["SmtpPassword"];
+            var fromEmail = smtpSettings["FromEmail"];
+
+            if (string.IsNullOrEmpty(smtpHost) || string.IsNullOrEmpty(smtpUser) ||
+            string.IsNullOrEmpty(smtpPassword) || string.IsNullOrEmpty(fromEmail))
             {
-                _logger.LogWarning("SendEmailAsync called with empty recipient email");
+                _logger.LogError("❌ Email settings are not configured properly");
                 return false;
             }
 
-            _logger.LogInformation("Sending email to: {ToEmail}, Subject: {Subject}", toEmail, subject);
+            _logger.LogInformation("Sending email to: {Email}, Subject: {Subject}", toEmail, subject);
 
-            var smtpSettings = _configuration.GetSection("SmtpSettings");
-            var host = smtpSettings["Host"];
-            var port = int.Parse(smtpSettings["Port"] ?? "587");
-            var senderEmail = smtpSettings["SenderEmail"];
-            var senderPassword = smtpSettings["SenderPassword"];
-            var senderName = smtpSettings["SenderName"] ?? "Game Store";
-
-            // For development: if SMTP not configured, log and return success
-            if (string.IsNullOrWhiteSpace(host))
-            {
-                _logger.LogWarning("SMTP not configured, email would be sent to: {ToEmail}", toEmail);
-                return true; // Return true so it doesn't block flow
-            }
-
-            using var client = new SmtpClient(host, port);
+            using var client = new SmtpClient(smtpHost, smtpPort);
             client.EnableSsl = true;
-            client.Credentials = new NetworkCredential(senderEmail, senderPassword);
-            client.Timeout = 10000;
+            client.Credentials = new NetworkCredential(smtpUser, smtpPassword);
 
-            var mailMessage = new MailMessage
-            {
-                From = new MailAddress(senderEmail!, senderName),
-                Subject = subject,
-                Body = body,
-                IsBodyHtml = isHtmlBody,
-            };
+            using var message = new MailMessage(fromEmail, toEmail);
+            message.Subject = subject;
+            message.Body = body;
+            message.IsBodyHtml = isHtmlBody;
 
-            mailMessage.To.Add(toEmail);
-
-            await client.SendMailAsync(mailMessage);
-
-            _logger.LogInformation("Email successfully sent to: {ToEmail}", toEmail);
+            await client.SendMailAsync(message);
+            _logger.LogInformation("✅ Email sent successfully to: {Email}", toEmail);
             return true;
-        }
-        catch (SmtpException ex)
-        {
-            _logger.LogError(ex, "SMTP error sending email to: {ToEmail}", toEmail);
-            return false;
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error sending email to: {ToEmail}", toEmail);
+            _logger.LogError(ex, "❌ Failed to send email to: {Email}", toEmail);
             return false;
         }
     }
 
-    /// <summary>
-    /// Send order notification email.
-    /// </summary>
     public async Task<bool> SendOrderNotificationEmailAsync(string userEmail, string userName, string orderId, string orderStatus, decimal totalPrice)
     {
-        var subject = $"Order {orderId} - Status Update: {orderStatus}";
+        try
+        {
+            var subject = $"Order {orderId} Status Update";
+            var body = BuildOrderNotificationHtml(userName, orderId, orderStatus, totalPrice);
 
-        var body = $@"
-            <h2>Order Status Update</h2>
-            <p>Hello {userName},</p>
-            <p>Your order <strong>#{orderId}</strong> status has been updated to <strong>{orderStatus}</strong>.</p>
-            <p><strong>Total:</strong> ${totalPrice:F2}</p>
-            <p>Thank you for your purchase!</p>
-            <p>Game Store Team</p>
-        ";
-
-        return await SendEmailAsync(userEmail, subject, body, isHtmlBody: true);
+            return await SendEmailAsync(userEmail, subject, body, isHtmlBody: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Failed to send order notification to: {Email}", userEmail);
+            return false;
+        }
     }
 
-    /// <summary>
-    /// Send notification preferences confirmation email.
-    /// </summary>
     public async Task<bool> SendNotificationPreferencesEmailAsync(string userEmail, string userName, List<string> selectedMethods)
     {
-        var subject = "Notification Preferences Updated";
-        var methodsList = string.Join(", ", selectedMethods.Select(m => m.ToUpper()));
+        try
+        {
+            var subject = "Notification Preferences Updated";
+            var body = BuildNotificationPreferencesHtml(userName, selectedMethods);
 
-        var body = $@"
-            <h2>Notification Preferences Updated</h2>
-            <p>Hello {userName},</p>
-            <p>Your notification preferences have been successfully updated.</p>
-            <p><strong>Active notification methods:</strong> {(string.IsNullOrEmpty(methodsList) ? "None (you will not receive notifications)" : methodsList)}</p>
-            <p>You can change these settings anytime in your account preferences.</p>
-            <p>Game Store Team</p>
-        ";
+            return await SendEmailAsync(userEmail, subject, body, isHtmlBody: true);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Failed to send notification preferences email to: {Email}", userEmail);
+            return false;
+        }
+    }
 
-        return await SendEmailAsync(userEmail, subject, body, isHtmlBody: true);
+    private static string BuildOrderNotificationHtml(string userName, string orderId, string orderStatus, decimal totalPrice)
+    {
+        var html = new StringBuilder();
+        html.Append("<html><body style='font-family: Arial, sans-serif;'>");
+        html.Append($"<h2>Your Order Status Updated</h2>");
+        html.Append($"<p>Dear {userName},</p>");
+        html.Append($"<p>Your order <strong>#{orderId}</strong> status has changed to: <strong>{orderStatus}</strong></p>");
+        html.Append($"<p>Total Price: <strong>${totalPrice:F2}</strong></p>");
+        html.Append($"<p>Updated: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC</p>");
+        html.Append("<p>Thank you for your business!</p>");
+        html.Append("</body></html>");
+        return html.ToString();
+    }
+
+    private static string BuildNotificationPreferencesHtml(string userName, List<string> selectedMethods)
+    {
+        var html = new StringBuilder();
+        html.Append("<html><body style='font-family: Arial, sans-serif;'>");
+        html.Append($"<h2>Notification Preferences Updated</h2>");
+        html.Append($"<p>Dear {userName},</p>");
+        html.Append($"<p>Your notification preferences have been successfully updated.</p>");
+        html.Append($"<p><strong>You will now receive notifications via:</strong></p>");
+        html.Append("<ul>");
+
+        foreach (var method in selectedMethods)
+        {
+            html.Append($"<li>{method}</li>");
+        }
+
+        html.Append("</ul>");
+        html.Append("<p>You can change these settings at any time in your profile.</p>");
+        html.Append("</body></html>");
+        return html.ToString();
     }
 }

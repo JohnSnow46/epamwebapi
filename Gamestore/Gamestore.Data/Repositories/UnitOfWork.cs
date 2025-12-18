@@ -2,6 +2,7 @@
 using Gamestore.Data.Interfaces;
 using Gamestore.Entities.Auth;
 using Gamestore.Entities.Business;
+using Gamestore.Entities.Notifications;
 
 namespace Gamestore.Data.Repositories;
 
@@ -32,6 +33,10 @@ public class UnitOfWork : IUnitOfWork
 
         // User notficication
         UserNotifications = new UserNotificationRepository(_context);
+
+        Orders = new Repository<Order>(_context);
+        OrderDetails = new Repository<OrderDetail>(_context);
+        OrderNotifications = new Repository<OrderNotification>(_context);
     }
 
     // Existing repositories
@@ -64,6 +69,12 @@ public class UnitOfWork : IUnitOfWork
 
     // User notification
     public IUserNotificationRepository UserNotifications { get; }
+
+    public IRepository<Order> Orders { get; }
+
+    public IRepository<OrderDetail> OrderDetails { get; }
+
+    public IRepository<OrderNotification> OrderNotifications { get; }
 
     public async Task CompleteAsync()
     {

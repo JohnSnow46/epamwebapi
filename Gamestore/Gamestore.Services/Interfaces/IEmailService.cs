@@ -9,7 +9,7 @@ public interface IEmailService
     /// <summary>
     /// Send email to recipient.
     /// </summary>
-    Task<bool> SendEmailAsync(string toEmail, string subject, string body, bool isHtmlBody = true);
+    Task<bool> SendEmailAsync(string toEmail, string subject, string body, bool isHtmlBody = true, bool isHtml = false);
 
     /// <summary>
     /// Send order notification email.

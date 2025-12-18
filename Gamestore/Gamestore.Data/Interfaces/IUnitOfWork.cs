@@ -1,5 +1,6 @@
 ﻿using Gamestore.Entities.Auth;
 using Gamestore.Entities.Business;
+using Gamestore.Entities.Notifications;
 
 namespace Gamestore.Data.Interfaces;
 
@@ -35,6 +36,12 @@ public interface IUnitOfWork
 
     // User notification
     IUserNotificationRepository UserNotifications { get; }
+
+    IRepository<Order> Orders { get; }
+
+    IRepository<OrderDetail> OrderDetails { get; }
+
+    IRepository<OrderNotification> OrderNotifications { get; }
 
     Task CompleteAsync();
 }

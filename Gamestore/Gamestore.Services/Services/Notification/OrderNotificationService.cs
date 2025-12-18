@@ -1,23 +1,20 @@
-﻿using Gamestore.Services.Interfaces;
+﻿using System.Text;
+using Gamestore.Data.Interfaces;
+using Gamestore.Entities.Notifications;
+using Gamestore.Services.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace Gamestore.Services.Services.Notification;
 
-/// <summary>
-/// Service for handling order notifications.
-/// Epic 12: Notifies managers and order owner on status change.
-/// </summary>
 public class OrderNotificationService(
-    INotificationDispatcher notificationDispatcher,
+    IUnitOfWork unitOfWork,
+    IEmailService emailService,
     ILogger<OrderNotificationService> logger) : IOrderNotificationService
 {
-    private readonly INotificationDispatcher _notificationDispatcher = notificationDispatcher;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IEmailService _emailService = emailService;
     private readonly ILogger<OrderNotificationService> _logger = logger;
 
-    /// <summary>
-    /// Notify user and managers when order status changes.
-    /// Epic 12 requirement: Managers and order owner get notifications on status change.
-    /// </summary>
     public async Task NotifyOrderStatusChangedAsync(
         Guid orderId,
         string orderStatus,
@@ -25,110 +22,158 @@ public class OrderNotificationService(
         string userName,
         decimal totalPrice)
     {
+        _logger.LogInformation(
+            "Starting notify order status changed for order: {OrderId}, Status: {Status}", orderId, orderStatus);
+
         try
         {
-            _logger.LogInformation(
-                "Notifying about order {OrderId} status change to {Status} for user {Email}",
-                orderId,
-                orderStatus,
-                userEmail);
+            var emailContent = BuildOrderStatusEmailHtml(orderId, orderStatus, userName, totalPrice);
+            var recipients = new List<string> { userEmail };
 
-            // Get user's notification preferences
-            var userNotificationMethods = await GetUserNotificationMethodsAsync(userEmail);
+            var managers = await GetManagerEmails();
+            recipients.AddRange(managers);
 
-            if (userNotificationMethods.Count == 0)
-            {
-                _logger.LogInformation("User {Email} has no notification methods enabled", userEmail);
-                return;
-            }
-
-            // Send notification via each enabled method
-            foreach (var method in userNotificationMethods)
+            foreach (var email in recipients)
             {
                 try
                 {
-                    await _notificationDispatcher.SendOrderStatusNotificationAsync(
-                        userEmail,
-                        userName,
-                        method,
-                        orderId.ToString(),
-                        orderStatus,
-                        totalPrice);
+                    await _emailService.SendEmailAsync(
+                        email,
+                        $"Order {orderId} Status: {orderStatus}",
+                        emailContent,
+                        isHtml: true);
 
-                    _logger.LogInformation(
-                        "Order status notification sent via {Method} to {Email}",
-                        method,
-                        userEmail);
+                    var notification = new OrderNotification
+                    {
+                        OrderId = orderId,
+                        RecipientEmail = email,
+                        NotificationType = "Email",
+                        SentAt = DateTime.UtcNow,
+                    };
+
+                    await _unitOfWork.OrderNotifications.AddAsync(notification);
+                    _logger.LogInformation("✅ Status notification sent to: {Email}", email);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(
-                        ex,
-                        "Failed to send {Method} notification to {Email}",
-                        method,
-                        userEmail);
-
-                    // Continue with other methods even if one fails
+                    _logger.LogError(ex, "❌ Failed to send status notification to: {Email}", email);
                 }
             }
+
+            await _unitOfWork.CompleteAsync();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error notifying about order status change for order {OrderId}", orderId);
+            _logger.LogError(ex, "❌ Error in NotifyOrderStatusChangedAsync for order: {OrderId}", orderId);
         }
     }
 
-    /// <summary>
-    /// Notify managers about new order.
-    /// </summary>
-    public Task NotifyManagersAboutNewOrderAsync(
+    public async Task NotifyManagersAboutNewOrderAsync(
         Guid orderId,
         string userEmail,
         string userName,
         decimal totalPrice)
     {
+        _logger.LogInformation(
+            "Starting notify managers about new order: {OrderId}",
+            orderId);
+
         try
         {
-            _logger.LogInformation(
-                "Notifying managers about new order {OrderId} from {Email}",
-                orderId,
-                userEmail);
+            var managers = await GetManagerEmails();
 
-            _logger.LogInformation(
-                "📧 New order notification: Order {OrderId} from {UserName} ({Email}), Total: ${Total:F2}",
-                orderId,
-                userName,
-                userEmail,
-                totalPrice);
+            if (managers.Count == 0)
+            {
+                _logger.LogWarning("No managers found to notify about new order: {OrderId}", orderId);
+                return;
+            }
 
-            return Task.CompletedTask;
+            var emailContent = BuildNewOrderManagerEmailHtml(orderId, userEmail, userName, totalPrice);
+
+            foreach (var managerEmail in managers)
+            {
+                try
+                {
+                    await _emailService.SendEmailAsync(
+                        managerEmail,
+                        $"New Order {orderId} from {userName}",
+                        emailContent,
+                        isHtml: true);
+
+                    var notification = new OrderNotification
+                    {
+                        OrderId = orderId,
+                        RecipientEmail = managerEmail,
+                        NotificationType = "Email",
+                        SentAt = DateTime.UtcNow,
+                    };
+
+                    await _unitOfWork.OrderNotifications.AddAsync(notification);
+                    _logger.LogInformation("✅ New order notification sent to manager: {Email}", managerEmail);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "❌ Failed to send new order notification to manager: {Email}", managerEmail);
+                }
+            }
+
+            await _unitOfWork.CompleteAsync();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error notifying managers about order {OrderId}", orderId);
-            return Task.CompletedTask;
+            _logger.LogError(ex, "❌ Error in NotifyManagersAboutNewOrderAsync for order: {OrderId}", orderId);
         }
     }
 
-    /// <summary>
-    /// Get user's enabled notification methods.
-    /// </summary>
-    private Task<List<string>> GetUserNotificationMethodsAsync(string userEmail)
+    private static string BuildOrderStatusEmailHtml(
+        Guid orderId,
+        string orderStatus,
+        string customerName,
+        decimal totalPrice)
+    {
+        var html = new StringBuilder();
+        html.Append("<html><body style='font-family: Arial, sans-serif;'>");
+        html.Append($"<h2>Your Order Status Updated</h2>");
+        html.Append($"<p>Dear {customerName},</p>");
+        html.Append($"<p>Your order <strong>#{orderId}</strong> status: <strong>{orderStatus}</strong></p>");
+        html.Append($"<p>Total Price: <strong>${totalPrice:F2}</strong></p>");
+        html.Append($"<p>Updated: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC</p>");
+        html.Append("<p>Thank you!</p>");
+        html.Append("</body></html>");
+        return html.ToString();
+    }
+
+    private static string BuildNewOrderManagerEmailHtml(
+        Guid orderId,
+        string userEmail,
+        string userName,
+        decimal totalPrice)
+    {
+        var html = new StringBuilder();
+        html.Append("<html><body style='font-family: Arial, sans-serif;'>");
+        html.Append($"<h2>New Order Received</h2>");
+        html.Append($"<p>Order ID: {orderId}</p>");
+        html.Append($"<p>Customer: {userName} ({userEmail})</p>");
+        html.Append($"<p>Total Price: ${totalPrice:F2}</p>");
+        html.Append($"<p>Received: {DateTime.UtcNow:yyyy-MM-dd HH:mm:ss} UTC</p>");
+        html.Append("</body></html>");
+        return html.ToString();
+    }
+
+    private async Task<List<string>> GetManagerEmails()
     {
         try
         {
-            // Find user by email - would need to implement in UserRepository
-            // For now, return empty list if user not found
-            var methods = new List<string>();
-
-            _logger.LogInformation("Retrieved {Count} notification methods for user {Email}", methods.Count, userEmail);
-
-            return Task.FromResult(methods);
+            var managers = await _unitOfWork.Users.GetAllAsync();
+            return managers
+                .Where(u => u.UserRoles.Any(ur => ur.Role.Name is "Manager" or "Admin"))
+                .Select(u => u.Email)
+                .ToList();
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error getting notification methods for user {Email}", userEmail);
-            return Task.FromResult(new List<string>());
+            _logger.LogError(ex, "❌ Error getting manager emails");
+            return new List<string>();
         }
     }
 }
