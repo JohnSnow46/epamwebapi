@@ -75,6 +75,49 @@ public class ShoppingController(
         }
     }
 
+    [HttpGet("orders/payment-methods")]
+    [AllowAnonymous]
+    public IActionResult GetPaymentMethods()
+    {
+        try
+        {
+            _logger.LogInformation("Getting payment methods");
+
+            var paymentMethods = new List<object>
+        {
+            new
+            {
+                title = "Bank",
+                description = "Bank transfer",
+                imageUrl = string.Empty,
+            },
+            new
+            {
+                title = "IBox terminal",
+                description = "Terminal payment",
+                imageUrl = string.Empty,
+            },
+            new
+            {
+                title = "Visa",
+                description = "Credit card payment",
+                imageUrl = string.Empty,
+            },
+        };
+
+            return Ok(new { paymentMethods });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving payment methods");
+            return StatusCode(StatusCodes.Status500InternalServerError, new ErrorResponseModel
+            {
+                Message = "Error retrieving payment methods",
+                StatusCode = StatusCodes.Status500InternalServerError,
+            });
+        }
+    }
+
     private ObjectResult HandleException(Exception ex, string message)
     {
         _logger.LogError(ex, "{Message}", message);

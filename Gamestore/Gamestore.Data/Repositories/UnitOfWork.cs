@@ -35,7 +35,7 @@ public class UnitOfWork : IUnitOfWork
         UserNotifications = new UserNotificationRepository(_context);
 
         Orders = new Repository<Order>(_context);
-        OrderDetails = new Repository<OrderDetail>(_context);
+        OrderDetails = new OrderDetailRepository(_context);
         OrderNotifications = new Repository<OrderNotification>(_context);
     }
 

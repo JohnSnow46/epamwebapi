@@ -255,6 +255,7 @@ static void ConfigureBusinessServices(WebApplicationBuilder builder)
     builder.Services.AddScoped<IPublisherService, PublisherService>();
     builder.Services.AddScoped<ICommentService, CommentService>();
     builder.Services.AddScoped<IGameFilterService, GameFilterService>();
+    builder.Services.AddScoped<IOrderService, OrderService>();
 
     // Data Access
     builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();

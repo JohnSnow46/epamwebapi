@@ -2,6 +2,9 @@
 using Gamestore.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
 
 namespace Gamestore.WebApi.Controllers.AzureBlob;
 
@@ -28,11 +31,7 @@ public class GameImageController(
             if (imageBytes == null)
             {
                 _logger.LogWarning("Image not found for game: {GameKey}", key);
-                return NotFound(new ErrorResponseModel
-                {
-                    Message = $"Image not found for game '{key}'",
-                    StatusCode = StatusCodes.Status404NotFound,
-                });
+                return File(GetPlaceholderImage(), "image/jpeg");
             }
 
             _logger.LogInformation("Successfully retrieved image for game: {GameKey}", key);
@@ -47,5 +46,16 @@ public class GameImageController(
                 StatusCode = StatusCodes.Status500InternalServerError,
             });
         }
+    }
+
+    private static byte[] GetPlaceholderImage()
+    {
+        // Zwróć domyślny obraz (50x50 szary kwadrat lub cokolwiek chcesz)
+        using var image = new Image<Rgba32>(200, 200);
+        image.Mutate(x => x.BackgroundColor(Color.Gray));
+
+        using var stream = new MemoryStream();
+        image.SaveAsJpeg(stream);
+        return stream.ToArray();
     }
 }

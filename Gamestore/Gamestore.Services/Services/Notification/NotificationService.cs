@@ -16,7 +16,7 @@ public class NotificationService(
     public async Task<List<string>> GetAvailableNotificationMethodsAsync()
     {
         _logger.LogInformation("Retrieving available notification methods");
-        return await Task.FromResult(NotificationConstants.AvailableMethods);
+        return await Task.FromResult(NotificationMethodExtensions.GetAvailableMethodsAsStrings());
     }
 
     public async Task<List<string>> GetUserNotificationMethodsAsync(Guid userId)
@@ -38,8 +38,10 @@ public class NotificationService(
             userId,
             string.Join(", ", notificationMethods));
 
+        var availableMethods = NotificationMethodExtensions.GetAvailableMethodsAsStrings();
+
         var validMethods = notificationMethods
-            .Where(m => NotificationConstants.AvailableMethods.Contains(m.ToLowerInvariant()))
+            .Where(m => availableMethods.Contains(m.ToLowerInvariant()))
             .Select(m => m.ToLowerInvariant())
             .Distinct()
             .ToList();
@@ -51,7 +53,7 @@ public class NotificationService(
         {
             UserId = userId,
             SelectedMethods = validMethods,
-            AvailableMethods = NotificationConstants.AvailableMethods,
+            AvailableMethods = availableMethods,
             UpdatedAt = DateTime.UtcNow,
         };
     }

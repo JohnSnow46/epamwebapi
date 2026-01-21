@@ -24,6 +24,27 @@ public class GameController(
     private readonly ILogger<GameController> _logger = logger;
 
     /// <summary>
+    /// Get all games
+    /// GET /api/games/all.
+    /// </summary>
+    [HttpGet("all")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetAllGames()
+    {
+        try
+        {
+            _logger.LogInformation("Getting all games");
+            var games = await _gameService.GetAllGames();
+            _logger.LogInformation("Successfully retrieved {Count} games", games.Count());
+            return Ok(games);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, "Error retrieving all games");
+        }
+    }
+
+    /// <summary>
     /// Get game by key
     /// GET /api/games/{key}.
     /// </summary>
@@ -255,6 +276,34 @@ public class GameController(
         catch (Exception ex)
         {
             return HandleException(ex, $"Error retrieving publisher for game with key: {key}");
+        }
+    }
+
+    /// <summary>
+    /// Get game by ID
+    /// GET /api/games/find/{id}.
+    /// </summary>
+    [HttpGet("find/{id}")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetGameById(Guid id)
+    {
+        try
+        {
+            _logger.LogInformation("Getting game by ID: {GameId}", id);
+
+            var game = await _gameService.GetGameById(id);
+
+            if (game == null)
+            {
+                return ResourceNotFound($"Game with ID '{id}' not found.");
+            }
+
+            _logger.LogInformation("Successfully retrieved game with ID: {GameId}", id);
+            return Ok(game);
+        }
+        catch (Exception ex)
+        {
+            return HandleException(ex, $"Error retrieving game with ID: {id}");
         }
     }
 

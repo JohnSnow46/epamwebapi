@@ -91,7 +91,7 @@ public class AuthController(
                 userRole,
                 request.TargetPage);
 
-            return hasAccess ? Ok(result) : Forbid();
+            return Ok(result);
         }
         catch (Exception ex)
         {
@@ -392,6 +392,7 @@ public class AuthController(
         return targetPage.ToLowerInvariant() switch
         {
             "buy" => userRole != Roles.Guest,
+            "comments" => userRole != Roles.Guest,
             "admin" => userRole == Roles.Administrator,
             "usermanagement" => userRole == Roles.Administrator,
             "rolemanagement" => userRole == Roles.Administrator,
