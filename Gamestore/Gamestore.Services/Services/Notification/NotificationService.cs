@@ -38,14 +38,12 @@ public class NotificationService(
             userId,
             string.Join(", ", notificationMethods));
 
-        // Validate all methods are known
         var validMethods = notificationMethods
             .Where(m => NotificationConstants.AvailableMethods.Contains(m.ToLowerInvariant()))
             .Select(m => m.ToLowerInvariant())
             .Distinct()
             .ToList();
 
-        // Update preferences
         await _unitOfWork.UserNotifications.UpdateUserNotificationPreferencesAsync(userId, validMethods);
         await _unitOfWork.CompleteAsync();
 

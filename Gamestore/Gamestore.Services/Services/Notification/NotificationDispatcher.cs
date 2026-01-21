@@ -75,50 +75,18 @@ public class NotificationDispatcher(IEmailService emailService, ILogger<Notifica
     /// Send SMS notification (FAKED - logged only).
     /// Epic 12: SMS should be faked for now.
     /// </summary>
-    private async Task<bool> SendSmsNotificationAsync(string userEmail, string subject, string message)
+    private Task<bool> SendSmsNotificationAsync(string userEmail, string subject, string message)
     {
-        try
-        {
-            _logger.LogInformation(
-                "📱 [FAKED SMS] To: {Email}, Subject: {Subject}, Message: {Message}",
-                userEmail,
-                subject,
-                message);
-
-            // In real implementation, integrate with SMS provider (Twilio, AWS SNS, etc.)
-            await Task.Delay(100); // Simulate async operation
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error in SendSmsNotificationAsync");
-            return false;
-        }
+        throw new NotImplementedException();
     }
 
     /// <summary>
     /// Send Push notification (FAKED - logged only).
     /// Epic 12: Push notifications should be faked for now.
     /// </summary>
-    private async Task<bool> SendPushNotificationAsync(string userEmail, string subject, string message)
+    private Task<bool> SendPushNotificationAsync(string userEmail, string subject, string message)
     {
-        try
-        {
-            _logger.LogInformation(
-                "🔔 [FAKED PUSH] To: {Email}, Subject: {Subject}, Message: {Message}",
-                userEmail,
-                subject,
-                message);
-
-            // In real implementation, integrate with push notification service (Firebase, OneSignal, etc.)
-            await Task.Delay(100); // Simulate async operation
-            return true;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error in SendPushNotificationAsync");
-            return false;
-        }
+        throw new NotImplementedException();
     }
 
     /// <summary>

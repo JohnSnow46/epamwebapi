@@ -391,6 +391,7 @@ public class AuthController(
     {
         return targetPage.ToLowerInvariant() switch
         {
+            "buy" => userRole != Roles.Guest,
             "admin" => userRole == Roles.Administrator,
             "usermanagement" => userRole == Roles.Administrator,
             "rolemanagement" => userRole == Roles.Administrator,
@@ -414,7 +415,6 @@ public class AuthController(
         string password = string.Empty;
         bool internalAuth = true;
 
-        // Parse different request formats for compatibility
         if (jsonElement.TryGetProperty("model", out var modelProperty))
         {
             email = modelProperty.GetProperty("login").GetString() ?? string.Empty;

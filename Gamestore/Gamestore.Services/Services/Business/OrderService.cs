@@ -164,27 +164,23 @@ public class OrderService(
 
         _logger.LogInformation("✅ Order shipped: {OrderId} at {ShippedDate}", orderId, order.ShippedDate);
 
-        // Launch async notification (fire and forget - doesn't block HTTP response)
-        _ = Task.Run(async () =>
+        try
         {
-            try
+            var customer = await _unitOfWork.Users.GetByIdAsync(Guid.Parse(order.CustomerId));
+            if (customer != null)
             {
-                var customer = await _unitOfWork.Users.GetByIdAsync(Guid.Parse(order.CustomerId));
-                if (customer != null)
-                {
-                    await _notificationService.NotifyOrderStatusChangedAsync(
-                        orderId,
-                        "Shipped",
-                        customer.Email,
-                        customer.FirstName,
-                        0m);
-                }
+                await _notificationService.NotifyOrderStatusChangedAsync(
+                    orderId,
+                    "Shipped",
+                    customer.Email,
+                    customer.FirstName,
+                    0m);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "❌ Failed to send notification for order: {OrderId}", orderId);
-            }
-        });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "❌ Failed to send notification for order: {OrderId}", orderId);
+        }
 
         return new ShipOrderResponse
         {

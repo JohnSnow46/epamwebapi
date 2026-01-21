@@ -15,7 +15,7 @@ public class ShoppingController(
     private readonly IShoppingService _shoppingService = shoppingService;
     private readonly ILogger<ShoppingController> _logger = logger;
 
-    [HttpGet("basket")]
+    [HttpGet("orders/cart")]
     [Authorize]
     public async Task<IActionResult> GetBasket()
     {
@@ -54,7 +54,7 @@ public class ShoppingController(
         }
     }
 
-    [HttpDelete("games/{key}/cancel-buy")]
+    [HttpDelete("orders/cart/{key}")]
     [Authorize]
     public async Task<IActionResult> CancelGameBuy(string key)
     {
